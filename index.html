@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<meta charset="utf-8">
+<html>
+<head>
+    <title>FHM Rink Factory</title>
+    <script type="text/javascript" src="./scripts/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="./scripts/spectrum.js"></script>
+    <script type="text/javascript" src="./scripts/fabric.min.js"></script>
+	<script type="text/javascript" src="./scripts/context_blender.js"></script>
+	<script type="text/javascript" src="./scripts/canvassaver.js"></script>
+	<script type="text/javascript" src="./scripts/modernizr.custom.68502.js"></script>
+	<script type="text/javascript" src="./scripts/jquery.magnific-popup.min.js"></script>
+	<script type="text/javascript" src="./scripts/jquery.mousewheel.min.js"></script>
+	<script type="text/javascript" src="./scripts/jquery.fileDownload.js"></script>
+	<script type="text/javascript" src="./scripts/jquery.html5storage.min.js"></script>
+	<script type="text/javascript" src="./scripts/spin.min.js"></script>
+    <link href='./scripts/rinkfactory.css' rel='stylesheet' type='text/css'>
+	<link href='./scripts/spectrum.css' rel='stylesheet' type='text/css'>
+	<link href='./scripts/menu.css' rel='stylesheet' type='text/css'>
+	<link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
+    <script>
+        var initialColors = {centerLineColor:"#d40000",creaseLineColor:"#d40000",faceOffCircleColor:"#d40000",faceOffDotColor:"#d40000",faceOffTargetColor:"#d40000",blueLineColor:"#0000ff",creaseColor:"#8eb7d8",rinkColor:"#eef0f2"};
+        var defaultTexture = "ice_scratches.png";
+        var prefColorFormat = $.localStorage.getItem('capmaker.color_format');
+		if (!prefColorFormat) {
+			prefColorFormat = "hex";
+		}
+    </script>
+<body>
+<div class="title">
+    <span class="header">Welcome To The FHM Rink Factory!</span>
+</div>
+<div id="page">
+    <div style="width: 1400px; margin:0 auto;">
+        <div class="section group" style="position: relative;">
+            <div class="col span_2_of_3" style="float:left;">
+                <div id="hiddenContainer" style="display:none;">
+                    <canvas id="fabricTexture" width="960" height="448"></canvas>
+                    <canvas id="texture" width="960" height="448"></canvas>
+                    
+                    <canvas id="final" width="960" height="448"></canvas>
+                </div>
+                <div id="canvasContainer" style="width:960px; height:575px;">
+                    <div id="overlay" class="sample"></div>
+                    <canvas id="composite" width="960" height="448" style="position:absolute; top:10; left:10; z-index:1;"></canvas>    
+                    <canvas id="below" width="960" height="448" style="position:absolute; top:10; left:10; z-index:2;"></canvas>
+                    <canvas id="above" width="960" height="448" style="position:absolute; top:10; left:10; z-index:3"></canvas>
+                    <!--<canvas id="guides" width="512" height="512" style="position:absolute; top:10; left:10; z-index:3; display:none;"></canvas>-->
+                    <div id="tipContainer" style="height:60px; padding-top:5px; font-weight:bold;"></div>
+                </div>
+            </div>
+            <div class="col span_1_of_3 " style="float:right; max-height:500px;">
+            <div id="text">
+                <div class="accordion">
+                    <div class="accord-header active-header">Main Rink Elements</div>
+                    <div class="accord-content" style="display:inline-block;">
+                        <table style="width:100%;">
+                            <tr>
+                                <td>
+                                    Team Name: <input type="text" id="teamName">
+                                </td>
+                                <td>Start: <select class="year" id="startYear">
+                                    <option value="0">N/A</option>
+                                </select></td>
+                                <td>End: <select class="year" id="endYear">
+                                    <option value="0">N/A</option>
+                                </select></td>
+                            </tr>	
+                        <table>
+                        <table style="width:100%;">
+							<tr class="color_tr">
+								<td>&nbsp;</td>
+								<td><label>Ice Color: </label></td>
+								<td style="text-align:right;">
+									<input class="baseSelector" type="text" id="rinkColor" data-element="rink_color" data-linkname="rink">
+								</td>
+							</tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    var spinnerOptions = {lines: 13, length: 28, width: 14, radius: 42, scale: 2, corners: 1, color: '#C6011F', opacity: 0.25, rotate: 0, direction: 1, speed: 1, trail: 60, fps: 20, zIndex: 2e9, className: 'spinner', top: '50%', left: '50%', shadow: false, hwaccel: false, position: 'absolute'}
+    var target = document.getElementById('overlay');
+    var spinner = new Spinner(spinnerOptions).spin(target);
+
+    var can = document.getElementById('below')
+    var ctx = can.getContext('2d')
+
+    var can2 = document.getElementById('texture')
+    var texture = can2.getContext('2d')
+
+    var below = new fabric.StaticCanvas('below',{enableRetinaScaling:false});
+
+    var above = new fabric.Canvas('above',{enableRetinaScaling:false});
+
+    initializeCanvas();
+
+    function initializeCanvas() {
+        below.setBackgroundColor(initialColors["rinkColor"], below.renderAll.bind(below))
+        
+        fabric.Image.fromURL("./images/"+defaultTexture, function (img) {
+            above.setBackgroundImage(img, above.renderAll.bind(above), {
+                scaleX: above.width / img.width,
+                scaleY: above.height / img.height
+            })
+        })
+
+        fabric.Image.fromURL("./images/boards.png", function (img) {
+            var overlayImg = img.set({
+                left: 0, 
+                top: 0, 
+                scaleX: above.width / img.width,
+                scaleY: above.height / img.height
+            })
+            above.add(overlayImg);
+        })
+
+        above.renderAll()
+        below.renderAll()
+    }
+
+    $("#rinkColor").spectrum({
+		showInput: true,
+		preferredFormat: prefColorFormat,
+		showInitial: true,
+		showPalette: true,
+		showButtons: true,
+		showSelectionPalette: true,
+		localStorageKey: "spectrum.sweaterfactory",
+		palette: [ ],
+		color: initialColors["rinkColor"],
+		show: function(color) {
+			original_color = color;
+			$(this).data('changed', false);
+		},
+		move: function(color) {
+			$(this).data('changed', true);
+            below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+		},
+		change: function(color) {
+			$(this).data('changed', true);
+			below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+		},
+		hide: function(color) {
+			if ($(this).data('changed')) {
+				below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+			} else {
+                below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
+			}
+		}
+	})
+
+    function getDataUri(url, callback) {
+		var image = new Image();
+		
+		image.onload = function () {
+			var canvas = document.createElement('canvas');
+			canvas.width = this.naturalWidth; // or 'width' if you want a special/scaled size
+			canvas.height = this.naturalHeight; // or 'height' if you want a special/scaled size
+			
+			canvas.getContext('2d').drawImage(this, 0, 0);
+			
+			callback(canvas.toDataURL('image/png'));
+		};
+		
+		image.src = url;
+	}
+    
+</script>
+</head>    
+</html>
