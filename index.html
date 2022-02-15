@@ -19,9 +19,9 @@
 	<link href='./scripts/menu.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
     <script>
-        var initialColors = {centerLineColor:"#d40000",creaseLineColor:"#d40000",faceOffCircleColor:"#d40000",faceOffDotColor:"#d40000",faceOffTargetColor:"#d40000",blueLineColor:"#0000ff",creaseColor:"#8eb7d8",rinkColor:"#eef0f2"};
+        var initialColors = {centerLineColor:"#C8102E",creaseLineColor:"#C8102E",faceOffCircleColor:"#C8102E",faceOffDotColor:"#C8102E",faceOffTargetColor:"#C8102E",blueLineColor:"#0032a0",creaseFillColor:"#41b6e6",creaseStrokeColor:"#C8102E",rinkColor:"#eef0f2",trapezoidFillColor:"#0000ffff",trapezoidStrokeColor:"#C8102E",goalLinesColor:"#C8102E",centerCircleColor:"#0032a0",centerDotColor:"#0032a0",nzFaceOffSpotsColor:"#C8102E",ezFaceOffCirclesColor:"#C8102E",ezFaceOffLinesColor:"#C8102E",ezFaceOffCirclesColor:"#C8102E",ezFaceOffSpotsColor:"#C8102E"};
         var defaultTexture = "ice_scratches.png";
-        var prefColorFormat = $.localStorage.getItem('capmaker.color_format');
+        var prefColorFormat = $.localStorage.getItem('rinkfactory.color_format');
 		if (!prefColorFormat) {
 			prefColorFormat = "hex";
 		}
@@ -75,6 +75,67 @@
 									<input class="baseSelector" type="text" id="rinkColor" data-element="rink_color" data-linkname="rink">
 								</td>
 							</tr>
+                            <tr class="color_tr">
+                                <td>&nbsp;</td>
+                                <td><label>Center Line: </label></td>
+                                <td style="text-align:right;">
+                                    <input class="selector enabledSelector" type="text" id="centerLineColor" data-element="centerLine">
+                                </td>
+                            </tr>
+                            <tr class="color_tr">
+                                <td>&nbsp;</td>
+                                <td><label>Blue Lines: </label></td>
+                                <td style="text-align:right;">
+                                    <input class="selector enabledSelector" type="text" id="blueLineColor" data-element="blueLines">
+                                </td>
+                            </tr>
+                            <tr class="color_tr">
+                                <td>&nbsp;</td>
+                                <td><label>Center Ice: </label></td>
+                                <td style="text-align:right;">
+                                    <input class="selector enabledSelector" type="text" id="centerCircleColor" data-element="centerCircle">
+                                    <input class="selector enabledSelector" type="text" id="centerDotColor" data-element="centerDot">
+                                </td>
+                            </tr>
+                            <tr class="color_tr">
+                                <td>&nbsp;</td>
+                                <td><label>Neutral Zone Face-Off Dots: </label></td>
+                                <td style="text-align:right;">
+                                    <input class="selector enabledSelector" type="text" id="nzFaceOffSpotsColor" data-element="nzFaceOffSpots">
+                                </td>
+                            </tr>
+                            <tr class="color_tr">
+                                <td>&nbsp;</td>
+                                <td><label>End Zone Circles: </label></td>
+                                <td style="text-align:right;">
+                                    <input class="selector enabledSelector" type="text" id="ezFaceOffCirclesColor" data-element="ezFaceOffCircles">
+                                    <input class="selector enabledSelector" type="text" id="ezFaceOffLinesColor" data-element="ezFaceOffLines">
+                                    <input class="selector enabledSelector" type="text" id="ezFaceOffSpotsColor" data-element="ezFaceOffSpots">
+                                </td>
+                            </tr>
+                            <tr class="color_tr">
+                                <td>&nbsp;</td>
+                                <td><label>Goal Lines: </label></td>
+                                <td style="text-align:right;">
+                                    <input class="selector enabledSelector" type="text" id="goalLinesColor" data-element="goalLines">
+                                </td>
+                            </tr>
+                            <tr class="color_tr">
+                                <td>&nbsp</td>
+                                <td><label>Crease: </label></td>
+                                <td style="text-align:right;">
+                                    <input class="multiSelector" type="text" id="creaseFillColor" data-element="creaseFill">
+                                    <input class="multiSelector" type="text" id="creaseStrokeColor" data-element="creaseStroke">
+                                </td>
+                            </tr>
+                            <tr class="color_tr">
+                                <td class="checkCell"><input type="checkbox" class="multiToggle" data-canvas="below" data-id="trapezoid" checked></td>
+                                <td><label>Trapezoid: </label></td>
+                                <td style="text-align:right;">
+                                    <input class="selector enabledSelector" type="text" id="trapezoidFillColor" data-element="trapezoidFill">
+                                    <input class="selector enabledSelector" type="text" id="trapezoidStrokeColor" data-element="trapezoidStroke">
+                                </td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -99,17 +160,54 @@
 
     var above = new fabric.Canvas('above',{enableRetinaScaling:false});
 
+    var filter = new fabric.Image.filters.Blur({
+        blur: 0.5
+    });
+
+    $(document).ready(function() {
+        $(".accordion .accord-header").click(function() {
+			if($(this).next("div").is(":visible")){
+				$(this).next("div").slideUp("fast");
+				$(this).removeClass("active-header").addClass("inactive-header");
+			} else {
+				$(".accordion .accord-content").slideUp("fast");
+				$(this).next("div").slideToggle("fast");
+				$(".active-header").each(function() {
+					$(this).removeClass("active-header").addClass("inactive-header");
+				}) 
+				$(this).removeClass("inactive-header").addClass("active-header");
+			}
+		});
+		$(":checkbox").each(function(e) {
+			if ($(this).is(':checked')) {
+				state = true;
+			} else {
+				state = false;
+			}
+			$(this).parent().parent().find(".enabledSelector").each(function(e) {				
+				if (state == true) {
+					$(this).spectrum('enable');
+				} else {
+					$(this).spectrum('disable');
+				}
+			})
+			$(this).parent().parent().find("input[type=button], input[type=range], select").each(function(e) {
+				if (state == true) {
+					$(this).prop('disabled',false);
+				} else {
+					$(this).prop('disabled',true);
+				}
+			})
+		})
+        //$(".msDropDown").msDropDown();
+    })
+
     initializeCanvas();
 
     function initializeCanvas() {
         below.setBackgroundColor(initialColors["rinkColor"], below.renderAll.bind(below))
         
-        fabric.Image.fromURL("./images/"+defaultTexture, function (img) {
-            above.setBackgroundImage(img, above.renderAll.bind(above), {
-                scaleX: above.width / img.width,
-                scaleY: above.height / img.height
-            })
-        })
+        reRenderBG();
 
         fabric.Image.fromURL("./images/boards.png", function (img) {
             var overlayImg = img.set({
@@ -120,6 +218,120 @@
             })
             above.add(overlayImg);
         })
+
+        centerLine = new fabric.Path("M 478.19727 30.496094 L 478.19727 416.50391 L 482.45117 416.50391 L 482.45117 30.496094 L 478.19727 30.496094 z",{
+			fill: initialColors["centerLineColor"],
+			id: 'centerLine',
+			visible: true,
+			selectable:false
+		});
+
+        centerLineStroke = new fabric.Path("M 476.19727 30.496094 L 476.19727 416.50391 L 480.19727 416.50391 L 480.45117 416.50391 L 484.45117 416.50391 L 484.45117 30.496094 L 480.45117 30.496094 L 480.19727 30.496094 L 476.19727 30.496094 z",{
+			fill: initialColors["rinkColor"],
+			id: 'centerLineStroke',
+			visible: true,
+			selectable:false
+		});
+
+        centerCircle = new fabric.Path("M 480.32227 156.79492 C 443.28967 156.79522 413.23664 186.85021 413.23633 223.88281 C 413.23551 260.91621 443.28887 290.96845 480.32227 290.96875 C 517.35566 290.96845 547.41098 260.91621 547.41016 223.88281 C 547.40985 186.85021 517.35486 156.79522 480.32227 156.79492 z M 480.32617 158.29492 A 65.586461 65.586461 0 0 1 545.91211 223.88086 A 65.586461 65.586461 0 0 1 480.32617 289.46875 A 65.586461 65.586461 0 0 1 414.74023 223.88086 A 65.586461 65.586461 0 0 1 480.32617 158.29492 z",{
+			fill: initialColors["blueLineColor"],
+			id: 'centerCircle',
+			visible: true,
+			selectable:false
+		});
+
+        blueLines = new fabric.Path("M 586.19727 30.496094 L 586.19727 416.50391 L 590.45117 416.50391 L 590.45117 30.496094 L 586.19727 30.496094 z M 368.87109 30.583984 L 368.87109 416.5918 L 373.125 416.5918 L 373.125 30.583984 L 368.87109 30.583984 z",{
+			fill: initialColors["blueLineColor"],
+			id: 'blueLines',
+			visible: true,
+			selectable:false
+		});
+
+        goalLines = new fabric.Path("M 865.84375 30.496094 L 865.84375 416.50391 L 868.84766 416.50391 L 868.84766 30.496094 L 865.84375 30.496094 z M 90.871094 30.583984 L 90.871094 416.5918 L 93.875 416.5918 L 93.875 30.583984 L 90.871094 30.583984 z",{
+			fill: initialColors["centerLineColor"],
+			id: 'goalLines',
+			visible: true,
+			selectable:false
+		});
+
+        trapezoidFill = new fabric.Path("M 43.724609 161.54688 L 42.369141 287.88477 L 92.091797 263.89453 L 92.478516 184.76367 L 44.691406 162.12891 L 43.724609 161.54688 z M 915.125 161.54688 L 914.1582 162.12891 L 866.37109 184.76367 L 866.75781 263.89453 L 916.47852 287.88477 L 915.125 161.54688 z",{
+			fill: 'transparent',
+			id: 'trapezoidFill',
+			visible: true,
+			selectable:false
+        });
+
+        trapezoidStroke = new fabric.Path("M 44.119141 159.37695 L 44.119141 162.18164 L 92.822266 185.02734 L 92.822266 182.22266 L 44.119141 159.37695 z M 914.82227 159.37695 L 866.11914 182.22266 L 866.11914 185.02734 L 914.82227 162.18164 L 914.82227 159.37695 z M 92.822266 261.24023 L 44.119141 284.08594 L 44.119141 286.89062 L 92.822266 264.04492 L 92.822266 261.24023 z M 866.11914 261.24023 L 866.11914 264.04492 L 914.82227 286.89062 L 914.82227 284.08594 L 866.11914 261.24023 z",{
+			fill: initialColors["centerLineColor"],
+			id: 'trapezoidStroke',
+			visible: true,
+			selectable:false
+        });
+
+        nzFaceOffSpots = new fabric.Path("M 392.48438 122.79297 A 5.0880853 5.0880853 0 0 0 387.39648 127.88086 A 5.0880853 5.0880853 0 0 0 392.48438 132.96875 A 5.0880853 5.0880853 0 0 0 397.57227 127.88086 A 5.0880853 5.0880853 0 0 0 392.48438 122.79297 z M 566.48438 122.79297 A 5.0880853 5.0880853 0 0 0 561.39453 127.88086 A 5.0880853 5.0880853 0 0 0 566.48438 132.96875 A 5.0880853 5.0880853 0 0 0 571.57227 127.88086 A 5.0880853 5.0880853 0 0 0 566.48438 122.79297 z M 392.48438 314.79297 A 5.0880853 5.0880853 0 0 0 387.39648 319.88086 A 5.0880853 5.0880853 0 0 0 392.48438 324.9707 A 5.0880853 5.0880853 0 0 0 397.57227 319.88086 A 5.0880853 5.0880853 0 0 0 392.48438 314.79297 z M 566.48438 314.79297 A 5.0880853 5.0880853 0 0 0 561.39453 319.88086 A 5.0880853 5.0880853 0 0 0 566.48438 324.9707 A 5.0880853 5.0880853 0 0 0 571.57227 319.88086 A 5.0880853 5.0880853 0 0 0 566.48438 314.79297 z",{
+			fill: initialColors["centerLineColor"],
+			id: 'nzFaceOffSpots',
+			visible: true,
+			selectable:false
+        });
+
+        ezFaceOffSpots = new fabric.Path("M 180.48438 122.79297 A 5.0880853 5.0880853 0 0 0 175.39648 127.88086 A 5.0880853 5.0880853 0 0 0 180.48438 132.96875 A 5.0880853 5.0880853 0 0 0 185.57227 127.88086 A 5.0880853 5.0880853 0 0 0 180.48438 122.79297 z M 778.48438 122.79297 A 5.0880853 5.0880853 0 0 0 773.39648 127.88086 A 5.0880853 5.0880853 0 0 0 778.48438 132.96875 A 5.0880853 5.0880853 0 0 0 783.57227 127.88086 A 5.0880853 5.0880853 0 0 0 778.48438 122.79297 z M 180.48438 314.79297 A 5.0880853 5.0880853 0 0 0 175.39648 319.88086 A 5.0880853 5.0880853 0 0 0 180.48438 324.9707 A 5.0880853 5.0880853 0 0 0 185.57227 319.88086 A 5.0880853 5.0880853 0 0 0 180.48438 314.79297 z M 778.48438 314.79297 A 5.0880853 5.0880853 0 0 0 773.39648 319.88086 A 5.0880853 5.0880853 0 0 0 778.48438 324.9707 A 5.0880853 5.0880853 0 0 0 783.57227 319.88086 A 5.0880853 5.0880853 0 0 0 778.48438 314.79297 z",{
+			fill: initialColors["centerLineColor"],
+			id: 'ezFaceOffSpots',
+			visible: true,
+			selectable:false
+        });
+
+        ezFaceOffLines = new fabric.Path("M 169.17188 110.79102 L 169.17188 121.15625 L 154.64453 121.15625 L 154.64453 124.30664 L 172.32227 124.30664 L 172.32227 121.15625 L 172.32227 110.79102 L 169.17188 110.79102 z M 188.64453 110.79102 L 188.64453 121.15625 L 188.64453 124.30664 L 191.79492 124.30664 L 206.32227 124.30664 L 206.32227 121.15625 L 191.79492 121.15625 L 191.79492 110.79102 L 188.64453 110.79102 z M 767.17383 110.79102 L 767.17383 121.15625 L 752.64648 121.15625 L 752.64648 124.30664 L 767.17383 124.30664 L 770.32227 124.30664 L 770.32227 121.15625 L 770.32227 110.79102 L 767.17383 110.79102 z M 786.64648 110.79102 L 786.64648 121.15625 L 786.64648 124.30664 L 804.32227 124.30664 L 804.32227 121.15625 L 789.79492 121.15625 L 789.79492 110.79102 L 786.64648 110.79102 z M 154.64453 131.45703 L 154.64453 134.60742 L 169.17188 134.60742 L 169.17188 144.97266 L 172.32227 144.97266 L 172.32227 131.45703 L 154.64453 131.45703 z M 188.64453 131.45703 L 188.64453 144.97266 L 191.79492 144.97266 L 191.79492 134.60742 L 206.32227 134.60742 L 206.32227 131.45703 L 191.79492 131.45703 L 188.64453 131.45703 z M 752.64648 131.45703 L 752.64648 134.60742 L 767.17383 134.60742 L 767.17383 144.97266 L 770.32227 144.97266 L 770.32227 131.45703 L 752.64648 131.45703 z M 786.64648 131.45703 L 786.64648 144.97266 L 789.79492 144.97266 L 789.79492 134.60742 L 804.32227 134.60742 L 804.32227 131.45703 L 789.79492 131.45703 L 786.64648 131.45703 z M 169.17188 302.79102 L 169.17188 313.15625 L 154.64453 313.15625 L 154.64453 316.30664 L 169.17188 316.30664 L 172.32227 316.30664 L 172.32227 313.15625 L 172.32227 302.79102 L 169.17188 302.79102 z M 188.64453 302.79102 L 188.64453 313.15625 L 188.64453 316.30664 L 206.32227 316.30664 L 206.32227 313.15625 L 191.79492 313.15625 L 191.79492 302.79102 L 188.64453 302.79102 z M 767.17383 302.79102 L 767.17383 313.15625 L 752.64648 313.15625 L 752.64648 316.30664 L 767.17383 316.30664 L 770.32227 316.30664 L 770.32227 313.15625 L 770.32227 302.79102 L 767.17383 302.79102 z M 786.64648 302.79102 L 786.64648 316.30664 L 789.79492 316.30664 L 804.32227 316.30664 L 804.32227 313.15625 L 789.79492 313.15625 L 789.79492 302.79102 L 786.64648 302.79102 z M 154.64453 323.45703 L 154.64453 326.60742 L 169.17188 326.60742 L 169.17188 336.97266 L 172.32227 336.97266 L 172.32227 323.45703 L 154.64453 323.45703 z M 188.64453 323.45703 L 188.64453 326.60742 L 188.64453 336.97266 L 191.79492 336.97266 L 191.79492 326.60742 L 206.32227 326.60742 L 206.32227 323.45703 L 188.64453 323.45703 z M 752.64648 323.45703 L 752.64648 326.60742 L 767.17383 326.60742 L 767.17383 336.97266 L 770.32227 336.97266 L 770.32227 323.45703 L 752.64648 323.45703 z M 786.64648 323.45703 L 786.64648 336.97266 L 789.79492 336.97266 L 789.79492 326.60742 L 804.32227 326.60742 L 804.32227 323.45703 L 789.79492 323.45703 L 786.64648 323.45703 z",{
+			fill: initialColors["centerLineColor"],
+			id: 'ezFaceOffLines',
+			visible: true,
+			selectable:false
+        });
+
+        ezFaceOffCircles = new fabric.Path("M 169.17188 53.457031 L 169.17188 61.769531 C 137.54393 67.157183 113.41602 94.732847 113.41602 127.88086 C 113.41602 161.02886 137.54393 188.60638 169.17188 193.99414 L 169.17188 202.30664 L 172.32227 202.30664 L 172.32227 194.45508 C 174.99869 194.78081 177.72094 194.95117 180.48438 194.95117 C 183.24648 194.95117 185.96937 194.7805 188.64453 194.45508 L 188.64453 202.30664 L 191.79492 202.30664 L 191.79492 193.99414 C 223.42399 188.60768 247.55273 161.02997 247.55273 127.88086 C 247.55273 94.731741 223.42399 67.155882 191.79492 61.769531 L 191.79492 53.457031 L 188.64453 53.457031 L 188.64453 61.308594 C 185.96936 60.983173 183.2465 60.8125 180.48438 60.8125 C 177.72092 60.8125 174.9987 60.982866 172.32227 61.308594 L 172.32227 53.457031 L 169.17188 53.457031 z M 767.17383 53.457031 L 767.17383 61.769531 C 735.54494 67.156402 711.41602 94.732184 711.41602 127.88086 C 711.41602 161.02953 735.54494 188.60716 767.17383 193.99414 L 767.17383 202.30664 L 770.32227 202.30664 L 770.32227 194.45508 C 772.99869 194.78081 775.72289 194.95117 778.48633 194.95117 C 781.24911 194.95117 783.97071 194.78066 786.64648 194.45508 L 786.64648 202.30664 L 789.79492 202.30664 L 789.79492 193.99414 C 821.42431 188.60794 845.55273 161.03019 845.55273 127.88086 C 845.55273 94.73152 821.42431 67.155622 789.79492 61.769531 L 789.79492 53.457031 L 786.64648 53.457031 L 786.64648 61.308594 C 783.97069 60.98302 781.24912 60.8125 778.48633 60.8125 C 775.72287 60.8125 772.9987 60.982866 770.32227 61.308594 L 770.32227 53.457031 L 767.17383 53.457031 z M 180.48438 63.962891 A 63.91907 63.91907 0 0 1 244.4043 127.88086 A 63.91907 63.91907 0 0 1 180.48438 191.80078 A 63.91907 63.91907 0 0 1 116.56445 127.88086 A 63.91907 63.91907 0 0 1 180.48438 63.962891 z M 778.48438 63.962891 A 63.91907 63.91907 0 0 1 842.4043 127.88086 A 63.91907 63.91907 0 0 1 778.48438 191.80078 A 63.91907 63.91907 0 0 1 714.56641 127.88086 A 63.91907 63.91907 0 0 1 778.48438 63.962891 z M 169.17188 245.45703 L 169.17188 253.76953 C 137.54393 259.15718 113.41602 286.73285 113.41602 319.88086 C 113.41602 353.02886 137.54393 380.60638 169.17188 385.99414 L 169.17188 394.30664 L 172.32227 394.30664 L 172.32227 386.45508 C 174.99869 386.78081 177.72094 386.95117 180.48438 386.95117 C 183.24648 386.95117 185.96937 386.7805 188.64453 386.45508 L 188.64453 394.30664 L 191.79492 394.30664 L 191.79492 385.99414 C 223.42399 380.60768 247.55273 353.02997 247.55273 319.88086 C 247.55273 286.73174 223.42399 259.15588 191.79492 253.76953 L 191.79492 245.45703 L 188.64453 245.45703 L 188.64453 253.30859 C 185.96936 252.98317 183.2465 252.8125 180.48438 252.8125 C 177.72092 252.8125 174.9987 252.98287 172.32227 253.30859 L 172.32227 245.45703 L 169.17188 245.45703 z M 767.17383 245.45703 L 767.17383 253.76953 C 735.54494 259.1564 711.41602 286.73219 711.41602 319.88086 C 711.41602 353.02953 735.54494 380.60716 767.17383 385.99414 L 767.17383 394.30664 L 770.32227 394.30664 L 770.32227 386.45508 C 772.99869 386.78081 775.72289 386.95117 778.48633 386.95117 C 781.24911 386.95117 783.97071 386.78066 786.64648 386.45508 L 786.64648 394.30664 L 789.79492 394.30664 L 789.79492 385.99414 C 821.42431 380.60794 845.55273 353.03019 845.55273 319.88086 C 845.55273 286.73152 821.42431 259.15562 789.79492 253.76953 L 789.79492 245.45703 L 786.64648 245.45703 L 786.64648 253.30859 C 783.97069 252.98302 781.24912 252.8125 778.48633 252.8125 C 775.72287 252.8125 772.9987 252.98287 770.32227 253.30859 L 770.32227 245.45703 L 767.17383 245.45703 z M 180.48438 255.96289 A 63.91907 63.91907 0 0 1 244.4043 319.88086 A 63.91907 63.91907 0 0 1 180.48438 383.80078 A 63.91907 63.91907 0 0 1 116.56445 319.88086 A 63.91907 63.91907 0 0 1 180.48438 255.96289 z M 778.48438 255.96289 A 63.91907 63.91907 0 0 1 842.4043 319.88086 A 63.91907 63.91907 0 0 1 778.48438 383.80078 A 63.91907 63.91907 0 0 1 714.56641 319.88086 A 63.91907 63.91907 0 0 1 778.48438 255.96289 z",{
+			fill: initialColors["centerLineColor"],
+			id: 'ezFaceOffCircles',
+			visible: true,
+			selectable:false
+        });
+        
+        creaseStroke1 = new fabric.Path("M 93.875 205.37891 L 93.875 208.01953 L 112.77539 208.01953 C 112.77539 208.01953 123.42667 220.89124 112.77539 239.98047 L 93.875 239.98047 L 93.875 242.62109 L 114.32617 242.62109 L 115.08008 241.26953 C 120.71127 231.17724 120.80176 222.38351 119.33984 216.23047 C 117.87792 210.07742 114.81445 206.33789 114.81445 206.33789 L 114.01758 205.37891 L 93.875 205.37891 z M 845.70117 205.37891 L 844.9043 206.33789 C 844.9043 206.33789 841.84082 210.07742 840.37891 216.23047 C 838.91699 222.38351 839.00748 231.17724 844.63867 241.26953 L 845.39258 242.62109 L 865.84375 242.62109 L 865.84375 239.98047 L 846.94336 239.98047 C 836.29208 220.89124 846.94336 208.01953 846.94336 208.01953 L 865.84375 208.01953 L 865.84375 205.37891 L 845.70117 205.37891 z",{
+			fill: initialColors["creaseStrokeColor"],
+			id: 'creaseStroke1',
+			visible: true,
+			selectable:false
+        });
+
+        creaseFill1 = new fabric.Path("M 92.875 207.01953 L 92.875 240.98047 L 113.36328 240.98047 L 113.64844 240.4668 C 115.82642 236.56341 117.1401 232.90377 117.84375 229.53125 C 118.40641 226.83451 118.57674 224.33248 118.48633 222.05273 C 118.41403 220.22967 118.17577 218.55145 117.83984 217.0332 C 117.60924 215.99098 116.18311 210.57097 113.54492 207.38281 L 113.24609 207.01953 L 92.875 207.01953 z M 846.47266 207.01953 L 846.17383 207.38281 C 843.53564 210.57097 842.10951 215.99098 841.87891 217.0332 C 841.54298 218.55145 841.30473 220.22967 841.23242 222.05273 C 841.14202 224.33248 841.31232 226.83451 841.875 229.53125 C 842.57865 232.90377 843.89233 236.56341 846.07031 240.4668 L 846.35547 240.98047 L 866.84375 240.98047 L 866.84375 207.01953 L 846.47266 207.01953 z",{
+			fill: initialColors["creaseFillColor"],
+			id: 'creaseFill1',
+			visible: true,
+			selectable:false
+        });
+
+        centerDot = new fabric.Path("M 480.32422 221.75391 A 2.127 2.127 0 0 0 478.19531 223.88086 A 2.127 2.127 0 0 0 480.32422 226.00977 A 2.127 2.127 0 0 0 482.45117 223.88086 A 2.127 2.127 0 0 0 480.32422 221.75391 z",{
+			fill: initialColors["centerDotColor"],
+			id: 'centerDot',
+			visible: true,
+			selectable:false
+        });
+
+        below.add(centerCircle)
+        below.add(centerLineStroke)
+        below.add(centerLine)
+        below.add(blueLines)
+        below.add(trapezoidFill)
+        below.add(trapezoidStroke)
+        below.add(creaseFill1)
+        below.add(creaseStroke1)
+        below.add(goalLines)
+        below.add(nzFaceOffSpots)
+        below.add(ezFaceOffSpots)
+        below.add(ezFaceOffLines)
+        below.add(ezFaceOffCircles)
+        
+        below.add(centerDot)
 
         above.renderAll()
         below.renderAll()
@@ -133,7 +345,7 @@
 		showButtons: true,
 		showSelectionPalette: true,
 		localStorageKey: "spectrum.sweaterfactory",
-		palette: [ ],
+		palette: [ "#eef0f2" ],
 		color: initialColors["rinkColor"],
 		show: function(color) {
 			original_color = color;
@@ -142,20 +354,250 @@
 		move: function(color) {
 			$(this).data('changed', true);
             below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+            var objects = below.getObjects('path');
+			for (x in objects) {
+				if (objects[x].id == 'centerLineStroke') {
+					objects[x].set('fill', color.toHexString())
+					//objects[x].fill = color.toHexString();
+                    below.renderAll()
+				}
+			}
 		},
 		change: function(color) {
 			$(this).data('changed', true);
 			below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+            var objects = below.getObjects('path');
+			for (x in objects) {
+				if (objects[x].id == 'centerLineStroke') {
+                    objects[x].set('fill', color.toHexString())
+					//objects[x].fill = color.toHexString();
+                    below.renderAll()
+				}
+			}
 		},
 		hide: function(color) {
 			if ($(this).data('changed')) {
 				below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+                var objects = below.getObjects('path');
+                for (x in objects) {
+                    if (objects[x].id == 'centerLineStroke') {
+                        objects[x].set('fill', color.toHexString())
+					    //objects[x].fill = color.toHexString();
+                        below.renderAll()
+                    }
+                }
 			} else {
                 below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
+                var objects = below.getObjects('path');
+                for (x in objects) {
+                    if (objects[x].id == 'centerLineStroke') {
+                        objects[x].set('fill', original_color.toHexString())
+					    //objects[x].fill = color.toHexString();
+                        below.renderAll()
+                    }
+                }
 			}
 		}
 	})
 
+    $(".selector").each(function() {
+		var color = $(this).attr('id');
+		var change = false;
+		if (color == 'transparent') {
+			color = null;
+		}
+		$(this).spectrum({
+			showInput: true,
+			preferredFormat: prefColorFormat,
+			showInitial: true,
+			showPalette: true,
+			showButtons: true,
+			allowEmpty: true,
+			showSelectionPalette: true,
+			localStorageKey: "spectrum.rinkfactory",
+			palette: [ "#C8102E", "#0032a0", "#41b6e6", "#eef0f2" ],
+			color: initialColors[$(this).attr('id')],
+			show: function(color) {
+				var original_color = color;
+                $(this).data('changed', false);
+			},
+			move: function(color) {
+                if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+				var objects = below.getObjects();
+				for (x in objects) {
+                    if (objects[x].id == id) {
+                        objects[x].set('fill', colorX);
+                    } 						
+				}
+				reRenderBG();
+			},
+			change: function(color) {
+                if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+				var objects = below.getObjects();
+				for (x in objects) {
+                    if (objects[x].id == id) {
+                        objects[x].set('fill', colorX);
+                    } 						
+				}
+				reRenderBG();
+			},
+			hide: function(color) {
+                if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+				var objects = below.getObjects();
+				for (x in objects) {
+                    if (objects[x].id == id) {
+                        objects[x].set('fill', colorX);
+                    } 						
+				}
+				reRenderBG();
+			}
+		})
+	})
+
+    $(".multiSelector").each(function() {
+		var color = $(this).attr('id');
+		var change = false;
+		if (color == 'transparent') {
+			color = null;
+		}
+		$(this).spectrum({
+			showInput: true,
+			preferredFormat: prefColorFormat,
+			showInitial: true,
+			showPalette: true,
+			showButtons: true,
+			allowEmpty: true,
+			showSelectionPalette: true,
+			localStorageKey: "spectrum.rinkfactory",
+			palette: [ "#C8102E", "#0032a0", "#41b6e6", "#eef0f2" ],
+			color: initialColors[$(this).attr('id')],
+			show: function(color) {
+				var original_color = color;
+                $(this).data('changed', false);
+			},
+			move: function(color) {
+                var elLength = $(this).data('element').length;
+                if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+                var objects = below.getObjects();
+				for (x in objects) {
+                    if (objects[x].id.substring(0, elLength) == id) {
+                        objects[x].set('fill', colorX);
+                    } 						
+				}
+				reRenderBG();
+			},
+			change: function(color) {
+                var elLength = $(this).data('element').length;
+                if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+                var objects = below.getObjects();
+				for (x in objects) {
+                    if (objects[x].id.substring(0, elLength) == id) {
+                        objects[x].set('fill', colorX);
+                    } 						
+				}
+				reRenderBG();
+			},
+			hide: function(color) {
+                var elLength = $(this).data('element').length;
+                if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+                var objects = below.getObjects();
+				for (x in objects) {
+                    if (objects[x].id.substring(0, elLength) == id) {
+                        objects[x].set('fill', colorX);
+                    } 						
+				}
+				reRenderBG();
+			}
+		})
+	})
+
+    $(".belowTextureToggle").on("click",function() {
+		if ($(this).is(':checked')) {
+			state = true;
+		} else {
+			state = false;
+		}
+		var id = $(this).data("id");
+		var objects = below.getObjects();
+		for (x in objects) {
+			if (objects[x].id == id) {
+				if (state == true) {
+					objects[x].visible = true;
+				} else {
+					objects[x].visible = false;
+				}
+			}
+		}
+		reRenderBG();
+	})
+
+    $(".multiToggle").on("click",function() {
+		if ($(this).is(':checked')) {
+			state = true;
+		} else {
+			state = false;
+		}
+        var elLength = $(this).data("id").length
+		var id = $(this).data("id");
+		var objects = below.getObjects();
+		for (x in objects) {
+			if (objects[x].id.substring(0,elLength) == id) {
+				if (state == true) {
+					objects[x].visible = true;
+				} else {
+					objects[x].visible = false;
+				}
+			}
+		}
+		reRenderBG();
+	})
+
+    function reRenderBG() {
+		below.renderAll();
+		fabric.Image.fromURL("./images/"+defaultTexture, function (img) {
+            above.setBackgroundImage(img, above.renderAll.bind(above), {
+                scaleX: above.width / img.width,
+                scaleY: above.height / img.height
+            })
+        })
+	}
+    
     function getDataUri(url, callback) {
 		var image = new Image();
 		
