@@ -1,10 +1,10 @@
 /*@import url('http://fonts.googleapis.com/css?family=Quicksand:400,700');*/
-@import url(https://fonts.googleapis.com/css?family=Quicksand:400,700|Economica:400,700|Lobster|Pacifico|Kaushan+Script|Courgette|Lobster+Two|Playball|Satisfy|Cookie|Damion|Berkshire+Swash|Oleo+Script|Yellowtail|Lily+Script+One|Grand+Hotel|Leckerli+One|Norican|Engagement|Graduate|Oleo+Script+Swash+Caps|UnifrakturMaguntia|Vibur|Trade+Winds|Condiment|Wellfleet|UnifrakturCook:700|Miniver|Pirata+One|Molle:400italic|New+Rocker|Germania+One|Chela+One|Croissant+One|Metal+Mania|Rubik+Mono+One|Rubik+One|Seymour+One|Rum+Raisin|Wendy+One|Cantora+One|Acme|Jockey+One|Viga);
+@import url(https://fonts.googleapis.com/css?family=Bowlby+One+SC|family=Quicksand:400,700|Economica:400,700|Lobster|Pacifico|Kaushan+Script|Courgette|Lobster+Two|Playball|Satisfy|Cookie|Damion|Berkshire+Swash|Oleo+Script|Yellowtail|Lily+Script+One|Grand+Hotel|Leckerli+One|Norican|Engagement|Graduate|Oleo+Script+Swash+Caps|UnifrakturMaguntia|Vibur|Trade+Winds|Condiment|Wellfleet|UnifrakturCook:700|Miniver|Pirata+One|Molle:400italic|New+Rocker|Germania+One|Chela+One|Croissant+One|Metal+Mania|Rubik+Mono+One|Rubik+One|Seymour+One|Rum+Raisin|Wendy+One|Cantora+One|Acme|Jockey+One|Viga);
 
 body {
 	font-family: "Economica", sans-serif;
 	font-size: 1em;
-	background-image: url("../images/TexturesCom_Ice0044_1_seamless_S.jpg");
+	background-image: url("../images/TexturesCom_Ice0035_1_seamless_S.jpg");
 }
 
 .button {
@@ -38,7 +38,7 @@ td {
 	text-align: center;
 }
 .header {
-	font-family: 'Graduate', sans-serif;
+	font-family: 'Bowlby One SC', sans-serif;
 	color:#FFFFFF;
 	font-size:3em;
 	font-size:2.5vw;
@@ -56,7 +56,7 @@ td {
 
 .title{
 	text-align:center;
-	width:60%;
+	width:52%;
 	margin:0 auto;
 	background:#c6011f;
 	-moz-border-radius:20px;  
@@ -141,7 +141,7 @@ td {
 .accord-content { display: none; }
 
 .question {
-	font-family: 'Graduate', serif;
+	font-family: 'Bowlby One SC', serif;
 	color:#000000;
 	margin-top:10px;
 	display:inline-block;
