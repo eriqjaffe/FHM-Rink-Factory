@@ -3,7 +3,6 @@ function CanvasSaver(url) {
 	this.url = url;
 	
 	this.savePNG = function(cnvs, fname, type) {
-		console.log(type);
 		if(!cnvs || !url) return;
 		fname = fname || 'picture';
 		
@@ -23,7 +22,7 @@ function CanvasSaver(url) {
 		
 		var nameInput = document.createElement("input") ;
 		nameInput.setAttribute("name", 'name') ;
-		nameInput.setAttribute("value", fname + '.png');
+		nameInput.setAttribute("value", fname);
 		
 		var typeInput = document.createElement("input") ;
 		typeInput.setAttribute("name", 'type') ;

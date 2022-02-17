@@ -138,7 +138,10 @@ td {
 	background-color: #CCCCCC;	
 }
 
-.accord-content { display: none; }
+.accord-content { 
+	display: none;
+	width:100%;
+ }
 
 .question {
 	font-family: 'Bowlby One SC', serif;
@@ -161,6 +164,10 @@ td {
 	width: 100%;
 	background-color:rgba(255, 255, 255, 0.5);
 	text-align:center;
+}
+
+.year {
+	width: 50px;
 }
 
 #canvasContainer {
@@ -442,37 +449,37 @@ legend {
 .spl28 { font-family: 'spl28scriptregular'; font-size: 1.1em; }
 
 /*  SECTIONS  */
-.section {
+/* .section {
 	clear: both;
 	padding: 0px;
 	margin: 0px;
-}
+} */
 
 /*  COLUMN SETUP  */
-.col {
+/* .col {
 	display: block;
 	float:left;
 	margin: 1% 0 1% 5%;
 }
-.col:first-child { margin-left: 0; }
+.col:first-child { margin-left: 0; } */
 
 /*  GROUPING  */
-.group:before,
+/* .group:before,
 .group:after { content:""; display:table; }
 .group:after { clear:both;}
-.group { zoom:1; /* For IE 6/7 */ }
+.group { zoom:1; /* For IE 6/7 */ } */
 
 /*  GRID OF TWO  */
-.span_2_of_2 {
+/* .span_2_of_2 {
 	width: 100%;
 }
 .span_1_of_2 {
 	width: 45%;
-}
+} */
 
 /*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
-@media only screen and (max-width: 480px) {
+/* @media only screen and (max-width: 480px) {
 	.col { 
 		margin: 1% 0 1% 0%;
 	}
@@ -480,10 +487,10 @@ legend {
 
 @media only screen and (max-width: 480px) {
 	.span_2_of_2, .span_1_of_2 { width: 100%; }
-}
+} */
 
 /*  GRID OF FOUR  */
-.span_4_of_4 {
+/* .span_4_of_4 {
 	width: 100%;
 }
 .span_3_of_4 {
@@ -494,12 +501,44 @@ legend {
 }
 .span_1_of_4 {
 	width: 23.8%;
+} */
+
+/*  GO FULL WIDTH BELOW 480 PIXELS */
+/* @media only screen and (max-width: 480px) {
+	.col {  margin: 1% 0 1% 0%; }
+	.span_1_of_4, .span_2_of_4, .span_3_of_4, .span_4_of_4 { width: 100%; }
+} */
+
+/*  SECTIONS  */
+.section {
+	clear: both;
+	padding: 0px;
+	margin: 0px;
 }
+
+/*  COLUMN SETUP  */
+.col {
+	display: block;
+	float:left;
+	margin: 1% 0 1% 1.6%;
+}
+.col:first-child { margin-left: 0; }
+
+/*  GROUPING  */
+.group:before,
+.group:after { content:""; display:table; }
+.group:after { clear:both;}
+.group { zoom:1; /* For IE 6/7 */ }
+
+/*  GRID OF THREE  */
+.span_3_of_3 { width: 100%; }
+.span_2_of_3 { width: 66.13%; }
+.span_1_of_3 { width: 32.26%; }
 
 /*  GO FULL WIDTH BELOW 480 PIXELS */
 @media only screen and (max-width: 480px) {
 	.col {  margin: 1% 0 1% 0%; }
-	.span_1_of_4, .span_2_of_4, .span_3_of_4, .span_4_of_4 { width: 100%; }
+	.span_3_of_3, .span_2_of_3, .span_1_of_3 { width: 100%; }
 }
 
 .colorSquare {
