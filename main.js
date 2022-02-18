@@ -40,7 +40,13 @@ app2.get("/uploadImage", (req, res) => {
 	  })
 })
 
-app2.post('/saveJersey', (req, res) => {
+app2.post("/saveJersey", (req, res) => {
+  console.log(req.body)
+  var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+})
+
+app2.post('/saveRink', (req, res) => {
+  var output = "success"
 	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
 
 	const options = {
@@ -64,17 +70,21 @@ app2.post('/saveJersey', (req, res) => {
         if(err) {
           console.log(err);
         } else {
+          fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+".png", buffer, 'base64', function(err) {
+            if (!err) { 
+              
+            }
+          })
             Jimp.read(scratchLayer0, (err, ice_img) => {
               if (err) {
                 console.log(err)
               } else {
+               
                 fir_img.composite(ice_img, 0, 0)
                 fir_img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
                   const finalImage = Buffer.from(buffer).toString('base64');
                   fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+"_0.png", finalImage, 'base64', function(err) {
-                    if (!err) { 
-                      
-                    }
+                    if (!err) { console.log(req.body.name+"_0.png") }
                   })
                 })
               }
@@ -93,9 +103,7 @@ app2.post('/saveJersey', (req, res) => {
                 sec_img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
                   const finalImage = Buffer.from(buffer).toString('base64');
                   fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+"_1.png", finalImage, 'base64', function(err) {
-                    if (!err) { 
-                      
-                    }
+                    if (!err) { console.log(req.body.name+"_1.png") }
                   })
                 })
               }
@@ -114,9 +122,7 @@ app2.post('/saveJersey', (req, res) => {
                 thi_img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
                   const finalImage = Buffer.from(buffer).toString('base64');
                   fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+"_2.png", finalImage, 'base64', function(err) {
-                    if (!err) { 
-                      
-                    }
+                    if (!err) { console.log(req.body.name+"_2.png") }
                   })
                 })
               }
@@ -135,9 +141,7 @@ app2.post('/saveJersey', (req, res) => {
                 fth_img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
                   const finalImage = Buffer.from(buffer).toString('base64');
                   fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+"_3.png", finalImage, 'base64', function(err) {
-                    if (!err) { 
-
-                    }
+                    if (!err) { console.log(req.body.name+"_3.png") }
                   })
                 })
               }
@@ -146,7 +150,7 @@ app2.post('/saveJersey', (req, res) => {
         });
 		} 
 	}).catch((err) => {
-		console.log(err);
+		return err;
 	});
 });
 
