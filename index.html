@@ -35,6 +35,9 @@
         <div class="section group" style="position: relative;">
             <div class="col span_2_of_3" style="float:left;">
                 <div id="hiddenContainer" style="display:none;">
+					<img src="./images/ice_scratches.png" id="iceScratches">
+					<img src="./images/boards2.png" id="boards">
+					<img src="./images/nets.png" id="nets">
 					<canvas id="textWarp" width="2880" height="1344"></canvas>
 					<canvas id="belowFull" width="2880" height="1344"></canvas>
 					<canvas id="textureFull" width="2880" height="1344"></canvas>
@@ -87,7 +90,7 @@
 								</td>
 							</tr>
 							<tr class="color_tr">
-                                <td class="checkCell"><input type="checkbox" class="aboveTextureToggle" data-canvas="below" data-id="nets" checked></td>
+                                <td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="nets" checked></td>
                                 <td>Nets</td>
                                 <td>&nbsp;</td>
                             </tr>
@@ -387,15 +390,15 @@
 
     function initializeCanvas() {
 		
-        //below.setBackgroundColor(initialColors["rinkColor"], below.renderAll.bind(below))
-        
-        /* fabric.Image.fromURL("./images/"+defaultTexture, function (img) {
-            above.setBackgroundImage(img, above.renderAll.bind(above), {
-                scaleX: above.width / img.width,
-                scaleY: above.height / img.height,
-				evented: false
-            })
-        }) */
+        below.setBackgroundColor(initialColors["rinkColor"], below.renderAll.bind(below))
+		overlayGroup = new fabric.Group([], {
+			visible: true,
+			selectable: false,
+			evented: false
+		})
+		
+		below.add(overlayGroup)
+
 		fabric.Image.fromURL("./images/ice_scratches.png", function (img) {
 			var ice = img.set({
 				left: 0, 
@@ -407,8 +410,10 @@
 				selectable: false,
 				evented: false
 			})
-			below.add(ice)
-			ice.bringToFront()
+			overlayGroup.addWithUpdate(ice)
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll();
 		})
 
 		fabric.Image.fromURL("./images/nets.png", function (img) {
@@ -422,8 +427,10 @@
 				selectable: false,
 				evented: false
 			})
-			below.add(nets)
-			nets.bringToFront()
+			overlayGroup.addWithUpdate(nets)
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll()
 		})
 
 		fabric.Image.fromURL("./images/boards2.png", function (img) {
@@ -437,21 +444,18 @@
 				selectable: false,
 				evented: false
             })
-            below.add(boards);
-			boards.bringToFront()
+            overlayGroup.addWithUpdate(boards);
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll()
         })
-		
-		backgroundColor = new fabric.Rect({
-			left: 0,
-			top: 0,
-			width: below.width,
-			height: below.height,
-			fill: initialColors['rinkColor'],
-			id: 'backgroundColor',
-			visible: true,
-			selectable: false,
-			evented: false
-		});
+
+		//console.log(overlayGroup)
+		var objects = overlayGroup.getObjects()
+		console.log(objects.length)
+		for (x in objects) {
+			console.log(objects[x])
+		}
 
 		centerLineBoards = new fabric.Path("M 476.11719 24.183594 L 476.11719 39.951172 L 484.53125 39.951172 L 484.53125 24.183594 L 476.11719 24.183594 z M 476.11719 407.99023 L 476.11719 423.75781 L 484.53125 423.75781 L 484.53125 407.99023 L 476.11719 407.99023 z",{
 			fill: initialColors["centerLineColor"],
@@ -669,7 +673,7 @@
 			evented: false
         });
 
-		below.add(backgroundColor)
+		//below.add(backgroundColor)
         below.add(centerCircle)
         below.add(centerLineStroke)
         below.add(centerLine1)
@@ -698,7 +702,7 @@
         below.add(ezFaceOffCircles)
         below.add(centerDot)
 
-        backgroundColor.sendToBack()
+        //backgroundColor.sendToBack()
         below.renderAll()
     }
 
@@ -718,10 +722,10 @@
 		},
 		move: function(color) {
 			$(this).data('changed', true);
-            //below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+            below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
             var objects = below.getObjects();
 			for (x in objects) {
-				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'backgroundColor') {
+				if (objects[x].id == 'strokeCenterLine') {
 					objects[x].set('fill', color.toHexString())
 					//objects[x].fill = color.toHexString();
                     below.renderAll()
@@ -730,11 +734,11 @@
 		},
 		change: function(color) {
 			$(this).data('changed', true);
-			//below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+			below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
             var objects = below.getObjects();
 			for (x in objects) {
 				console.log(objects[x].id)
-				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'backgroundColor') {
+				if (objects[x].id == 'strokeCenterLine') {
                     objects[x].set('fill', color.toHexString())
 					//objects[x].fill = color.toHexString();
                     below.renderAll()
@@ -743,20 +747,20 @@
 		},
 		hide: function(color) {
 			if ($(this).data('changed')) {
-				//below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+				below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
                 var objects = below.getObjects();
                 for (x in objects) {
-                    if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'backgroundColor') {
+                    if (objects[x].id == 'strokeCenterLine') {
                         objects[x].set('fill', color.toHexString())
 					    //objects[x].fill = color.toHexString();
                         below.renderAll()
                     }
                 }
 			} else {
-                //below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
+                below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
                 var objects = below.getObjects();
                 for (x in objects) {
-                    if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'backgroundColor') {
+                    if (objects[x].id == 'strokeCenterLine') {
                         objects[x].set('fill', original_color.toHexString())
 					    //objects[x].fill = color.toHexString();
                         below.renderAll()
@@ -1034,7 +1038,18 @@
 				}
 			}
 		}
-		reRenderBG();
+		var objects = overlayGroup.getObjects();
+		for (x in objects) {
+			if (objects[x].id == id) {
+				if (state == true) {
+					objects[x].visible = true;
+				} else {
+					objects[x].visible = false;
+				}
+			}
+			overlayGroup.addWithUpdate();
+		}
+		below.renderAll();
 	})
 
 	$(".aboveTextureToggle").on("click",function() {
@@ -1080,10 +1095,12 @@
 	})
 
     $("#fakeImageButton").on("click",function() {
+		console.log("clicky!")
 		$.ajax({
 			type: "GET",
 			url: "http://127.0.0.1:8086/uploadImage",
 			success: function(data) {
+				console.log(data)
 				var imgObj = new Image();
 				imgObj.src = data.image;
 				$("#fileName").html(data.filename);
@@ -1120,7 +1137,8 @@
 					//}
 					below.add(image);
 					image.sendToBack();
-					image.bringForward();
+					below.renderAll();
+					//image.bringForward();
 					
 					// end fabricJS stuff
 				}
@@ -1160,90 +1178,60 @@
 		teamName = teamName.split(' ').join('_');
 		var fileName = "rink_"+teamName+yearRange;
 		
-		//above.backgroundImage.set({opacity:0});
-		//above.renderAll();
+		belowFull.setBackgroundColor($("#rinkColor").spectrum("get").toHexString(), belowFull.renderAll.bind(belowFull))
 
-		/* aboveFull.loadFromJSON(above.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']), aboveFull.renderAll.bind(aboveFull), function(o, object) {
-			object.set({
-				scaleX: object.scaleX * 3,
-				scaleY: object.scaleY * 3,
-				left: object.left * 3,
-				top: object.top * 3 
-			})
-			aboveFull.add(object);
-			
-		}); */
-
-		aboveFull.renderAll();
-		
-		var img = new Image; 
-		img.onload = function(){
-			belowFull.loadFromJSON(below.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']), belowFull.renderAll.bind(belowFull), function(o, object) {
-				//console.log(object.id)
-				if (object.id != "nets" || object.id != "boards" || object.id != "ice") {
-					object.set({
-						id: object.id.toString(),
-						scaleX: object.scaleX * 3,
-						scaleY: object.scaleY * 3,
-						left: object.left * 3,
-						top: object.top * 3 
-					})
-					belowFull.add(object);
-				}
-			});
-			
-			objects = belowFull.getObjects()
-				for (x in objects) {
-					console.log(x.id)
-				}
-
-			belowFull.renderAll();
-
-			//textureFullCTX.drawImage(img,0,0);
-			/* var can3 = document.getElementById('compositeFull');
-			var compositeFull = can3.getContext('2d');
-			compositeFull.clearRect(0, 0, 2880, 1344);
-			if (Modernizr.canvasblending == true) {
-				compositeFull.globalCompositeOperation = "multiply";
-				compositeFull.drawImage(canFull, 0, 0);
-				compositeFull.drawImage(can2Full, 0, 0);
-			} else {
-				textureFullCTX.drawImage(img,0,0);
-				compositeFull.drawImage(canFull, 0, 0);
-				textureFullCTX.blendOnto(composite,'multiply');
-			}
-			var finalCanvas = document.getElementById('finalFull');
-			var exportCtx = finalCanvas.getContext('2d');
-			exportCtx.clearRect(0,0,2880,1344);
-			exportCtx.drawImage(can3,0,0);
-			exportCtx.drawImage(can4Full,0,0); */
-			new CanvasSaver('http://127.0.0.1:8086/saveJersey').savePNG(document.getElementById("belowFull"), fileName, "rink");
-			/* getDataUri("./images/fhm_cutout_2.png", function(dataUri) {
-				fabric.Image.fromURL(dataUri, function(oImg) {
-					oImg.set("scaleX",0.5);
-					oImg.set("scaleY",0.5);
-					logoCanvas.setBackgroundImage(oImg, logoCanvas.renderAll.bind(logoCanvas));
-				})
-			}) */
-			
-		};
- 		if (defaultTexture.indexOf(".png") > -1) {
-			img.src = "./images/"+defaultTexture;
-		} else {
-			img.src = defaultTexture;
-		}
-		
-		var objects = textureFull.getObjects();
+		objects = below.getObjects('image')
 		for (x in objects) {
-			textureFull.remove(objects[x]);
+			belowFull.add(objects[x])
 		}
-		
-		getDataUri(img.src, function(dataUri) {
-			fabric.Image.fromURL(dataUri, function(oImg) {
-				textureFull.add(oImg);
+
+		objects = below.getObjects('path')
+		for (x in objects) {
+			belowFull.add(objects[x])
+		}
+
+		objects = belowFull.getObjects()
+		for (x in objects) {
+			objects[x].set({
+				scaleX: objects[x].scaleX * 3,
+				scaleY: objects[x].scaleY * 3,
+				left: objects[x].left * 3,
+				top: objects[x].top * 3 
 			})
-			textureFull.renderAll();
-		})
+		}
+
+		belowFull.renderAll();
+
+		objects = below.getObjects('image')
+		for (x in objects) {
+			objects[x].set({
+				scaleX: 1,
+				scaleY: 1,
+				left: objects[x].left / 3,
+				top: objects[x].top / 3 
+			})
+		}
+
+		objects = below.getObjects('path')
+		for (x in objects) {
+			objects[x].set({
+				scaleX: 1,
+				scaleY: 1,
+				left: objects[x].left / 3,
+				top: objects[x].top / 3 
+			})
+		}
+
+		below.renderAll()
+
+		new CanvasSaver('http://127.0.0.1:8086/saveJersey').savePNG(document.getElementById("belowFull"), fileName, "rink");
+
+		var objects = belowFull.getObjects()
+		for (x in objects) {
+			belowFull.remove(objects[x])
+		}
+
+		below.renderAll()
 	})
 	
 	function reRenderBG() {
