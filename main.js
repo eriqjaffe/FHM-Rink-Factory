@@ -4,6 +4,7 @@ const fs = require('fs')
 const express = require('express')
 const Jimp = require('jimp')
 const openExplorer = require('open-file-explorer');
+const sharp = require('sharp')
 
 const app2 = express()
 const port = 8086;
@@ -49,7 +50,8 @@ app2.post("/saveJersey", (req, res) => {
 app2.post('/saveRink', (req, res) => {
   var x =0
   var output = "success"
-	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	const images = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+  const staticLines = Buffer.from(req.body.rinkLines.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
 
 	const options = {
 		defaultPath: app.getPath('desktop') + '/' + req.body.name + ".zip",
@@ -68,15 +70,17 @@ app2.post('/saveRink', (req, res) => {
       var scratches3 = fs.readFileSync(__dirname + "\\images\\overlay_3.png", {encoding: 'base64'});
       var scratchLayer3 = Buffer.from(scratches3, 'base64');
       
-      createFile (buffer, scratchLayer0, req.body.name+"_0.png")
-      createFile (buffer, scratchLayer1, req.body.name+"_1.png")
-      createFile (buffer, scratchLayer2, req.body.name+"_2.png")
-      createFile (buffer, scratchLayer3, req.body.name+"_3.png")
+      createFile (scratchLayer0, req.body.name+"_0.png")
+      createFile (scratchLayer1, req.body.name+"_1.png")
+      createFile (scratchLayer2, req.body.name+"_2.png")
+      createFile (scratchLayer3, req.body.name+"_3.png")
 
-      async function createFile(rink, overlay, filename) {
-        const base = await Jimp.read(rink)
+      async function createFile(overlay, filename) {
+        const base = await Jimp.read(images)
+        const lines = await Jimp.read(staticLines)
         const ice = await Jimp.read(overlay)
-        await base.resize(2880, 1344)
+        await base.resize(2880, 1344, Jimp.RESIZE_BEZIER).quality(100)
+        await base.composite(lines, 0, 0)
         await base.composite(ice, 0, 0)
         await base.writeAsync(result.filePaths[0] +"\\"  +filename)
         if (filename.substr(filename.length - 5) == "3.png") {
@@ -91,115 +95,6 @@ app2.post('/saveRink', (req, res) => {
 		res.end(err);
 	});
 });
-
-/* app2.post('/saveRink', (req, res) => {
-  var output = "success"
-	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
-
-	const options = {
-		defaultPath: app.getPath('desktop') + '/' + req.body.name + ".zip",
-	}
-
-	dialog.showOpenDialog(null, {
-    properties: ['openFile', 'openDirectory', 'createDirectory', 'promptToCreate' ]
-  }).then((result) => {
-		if (!result.canceled) {
-      console.log(result.filePaths[0])
-      var scratches0 = fs.readFileSync(__dirname + "\\images\\boards2.png", {encoding: 'base64'});
-      var scratchLayer0 = Buffer.from(scratches0, 'base64');
-      var scratches1 = fs.readFileSync(__dirname + "\\images\\overlay_1.png", {encoding: 'base64'});
-      var scratchLayer1 = Buffer.from(scratches1, 'base64');
-      var scratches2 = fs.readFileSync(__dirname + "\\images\\overlay_2.png", {encoding: 'base64'});
-      var scratchLayer2 = Buffer.from(scratches2, 'base64');
-      var scratches3 = fs.readFileSync(__dirname + "\\images\\overlay_3.png", {encoding: 'base64'});
-      var scratchLayer3 = Buffer.from(scratches3, 'base64');
-      Jimp.read(buffer, (err, fir_img) => {
-        if(err) {
-          console.log(err);
-        } else {
-          fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+".png", buffer, 'base64', function(err) {
-            if (!err) { 
-              
-            }
-          })
-            Jimp.read(scratchLayer0, (err, ice_img) => {
-              if (err) {
-                console.log(err)
-              } else {
-               
-                fir_img.composite(ice_img, 0, 0)
-                fir_img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-                  const finalImage = Buffer.from(buffer).toString('base64');
-                  fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+"_0.png", finalImage, 'base64', function(err) {
-                    if (!err) { console.log(req.body.name+"_0.png") }
-                  })
-                })
-              }
-            })
-          }
-        });
-			Jimp.read(buffer, (err, sec_img) => {
-        if(err) {
-          console.log(err);
-        } else {
-            Jimp.read(scratchLayer1, (err, ice_img) => {
-              if (err) {
-                console.log(err)
-              } else {
-                sec_img.composite(ice_img, 0, 0)
-                sec_img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-                  const finalImage = Buffer.from(buffer).toString('base64');
-                  fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+"_1.png", finalImage, 'base64', function(err) {
-                    if (!err) { console.log(req.body.name+"_1.png") }
-                  })
-                })
-              }
-            })
-          }
-        });
-      Jimp.read(buffer, (err, thi_img) => {
-        if(err) {
-          console.log(err);
-        } else {
-            Jimp.read(scratchLayer2, (err, ice_img) => {
-              if (err) {
-                console.log(err)
-              } else {
-                thi_img.composite(ice_img, 0, 0)
-                thi_img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-                  const finalImage = Buffer.from(buffer).toString('base64');
-                  fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+"_2.png", finalImage, 'base64', function(err) {
-                    if (!err) { console.log(req.body.name+"_2.png") }
-                  })
-                })
-              }
-            })
-          }
-        });
-      Jimp.read(buffer, (err, fth_img) => {
-        if(err) {
-          console.log(err);
-        } else {
-            Jimp.read(scratchLayer3, (err, ice_img) => {
-              if (err) {
-                console.log(err)
-              } else {
-                fth_img.composite(ice_img, 0, 0)
-                fth_img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-                  const finalImage = Buffer.from(buffer).toString('base64');
-                  fs.writeFile(result.filePaths[0] +"\\"  +req.body.name+"_3.png", finalImage, 'base64', function(err) {
-                    if (!err) { console.log(req.body.name+"_3.png") }
-                  })
-                })
-              }
-            })
-          }
-        });
-		} 
-	}).catch((err) => {
-		return err;
-	});
-}); */
 
 function getExtension(filename) {
 	var ext = path.extname(filename||'').split('.');
