@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const express = require('express')
 const Jimp = require('jimp')
+const openExplorer = require('open-file-explorer');
 
 const app2 = express()
 const port = 8086;
@@ -46,6 +47,52 @@ app2.post("/saveJersey", (req, res) => {
 })
 
 app2.post('/saveRink', (req, res) => {
+  var x =0
+  var output = "success"
+	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+
+	const options = {
+		defaultPath: app.getPath('desktop') + '/' + req.body.name + ".zip",
+	}
+
+	dialog.showOpenDialog(null, {
+    properties: ['openFile', 'openDirectory', 'createDirectory', 'promptToCreate' ]
+  }).then((result) => {
+		if (!result.canceled) {
+      var scratches0 = fs.readFileSync(__dirname + "\\images\\boards2.png", {encoding: 'base64'});
+      var scratchLayer0 = Buffer.from(scratches0, 'base64');
+      var scratches1 = fs.readFileSync(__dirname + "\\images\\overlay_1.png", {encoding: 'base64'});
+      var scratchLayer1 = Buffer.from(scratches1, 'base64');
+      var scratches2 = fs.readFileSync(__dirname + "\\images\\overlay_2.png", {encoding: 'base64'});
+      var scratchLayer2 = Buffer.from(scratches2, 'base64');
+      var scratches3 = fs.readFileSync(__dirname + "\\images\\overlay_3.png", {encoding: 'base64'});
+      var scratchLayer3 = Buffer.from(scratches3, 'base64');
+      
+      createFile (buffer, scratchLayer0, req.body.name+"_0.png")
+      createFile (buffer, scratchLayer1, req.body.name+"_1.png")
+      createFile (buffer, scratchLayer2, req.body.name+"_2.png")
+      createFile (buffer, scratchLayer3, req.body.name+"_3.png")
+
+      async function createFile(rink, overlay, filename) {
+        const base = await Jimp.read(rink)
+        const ice = await Jimp.read(overlay)
+        await base.resize(2880, 1344)
+        await base.composite(ice, 0, 0)
+        await base.writeAsync(result.filePaths[0] +"\\"  +filename)
+        if (filename.substr(filename.length - 5) == "3.png") {
+          openExplorer(result.filePaths[0])
+          res.end("success")
+        }
+      }
+		} else {
+      res.end("success")
+    }
+	}).catch((err) => {
+		res.end(err);
+	});
+});
+
+/* app2.post('/saveRink', (req, res) => {
   var output = "success"
 	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
 
@@ -152,7 +199,7 @@ app2.post('/saveRink', (req, res) => {
 	}).catch((err) => {
 		return err;
 	});
-});
+}); */
 
 function getExtension(filename) {
 	var ext = path.extname(filename||'').split('.');
