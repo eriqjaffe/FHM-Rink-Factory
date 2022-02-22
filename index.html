@@ -94,6 +94,11 @@
                                 <td>Nets</td>
                                 <td>&nbsp;</td>
                             </tr>
+							<tr class="color_tr">
+                                <td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="guides" checked></td>
+                                <td>Guides (Automatically hidden on export)</td>
+                                <td>&nbsp;</td>
+                            </tr>
                             <tr class="color_tr">
                                 <td>&nbsp;</td>
                                 <td>Center Line:&nbsp;
@@ -123,19 +128,24 @@
                                     <input class="centerLineSelector enabledSelector" type="text" id="centerLineColor" data-element="centerLine01">
                                 </td>
                             </tr>
-                            <tr class="color_tr">
-                                <td>&nbsp;</td>
-                                <td><label>Blue Lines: </label></td>
-                                <td style="text-align:right;">
-                                    <input class="selector enabledSelector" type="text" id="blueLineColor" data-element="blueLines">
-                                </td>
-                            </tr>
-                            <tr class="color_tr">
+							<tr class="color_tr">
                                 <td>&nbsp;</td>
                                 <td><label>Center Ice: </label></td>
                                 <td style="text-align:right;">
                                     <input class="selector enabledSelector" type="text" id="centerCircleColor" data-element="centerCircle">
                                     <input class="selector enabledSelector" type="text" id="centerDotColor" data-element="centerDot">
+                                </td>
+                            </tr>
+							<tr class="color_tr">
+								<td>&nbsp;</td>
+								<td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterLine" checked>&nbsp;Center Line Stroke</td>
+								<td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterCircle" checked>&nbsp;Center Circle Stroke</td>
+							</tr>
+                            <tr class="color_tr">
+                                <td>&nbsp;</td>
+                                <td><label>Blue Lines: </label></td>
+                                <td style="text-align:right;">
+                                    <input class="selector enabledSelector" type="text" id="blueLineColor" data-element="blueLines">
                                 </td>
                             </tr>
                             <tr class="color_tr">
@@ -158,7 +168,7 @@
                                 <td>&nbsp;</td>
                                 <td colspan="2">
 									<table style="width:100%;">
-										<tr>
+										<tr class="color_tr">
 											<td style="text-align: left;">Circle Style:&nbsp;
 												<select id="circleStyle">
 												<option	value="1">Modern</option>
@@ -214,7 +224,7 @@
                             </tr>
                         </table>
                     </div>
-					<div class="accord-header inactive-header">Images</div>
+					<div class="accord-header inactive-header" id="imagesHeader">Images</div>
 					<div class="accord-content">
 						<div id="uploadImageDiv">
 						<table style="width:100%;">
@@ -235,10 +245,24 @@
 							<table style="width:100%;">
 								<tr>
 									<td><center>
-										<input type="button" id="makeCrest" class="button" value="Make Crest">
-										<input type="button" class="button makePatch" data-sleeve="left" value="Make Left Patch">
-										<input type="button" class="button makePatch" data-sleeve="right" value="Make Right Patch">
+										<input type="button" id="makeCenterIceLogo" class="button" value="Make Center Ice Logo">
 									</td>
+								</tr>
+								<tr>
+									<td><center>
+										<input type="button" class="button makeAd" data-adLoc="1" value="&nbsp;Ad Location 1&nbsp;">
+										<input type="button" class="button makeAd" data-adLoc="2" value="&nbsp;Ad Location 2&nbsp;">
+										<input type="button" class="button makeAd" data-adLoc="3" value="&nbsp;Ad Location 3&nbsp;">
+										<input type="button" class="button makeAd" data-adLoc="4" value="&nbsp;Ad Location 4&nbsp;">
+									</center></td>
+								</tr>
+								<tr>
+									<td><center>
+										<input type="button" class="button makeAd" data-adLoc="5" value="&nbsp;Ad Location 5&nbsp;">
+										<input type="button" class="button makeAd" data-adLoc="6" value="&nbsp;Ad Location 6&nbsp;">
+										<input type="button" class="button makeAd" data-adLoc="7" value="&nbsp;Ad Location 7&nbsp;">
+										<input type="button" class="button makeAd" data-adLoc="8" value="&nbsp;Ad Location 8&nbsp;">
+									</center></td>
 								</tr>
 								<tr>
 									<td><center>
@@ -309,10 +333,90 @@
 		preserveObjectStacking: true
 	});
 
-	below.on('mouse:down', function(options) {
-		console.log(options.e)
-    	console.log(options.e.layerX, options.e.layerY);
+	below.on('selection:created', function(e) {
+		$("#straightenObject").css("display","inline-block");
+		var obj = e.selected[0];
+		console.log(obj.id)
+		if (obj.type == 'image') {
+			$("#fileName").html(obj.get('name'));
+			if ($("#trimImageDiv").css("display") == "none") {
+				$("#trimImageDiv").css("display","block");
+				$("#uploadImageDiv").css("display","none");
+				$("#selectedImageDiv").css("display","block");
+			}
+			$("#tipContainer").html("Use Arrow keys to move image 1 pixel.<br>Use Shift + Arrow keys to move image 10 pixels.<br>Use Delete key to remove image");
+		}
+	})
+	
+	below.on('object:modified', function(e) {
+		var obj = e.target;
+	 	if (obj.get('type') == "image") {
+	 		imLeft = obj.get('left');
+	 		imTop = obj.get('top');
+	 	}
+		if (obj.id == "wordmark") {
+			wmLeft = obj.get('left');
+	 		wmTop = obj.get('top');
+		}
+	})
+	
+	below.on('selection:cleared', function(e) {
+		$("#straightenObject").css("display","none");
+		if ($("#replaceColorDiv").css("display") == "block") {
+			$("#replaceColorDiv").slideToggle();
+		}
+		if ($("#trimImageDiv").css("display") == "block") {		
+			$("#trimImageDiv").slideToggle();
+			$("#colorSquare").val("Select Color");
+			$("#colorSquare").css("background","#FFFFFF");
+			$("#colorSquare").css("color","#000000");
+			$("#chosenCoordinates").html("");
+		}
+		$("#uploadImageDiv").css("display","block");
+		$("#selectedImageDiv").css("display","none");
+		$("#fileName").html("");
+		$("#tipContainer").html("");
+	})
+	
+	below.on('mouse:move', function(e) {
+		if (below.hoverCursor != "move") {
+			var mouse = below.getPointer(e.e);
+			var x = parseInt(mouse.x);
+			var y = parseInt(mouse.y);
+			var px = ctx.getImageData(x, y, 1, 1).data;
+			var hex = rgb2hex(px[0],px[1],px[2]);
+			var textColor = idealTextColor(hex);
+			$("#xPos").html(x);
+			$("#yPos").html(y);
+			$("#colorSquare").css("background",hex);
+			$("#colorSquare").css("color",textColor);
+			$("#colorSquare").val(hex);			
+		}
 	});
+	
+	below.on("mouse:down",function(e) {
+		if (below.hoverCursor != "move") {
+			$("#colorSquare").removeClass("colorSquareActive").addClass("colorSquareSelected");
+			below.hoverCursor='move';
+			below.off('mouse:move');
+			var object = below.getActiveObject();
+			var mouse = object.getLocalPointer(e.e);
+			var imageX = parseInt(mouse.x);
+			var imageY = parseInt(mouse.y);
+			$("#chosenCoordinates").html("(X:"+imageX+", Y:"+imageY+")");
+			var mouse2 = below.getPointer(e.e);
+			var x = parseInt(mouse2.x);
+			var y = parseInt(mouse2.y);
+			var px = ctx.getImageData(x, y, 1, 1).data;
+			var hex = rgb2hex(px[0],px[1],px[2]);
+			$("#xPos").html(imageX);
+			$("#yPos").html(imageY);
+			$(".removeColor, .replaceColor").each(function(e) {
+				$(this).data("x",imageX);
+				$(this).data("y",imageY);
+			})
+		}
+	})
 
     /* var above = new fabric.Canvas('above',{
 		enableRetinaScaling:false,
@@ -425,6 +529,18 @@
 		}
 		return;
 	});
+
+	$(".colorSelector").spectrum({
+		showInput: true,
+		preferredFormat: prefColorFormat,
+		showInitial: true,
+		showPalette: true,
+		showButtons: true,
+		showSelectionPalette: true,
+		localStorageKey: "spectrum.jerseymaker",
+		palette: [ ],
+		color: "#FF0000"
+	})
 	
 	initializeCanvas();
 
@@ -454,6 +570,23 @@
 				evented: false
 			})
 			overlayGroup.addWithUpdate(ice)
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll();
+		})
+
+		fabric.Image.fromURL("./images/guides.png", function (img) {
+			var guides = img.set({
+				left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'guides',
+				visible: true,
+				selectable: false,
+				evented: false
+			})
+			overlayGroup.addWithUpdate(guides)
 			overlayGroup.setCoords();
 			overlayGroup.bringToFront();
 			below.renderAll();
@@ -661,12 +794,36 @@
 			evented: false
 		});
 
-        centerCircle = new fabric.Path("M 480.32227 156.79492 C 443.28967 156.79522 413.23664 186.85021 413.23633 223.88281 C 413.23551 260.91621 443.28887 290.96845 480.32227 290.96875 C 517.35566 290.96845 547.41098 260.91621 547.41016 223.88281 C 547.40985 186.85021 517.35486 156.79522 480.32227 156.79492 z M 480.32617 158.29492 A 65.586461 65.586461 0 0 1 545.91211 223.88086 A 65.586461 65.586461 0 0 1 480.32617 289.46875 A 65.586461 65.586461 0 0 1 414.74023 223.88086 A 65.586461 65.586461 0 0 1 480.32617 158.29492 z",{
+/*         centerCircle = new fabric.Path("M 480.32227 156.79492 C 443.28967 156.79522 413.23664 186.85021 413.23633 223.88281 C 413.23551 260.91621 443.28887 290.96845 480.32227 290.96875 C 517.35566 290.96845 547.41098 260.91621 547.41016 223.88281 C 547.40985 186.85021 517.35486 156.79522 480.32227 156.79492 z M 480.32617 158.29492 A 65.586461 65.586461 0 0 1 545.91211 223.88086 A 65.586461 65.586461 0 0 1 480.32617 289.46875 A 65.586461 65.586461 0 0 1 414.74023 223.88086 A 65.586461 65.586461 0 0 1 480.32617 158.29492 z",{
 			fill: initialColors["blueLineColor"],
 			id: 'centerCircle',
 			visible: true,
 			selectable:false,
-			evented: false
+			evented: false,
+		}); */
+
+		centerCircle = new fabric.Path("M 478.19727 156.84961 C 442.14905 157.97588 413.23663 187.56279 413.23633 223.88281 C 413.23552 260.20362 442.14828 289.78789 478.19727 290.91406 L 478.19727 289.31641 A 65.586461 65.586461 0 0 1 414.74023 223.88086 A 65.586461 65.586461 0 0 1 478.19727 158.44727 L 478.19727 156.84961 z M 482.45117 156.84961 L 482.45117 158.44727 A 65.586461 65.586461 0 0 1 545.91211 223.88086 A 65.586461 65.586461 0 0 1 482.45117 289.41406 L 482.45117 290.91406 C 518.49841 289.78588 547.41096 260.20231 547.41016 223.88281 C 547.40985 187.56409 518.49764 157.97789 482.45117 156.84961 z",{
+			fill: initialColors["blueLineColor"],
+			id: 'centerCircle',
+			visible: true,
+			selectable:false,
+			evented: false,
+		});
+
+/* 		centerCircleStroke = new fabric.Path("M 480.32031 154.9082 C 442.26529 154.90851 411.34407 185.82981 411.34375 223.88477 C 411.34291 261.94053 442.26461 292.86101 480.32031 292.86133 C 518.37601 292.86101 549.29772 261.9406 549.29688 223.88477 C 549.29656 185.82975 518.37532 154.90851 480.32031 154.9082 z M 480.32812 160.1875 C 515.52879 160.18778 544.01925 188.67629 544.01953 223.87695 C 544.0203 259.07836 515.52953 287.57589 480.32812 287.57617 C 445.12672 287.57589 416.63009 259.07836 416.63086 223.87695 C 416.63114 188.67629 445.12746 160.18778 480.32812 160.1875 z",{
+			fill: initialColors["rinkColor"],
+			id: 'strokeCenterCircle',
+			visible: true,
+			selectable:false,
+			evented: false,
+		}); */
+		
+		centerCircleStroke = new fabric.Path("M 478.19727 154.96289 C 441.12414 156.09017 411.34406 186.54164 411.34375 223.88477 C 411.34293 261.22867 441.12348 291.67938 478.19727 292.80664 L 478.19727 287.52344 C 443.98623 286.39815 416.63011 258.36357 416.63086 223.87695 C 416.63113 189.39107 443.98693 161.36517 478.19727 160.24023 L 478.19727 154.96289 z M 482.45117 154.96289 L 482.45117 160.24023 C 516.66493 161.36117 544.01926 189.38845 544.01953 223.87695 C 544.02029 258.36619 516.66563 286.40215 482.45117 287.52344 L 482.45117 292.80664 C 519.52134 291.67535 549.29769 261.22613 549.29688 223.88477 C 549.29656 186.5442 519.52067 156.0942 482.45117 154.96289 z",{
+			fill: initialColors["rinkColor"],
+			id: 'strokeCenterCircle',
+			visible: true,
+			selectable:false,
+			evented: false,
 		});
 
         blueLines = new fabric.Path("M 586.19727 25.845703 L 586.19727 421.1543 L 590.45117 421.1543 L 590.45117 25.845703 L 586.19727 25.845703 z M 368.87109 25.935547 L 368.87109 421.24414 L 373.125 421.24414 L 373.125 25.935547 L 368.87109 25.935547 z",{
@@ -870,7 +1027,7 @@
 			width: 100
 		})
 
-		rinkElementGroup = new fabric.Group([ centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
+		rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
 			id: 'rinkElementGroup',
 			visible: true,
 			selectable: false,
@@ -900,7 +1057,7 @@
             below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
             var objects = rinkElementGroup.getObjects();
 			for (x in objects) {
-				if (objects[x].id == 'strokeCenterLine') {
+				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
 					objects[x].set('fill', color.toHexString())
 					//objects[x].fill = color.toHexString();
 					rinkElementGroup.addWithUpdate()
@@ -914,7 +1071,7 @@
             var objects = rinkElementGroup.getObjects();
 			for (x in objects) {
 				console.log(objects[x].id)
-				if (objects[x].id == 'strokeCenterLine') {
+				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
                     objects[x].set('fill', color.toHexString())
 					rinkElementGroup.addWithUpdate()
                     below.renderAll()
@@ -926,7 +1083,7 @@
 				below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
                 var objects = rinkElementGroup.getObjects();
                 for (x in objects) {
-                    if (objects[x].id == 'strokeCenterLine') {
+                    if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
                         objects[x].set('fill', color.toHexString())
 					    rinkElementGroup.addWithUpdate()
                         below.renderAll()
@@ -936,7 +1093,7 @@
                 below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
                 var objects = rinkElementGroup.getObjects();
                 for (x in objects) {
-                    if (objects[x].id == 'strokeCenterLine') {
+                    if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
                         objects[x].set('fill', original_color.toHexString())
 					    rinkElementGroup.addWithUpdate()
                         below.renderAll()
@@ -1396,9 +1553,10 @@
 
     $("#creaseStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = below.getObjects();
+		var objects = rinkElementGroup.getObjects();
 		for (x in objects) {
 			if (objects[x].id.substring(0,6) == "crease") {
+				console.log('found a crease')
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					if (objects[x].id.substring(0,7) == "creaseF") {
 						$("#creaseFillColor").spectrum("set", objects[x].fill)
@@ -1596,6 +1754,7 @@
 					//	image.scale(0.5);
 					//}
 					below.add(image);
+					below.centerObject(image)
 					image.sendToBack();
 					below.renderAll();
 					//image.bringForward();
@@ -1686,6 +1845,461 @@
 			}
 		})
 	})
+
+	$(".makeAd").on("click",function(e) {
+		$("#overlay").css("display","inline-block");	
+		var object = below.getActiveObject();
+		if (object.get('type') == "image") {
+			var imageHeight = object.height
+			var imageWidth = object.width
+			console.log($(this).data("adloc"))
+			switch ($(this).data("adloc")) {
+				case 1:
+					if (imageHeight > imageWidth && imageHeight > 42) {
+						object.scaleToHeight(42);
+					} else if (imageWidth > imageHeight && imageWidth > 89) {
+						object.scaleToWidth(89);
+					} else {
+						if (imageWidth > 89) {
+							object.scaleToWidth(89);
+						} 
+					}
+					object.set({"left":425.5,"top":91});
+					object.setCoords();
+					break;
+				case 2:
+					if (imageHeight > imageWidth && imageHeight > 42) {
+						object.scaleToHeight(42);
+					} else if (imageWidth > imageHeight && imageWidth > 89) {
+						object.scaleToWidth(89);
+					} else {
+						if (imageWidth > 89) {
+							object.scaleToWidth(89);
+						} 
+					}
+					object.set({"left":534.5,"top":91});
+					object.setCoords();
+					break;
+				case 3:
+					if (imageHeight > imageWidth && imageHeight > 42) {
+						object.scaleToHeight(42);
+					} else if (imageWidth > imageHeight && imageWidth > 89) {
+						object.scaleToWidth(89);
+					} else {
+						if (imageWidth > 89) {
+							object.scaleToWidth(89);
+						} 
+					}
+					object.set({"left":425.5,"top":357});
+					object.setCoords();
+					break;
+				case 4:
+					if (imageHeight > imageWidth && imageHeight > 42) {
+						object.scaleToHeight(42);
+					} else if (imageWidth > imageHeight && imageWidth > 89) {
+						object.scaleToWidth(89);
+					} else {
+						if (imageWidth > 89) {
+							object.scaleToWidth(89);
+						} 
+					}
+					object.set({"left":534.5,"top":357});
+					object.setCoords();
+					break;
+				case 5:
+					if (imageHeight > imageWidth && imageHeight > 20) {
+						object.scaleToHeight(20);
+					} else if (imageWidth > imageHeight && imageWidth > 75) {
+						object.scaleToWidth(75);
+					} else {
+						if (imageWidth > 75) {
+							object.scaleToWidth(75);
+						} 
+					}
+					object.set({"left":70.5,"top":114.5,"angle":90});
+					object.setCoords();
+					break;
+				case 6:
+					if (imageHeight > imageWidth && imageHeight > 20) {
+						object.scaleToHeight(20);
+					} else if (imageWidth > imageHeight && imageWidth > 75) {
+						object.scaleToWidth(75);
+					} else {
+						if (imageWidth > 75) {
+							object.scaleToWidth(75);
+						} 
+					}
+					object.set({"left":70.5,"top":332.5,"angle":90});
+					object.setCoords();
+					break;
+				case 7:
+					if (imageHeight > imageWidth && imageHeight > 20) {
+						object.scaleToHeight(20);
+					} else if (imageWidth > imageHeight && imageWidth > 75) {
+						object.scaleToWidth(75);
+					} else {
+						if (imageWidth > 75) {
+							object.scaleToWidth(75);
+						} 
+					}
+					object.set({"left":890.5,"top":114.5,"angle":270});
+					object.setCoords();
+					break;
+				case 8:
+					if (imageHeight > imageWidth && imageHeight > 20) {
+						object.scaleToHeight(20);
+					} else if (imageWidth > imageHeight && imageWidth > 75) {
+						object.scaleToWidth(75);
+					} else {
+						if (imageWidth > 75) {
+							object.scaleToWidth(75);
+						} 
+					}
+					object.set({"left":890.5,"top":332.5,"angle":270});
+					object.setCoords();
+					break;
+				default:
+					console.log("dunno")
+					break;
+			}
+/* 			if (imageHeight > imageWidth && imageHeight > 29) {
+				object.scaleToHeight(29);
+			} else if (imageWidth > imageHeight && imageWidth > 29) {
+				object.scaleToWidth(29);
+			} else {
+				if (imageWidth > 29) {
+					object.scaleToWidth(29);
+				} 
+			}
+			if ($(this).data("adLoc") == "left") {
+				object.set({"left":318.5,"top":263.5,"angle":270});
+				object.setCoords();
+			} else if ($(this).data("sleeve") == "right") {
+				object.set({"left":190.5,"top":263.5,"angle":90});
+				object.setCoords();
+			} */
+		}
+		below.renderAll();
+		$("#overlay").css("display","none");
+	})
+
+	$("#makeCenterIceLogo").on("click",function(e) {
+		$("#overlay").css("display","inline-block");	
+		var object = below.getActiveObject();
+		if (object.type == "image") {
+			var imageHeight = object.height;
+			var imageWidth = object.width;
+			if (imageHeight > imageWidth && imageHeight > 394) {
+				object.scaleToHeight(394);
+			} else if (imageWidth > imageHeight && imageWidth > 394) {
+				object.scaleToWidth(394);
+			} else {
+				if (imageWidth > 394) {
+					object.scaleToWidth(394);
+				} 
+			}
+			below.centerObject(object);
+			object.setCoords();
+		}
+		below.renderAll();
+		$("#overlay").css("display","none");
+	})
+
+	$("#colorSquare").on("click",function(e) {
+		below.renderAll();
+		$(this).removeClass("colorSquareSelected").addClass("colorSquareActive");
+		var object = below.getActiveObject();
+		below.hoverCursor='url(./images/eyedropper.cur),default';
+		below.on('mouse:move', function(e) {	
+			var mouse = below.getPointer(e.e);
+			var x = parseInt(mouse.x);
+			var y = parseInt(mouse.y);
+			var px = ctx.getImageData(x, y, 1, 1).data;
+			var hex = rgb2hex(px[0],px[1],px[2]);
+			var textColor = idealTextColor(hex);
+			$("#xPos").html(x);
+			$("#yPos").html(y);
+			$("#colorSquare").css("background",hex);
+			$("#colorSquare").css("color",textColor);
+			$("#colorSquare").val(hex);
+		});
+	})
+
+	$("#border").on("click",function(e) {
+		var action = $(this).data("action");
+		var fuzz = parseInt($("#colorFuzz").val());
+		if (below.getActiveObject()) {
+			$("#overlay").css("display","inline-block");
+			var object = below.getActiveObject()
+			var idx = below.getObjects().indexOf(object)
+			if (object.get('type') == "image") {
+				var pictureName = object.get('name');
+				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
+				var theImage = object._originalElement.currentSrc;	
+				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();
+				$.ajax({
+					type: "POST",
+					url: "http://127.0.0.1:8086/removeBorder",
+					data: {imgdata: theImage, x: "1", y: "1", action: "removeBorder", color: "null", newcolor: "null", fuzz: fuzz, filename: pictureName},
+					success: function(data) {
+						$("#overlay").css("display","none");
+						//$("#testImage").attr("src","data:image/png;base64,"+data);
+						var imgObj = new Image();
+						imgObj.src = data;
+						imgObj.onload = function () {
+							var image = new fabric.Image(imgObj);
+							image.set({
+								originX: 'center',
+								originY: 'center',
+								left: imLeft,
+								top: imTop,
+								perPixelTargetFind: true,
+								centeredScaling: true,
+								centeredRotation: true,
+								borderColor: 'red',
+								cornerColor: 'yellow',
+								cornerSize: 12,
+								name: pictureName,
+								transparentCorners: false
+							});
+							
+							image.filters.push(new fabric.Image.filters.Resize({
+								resizeType: 'lanczos', // typo fixed
+								lanczosLobes: 2 // typo fixed
+							}));
+							
+							image.on('object:modified',function() {
+								imLeft = image.get('left')
+								imTop = image.get('top');
+							});
+							
+							below.remove(object);
+							below.add(image);
+							image.moveTo(idx);
+							below.renderAll();
+							imLeft = image.get('left')
+							imTop = image.get('top');
+						}
+					}
+				})
+				return false;
+			}
+		}	
+	})
+
+	$("#removeColorRange").on("click",function(e) {
+		var x = $(this).data("x");
+		var y = $(this).data("y");
+		var action = $(this).attr("id");
+		var color = $("#colorSquare").val();
+		var fuzz = parseInt($("#colorFuzz").val());
+		if (below.getActiveObject()) {
+			var object = below.getActiveObject()
+			var idx = below.getObjects().indexOf(object)
+			if (object.get('type') == "image") {
+				//$("#overlay").css("display","inline-block");
+				var pictureName = object.get('name');
+				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
+				var theImage = object._originalElement.currentSrc;
+				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();			
+				$.ajax({
+					type: "POST",
+					url: "http://127.0.0.1:8086/removeColorRange",
+					data: {imgdata: theImage, x: x, y: y, color: color, action: action, fuzz: fuzz, filename: pictureName},
+					success: function(data) {
+						var imgObj = new Image();
+						imgObj.src = data;
+						imgObj.onload = function () {
+							var image = new fabric.Image(imgObj);
+							image.set({
+								originX: 'center',
+								originY: 'center',
+								left: imLeft,
+								top: imTop,
+								perPixelTargetFind: true,
+								centeredScaling: true,
+								centeredRotation: true,
+								borderColor: 'red',
+								cornerColor: 'yellow',
+								cornerSize: 12,
+								name: pictureName,
+								transparentCorners: false
+							});
+							
+							image.filters.push(new fabric.Image.filters.Resize({
+								resizeType: 'lanczos', // typo fixed
+								lanczosLobes: 2 // typo fixed
+							}));	
+							
+							image.on('object:modified',function() {
+								imLeft = image.get('left');
+								imTop = image.get('top');
+							});
+							
+							below.remove(object);
+							below.add(image);
+							image.moveTo(idx);
+							below.renderAll();
+							imLeft = image.get('left');
+							imTop = image.get('top');
+							$("#colorSquare").val("Select Color");
+							$("#colorSquare").css("background","#FFFFFF");
+							$("#colorSquare").css("color","#000000");
+							$("#overlay").css("display","none");
+						}
+					}
+				})
+				return false;
+			}
+		}
+	})
+
+	$("#removeAllColor").on("click",function(e) {
+		var x = $(this).data("x");
+		var y = $(this).data("y");
+		var action = $(this).attr("id");
+		var color = $("#colorSquare").val();
+		var fuzz = parseInt($("#colorFuzz").val());
+		if (below.getActiveObject()) {
+			var object = below.getActiveObject()
+			var idx = below.getObjects().indexOf(object)
+			if (object.get('type') == "image") {
+				$("#overlay").css("display","inline-block");
+				var pictureName = object.get('name');
+				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
+				var theImage = object._originalElement.currentSrc;
+				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();			
+				$.ajax({
+					type: "POST",
+					//url: "./scripts/changecolor.php",
+					url: "http://127.0.0.1:8086/removeAllColor",
+					data: {imgdata: theImage, x: x, y: y, color: color, action: action, fuzz: fuzz, filename: pictureName},
+					success: function(data) {
+						var imgObj = new Image();
+						imgObj.src = data;
+						imgObj.onload = function () {
+							var image = new fabric.Image(imgObj);
+							image.set({
+								originX: 'center',
+								originY: 'center',
+								left: imLeft,
+								top: imTop,
+								perPixelTargetFind: true,
+								centeredScaling: true,
+								centeredRotation: true,
+								borderColor: 'red',
+								cornerColor: 'yellow',
+								cornerSize: 12,
+								name: pictureName,
+								transparentCorners: false
+							});
+							
+							image.filters.push(new fabric.Image.filters.Resize({
+								resizeType: 'lanczos',
+								lanczosLobes: 2
+							}));
+							
+							image.on('object:modified',function() {
+								imLeft = image.get('left');
+								imTop = image.get('top');
+							});
+							
+							below.remove(object);
+							below.add(image);
+							image.moveTo(idx);
+							below.renderAll();
+							imLeft = image.get('left');
+							imTop = image.get('top');
+							$("#colorSquare").val("Select Color");
+							$("#colorSquare").css("background","#FFFFFF");
+							$("#colorSquare").css("color","#000000");
+							$("#overlay").css("display","none");
+						}
+					}
+				})
+				return false;
+			}
+		}
+	})
+	
+	$(".replaceColor").on("click",function(e) {
+		$("#replaceColorSubmit").data("action",$(this).attr("id"))
+		$("#replaceColorSubmit").data("x",$(this).data("x"))
+		$("#replaceColorSubmit").data("y",$(this).data("y"))
+		var color = $("#colorSquare").val();
+		if ($("#replaceColorDiv").css("display") == "none") {
+			$("#replaceColorDiv").slideToggle();
+		}
+	})
+	
+	$("#replaceColorSubmit").on("click",function(e) {
+		var action = $(this).data("action");
+		var x = $(this).data("x");
+		var y = $(this).data("y");
+		var color = $("#colorSquare").val();
+		var newcolor = $("#replacementColor").spectrum("get").toHexString();
+		var fuzz = parseInt($("#colorFuzz").val());
+		if (below.getActiveObject()) {
+			var object = below.getActiveObject()
+			var idx = below.getObjects().indexOf(object)
+			if (object.get('type') == "image") {
+				var pictureName = object.get('name');
+				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
+				
+				var theImage = object._originalElement.currentSrc;
+
+				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();
+				
+				$.ajax({
+					type: "POST",
+					url: "http://127.0.0.1:8086/replaceColor",
+					data: {imgdata: theImage, x: x, y: y, action: action, color: color, newcolor: newcolor, fuzz: fuzz, filename: pictureName},
+					success: function(data) {
+					//$("#testImage").attr("src","data:image/png;base64,"+data);
+						var imgObj = new Image();
+						imgObj.src = data;
+						imgObj.onload = function () {
+							var image = new fabric.Image(imgObj);
+							image.set({
+								originX: 'center',
+								originY: 'center',
+								left: imLeft,
+								top: imTop,
+								perPixelTargetFind: true,
+								centeredScaling: true,
+								centeredRotation: true,
+								borderColor: 'red',
+								cornerColor: 'yellow',
+								cornerSize: 12,
+								name: pictureName,
+								transparentCorners: false
+							});
+							
+							image.filters.push(new fabric.Image.filters.Resize({
+								resizeType: 'lanczos',
+								lanczosLobes: 2
+							}));
+							
+							image.on('object:modified',function() {
+								imLeft = image.get('left')
+								imTop = image.get('top');
+								//$("#infoWTF").html("imLeft: "+imLeft+"<br>imTop: "+imTop);
+							});
+							
+							below.remove(object);
+							below.add(image);
+							image.moveTo(idx);
+							below.renderAll();
+							imLeft = image.get('left')
+							imTop = image.get('top');
+							//$("#infoWTF").html("imLeft: "+imLeft+"<br>imTop: "+imTop);
+						}
+					}
+				})
+				return false;
+			}
+		}	
+	})
     
     function getDataUri(url, callback) {
 		var image = new Image();
@@ -1739,6 +2353,36 @@
         return true;
     }
     
+	function rgb2hex(r,g,b) {
+		return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+	}
+	
+	function componentToHex(c) {
+		var hex = c.toString(16);
+		return hex.length == 1 ? "0" + hex : hex;
+	}
+	
+	$("#colorFuzz").on("change",function(e) {
+		$("#fuzzAmount").html($(this).val());
+	})
+
+	function idealTextColor(bgColor) {
+		var nThreshold = 105;
+		var components = getRGBComponents(bgColor);
+		var bgDelta = (components.R * 0.299) + (components.G * 0.587) + (components.B * 0.114);
+		return ((255 - bgDelta) < nThreshold) ? "#000000" : "#ffffff";   
+	}
+	
+	function getRGBComponents(color) {       
+		var r = color.substring(1, 3);
+		var g = color.substring(3, 5);
+		var b = color.substring(5, 7);
+		return {
+			R: parseInt(r, 16),
+			G: parseInt(g, 16),
+			B: parseInt(b, 16)
+		};
+	}
 </script>
 </head>    
 </html>

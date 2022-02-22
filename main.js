@@ -1,13 +1,15 @@
 const { app, BrowserWindow, dialog } = require('electron')
 const path = require('path')
 const fs = require('fs')
+const os = require('os')
 const express = require('express')
 const Jimp = require('jimp')
 const openExplorer = require('open-file-explorer');
-const sharp = require('sharp')
+const imagemagickCli = require('imagemagick-cli');
 
 const app2 = express()
 const port = 8086;
+const tempDir = os.tmpdir()
 
 app2.listen(port, () => {
   console.log(`Server running on port ${port}`);
@@ -42,10 +44,117 @@ app2.get("/uploadImage", (req, res) => {
 	  })
 })
 
-app2.post("/saveJersey", (req, res) => {
-  console.log(req.body)
-  var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+app2.post("/removeBorder", (req, res) => {
+	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	var fuzz = parseInt(req.body.fuzz);
+	Jimp.read(buffer, (err, image) => {
+		if (err) {
+			console.log(err);
+		} else {
+			image.write(tempDir+"/temp.png");
+			imagemagickCli.exec('magick convert -trim -fuzz '+fuzz+'% '+tempDir+'/temp.png '+tempDir+'/temp.png').then(({ stdout, stderr }) => {
+				Jimp.read(tempDir+"/temp.png", (err, image) => {
+					if (err) {
+						console.log(err);
+					} else {
+						image.getBase64(Jimp.AUTO, (err, ret) => {
+							res.end(ret);
+						})
+					}
+				})
+			})
+		}
+	})
 })
+
+app2.post("/replaceColor", (req, res) => {
+	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	var x = parseInt(req.body.x);
+	var y = parseInt(req.body.y);
+	var color = req.body.color;
+	var newcolor = req.body.newcolor;
+	var action = req.body.action;
+	var fuzz = parseInt(req.body.fuzz);
+	var cmdString;
+	Jimp.read(buffer, (err, image) => {
+		if (err) {
+			console.log(err);
+		} else {
+			image.write(tempDir+"/temp.png");
+			if (action == "replaceColorRange") {
+				cmdString = 'magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -fill '+newcolor+' -draw "color '+x+','+y+' floodfill" '+tempDir+'/temp.png';		
+			} else {
+				cmdString = 'magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -fill '+newcolor+' -opaque '+color+' '+tempDir+'/temp.png';	
+			}
+			imagemagickCli.exec(cmdString).then(({ stdout, stderr }) => {
+				Jimp.read(tempDir+"/temp.png", (err, image) => {
+					if (err) {
+						console.log(err);
+					} else {
+						image.getBase64(Jimp.AUTO, (err, ret) => {
+							res.end(ret);
+						})
+					}
+				})
+			})
+		}
+	})
+})
+
+app2.post("/removeColorRange", (req, res) => {
+	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	var x = parseInt(req.body.x);
+	var y = parseInt(req.body.y);
+	var fuzz = parseInt(req.body.fuzz);
+	Jimp.read(buffer, (err, image) => {
+		if (err) {
+			console.log(err);
+		} else {
+			image.write(tempDir+"/temp.png", (err) => {
+				imagemagickCli.exec('magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -fill none -draw "color '+x+','+y+' floodfill" '+tempDir+'/temp.png')
+				.then(({ stdout, stderr }) => {
+					Jimp.read(tempDir+"/temp.png", (err, image) => {
+						if (err) {
+							console.log(err);
+						} else {
+							image.getBase64(Jimp.AUTO, (err, ret) => {
+								res.end(ret);
+							})
+						}
+					})
+				})
+			})
+		}
+ 	})
+})
+
+app2.post('/removeAllColor', (req, res) => {
+	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	var x = parseInt(req.body.x);
+	var y = parseInt(req.body.y);
+	var color = req.body.color;
+	var fuzz = parseInt(req.body.fuzz);
+	Jimp.read(buffer, (err, image) => {
+		if (err) {
+			console.log(err);		
+		} else {
+			image.write(tempDir+"/temp.png", (err) => {
+				var cmdString = 'magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -transparent '+color+' '+tempDir+'/temp.png';
+				imagemagickCli.exec(cmdString).then(({ stdout, stderr }) => {
+					Jimp.read(tempDir+"/temp.png", (err, image) => {
+						if (err) {
+							console.log(err);
+						} else {
+							image.getBase64(Jimp.AUTO, (err, ret) => {
+								res.end(ret);
+							})
+						}
+					})
+				})
+			})
+		}
+	})
+});
 
 app2.post('/saveRink', (req, res) => {
   const images = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
@@ -54,10 +163,9 @@ app2.post('/saveRink', (req, res) => {
 	const options = {
 		defaultPath: app.getPath('desktop'),
     title: "Choose a folder to save the rink images",
-    properties: ['openFile', 'openDirectory', 'createDirectory', 'promptToCreate' ], 
 	}
 
-	dialog.showOpenDialog(null, { options }).then((result) => {
+	dialog.showOpenDialog(null, { properties: ['openFile', 'openDirectory', 'createDirectory', 'promptToCreate' ] }).then((result) => {
 		if (!result.canceled) {
       var scratches0 = fs.readFileSync(__dirname + "\\images\\boards2.png", {encoding: 'base64'});
       var scratchLayer0 = Buffer.from(scratches0, 'base64');
