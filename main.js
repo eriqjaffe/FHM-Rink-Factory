@@ -48,18 +48,16 @@ app2.post("/saveJersey", (req, res) => {
 })
 
 app2.post('/saveRink', (req, res) => {
-  var x =0
-  var output = "success"
-	const images = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+  const images = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
   const staticLines = Buffer.from(req.body.rinkLines.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
 
 	const options = {
-		defaultPath: app.getPath('desktop') + '/' + req.body.name + ".zip",
+		defaultPath: app.getPath('desktop'),
+    title: "Choose a folder to save the rink images",
+    properties: ['openFile', 'openDirectory', 'createDirectory', 'promptToCreate' ], 
 	}
 
-	dialog.showOpenDialog(null, {
-    properties: ['openFile', 'openDirectory', 'createDirectory', 'promptToCreate' ]
-  }).then((result) => {
+	dialog.showOpenDialog(null, { options }).then((result) => {
 		if (!result.canceled) {
       var scratches0 = fs.readFileSync(__dirname + "\\images\\boards2.png", {encoding: 'base64'});
       var scratchLayer0 = Buffer.from(scratches0, 'base64');
