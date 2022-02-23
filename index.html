@@ -19,12 +19,70 @@
 	<link href='./scripts/menu.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
     <script>	
-        var initialColors = {centerLineColor:"#C8102E",creaseLineColor:"#C8102E",faceOffCircleColor:"#C8102E",faceOffDotColor:"#C8102E",faceOffTargetColor:"#C8102E",blueLineColor:"#0032a0",creaseFillColor:"#41b6e6",creaseStrokeColor:"#C8102E",rinkColor:"#eef0f2",trapezoidFillColor:"rgba(0,0,0,0)",trapezoidStrokeColor:"#C8102E",goalLinesColor:"#C8102E",centerCircleColor:"#0032a0",centerDotColor:"#0032a0",nzFaceOffSpotsColor:"#C8102E",ezCircle1Color:"#C8102E",hashmarks1Color:"#C8102E",ezCircle1Color:"#C8102E",ezDots1Color:"#C8102E"};
+        var initialColors = {centerLineColor:"#C8102E",creaseLineColor:"#C8102E",faceOffCircleColor:"#C8102E",faceOffDotColor:"#C8102E",faceOffTargetColor:"#C8102E",blueLineColor:"#0032a0",creaseFillColor:"#41b6e6",creaseStrokeColor:"#C8102E",rinkColor:"#eef0f2",trapezoidFillColor:"rgba(0,0,0,0)",trapezoidStrokeColor:"#C8102E",goalLinesColor:"#C8102E",centerCircleColor:"#0032a0",centerDotColor:"#0032a0",nzFaceOffSpotsColor:"#C8102E",ezCircle1Color:"#C8102E",hashmarks1Color:"#C8102E",ezCircle1Color:"#C8102E",ezDots1Color:"#C8102E",textColor:"#000000"};
         var defaultTexture = "ice_scratches.png";
         var prefColorFormat = $.localStorage.getItem('rinkfactory.color_format');
 		if (!prefColorFormat) {
 			prefColorFormat = "hex";
 		}
+		var wmLeft = 480
+		var wmTop = 224
+		var fontSources = {
+			Acme: "Acme-Regular.ttf",
+			athletic_gothicregular: "athletic_gothic-webfont.ttf",
+			athletic_gothic_shadowregular: "athletic_gothic_shadow-webfont.ttf",
+			beaverton_scriptregular: "beaverton_script-webfont.ttf",
+			'"Berkshire Swash"': "BerkshireSwash-Regular.ttf",
+			'"Cantora One"': "CantoraOne-Regular.ttf",
+			caxton_romanregular: "caxton_roman-webfont.ttf",
+			'"Chela One"': "ChelaOne-Regular.ttf",
+			russell_circusregular: "circus-webfont.ttf",
+			Condiment: "Condiment-Regular.ttf",
+			Cookie: "Cookie-Regular.ttf",
+			Courgette: "Courgette-Regular.ttf",
+			'"Croissant One"': "CroissantOne-Regular.ttf",
+			Damion: "Damion-Regular.ttf",
+			Engagement: "Engagement-Regular.ttf",
+			rawlings_fancy_blockregular: "rawlingsfancyblock-regular-webfont.ttf",
+			'"Germania One"': "GermaniaOne-Regular.ttf",
+			Graduate: "Graduate-Regular.ttf",
+			'"Grand Hotel"': "GrandHotel-Regular.ttf",
+			'"Jockey One"': "JockeyOne-Regular.ttf",
+			kansasregular: "tuscan-webfont.ttf",
+			'"Kaushan Script"': "KaushanScript-Regular.ttf",
+			'"Leckerli One"': "LeckerliOne-Regular.ttf",
+			'"Lily Script One"': "LilyScriptOne-Regular.ttf",
+			Lobster: "Lobster-Regular.ttf",
+			'"Lobster Two"': "LobsterTwo-Regular.ttf",
+			'"Metal Mania"': "MetalMania-Regular.ttf",
+			Miniver: "Miniver-Regular.ttf",
+			'Molle, italic': "Molle-Regular.ttf",
+			'"New Rocker"': "NewRocker-Regular.ttf",
+			Norican: "Norican-Regular.ttf",
+			rawlings_old_englishmedium: "rawlingsoldenglish-webfont.ttf",
+			'"Oleo Script"': "OleoScript-Regular.ttf",
+			'"Oleo Script Swash Caps"': "OleoScriptSwashCaps-Regular.ttf",
+			Pacifico: "Pacifico.ttf",
+			'"Pirata One"': "PirataOne-Regular.ttf",
+			Playball: "Playball-Regular.ttf",
+			pro_full_blockregular: "pro_full_block-webfont.ttf",
+			richardson_fancy_blockregular: "richardson_fancy_block-webfont.ttf",
+			'"Rubik One"': "RubikOne-Regular.ttf",
+			'"Rum Raisin"': "RumRaisin-Regular.ttf",
+			Satisfy: "Satisfy-Regular.ttf",
+			'"Seymour One"': "SeymourOne-Regular.ttf",
+			spl28scriptregular: "spl28script-webfont.ttf",
+			ua_tiffanyregular: "tiffany-webfont.ttf",
+			'"Trade Winds"': "TradeWinds-Regular.ttf",
+			mlb_tuscan_newmedium: "mlb_tuscan_new-webfont.ttf",
+			UnifrakturCook: "UnifrakturCook-Bold.ttf",
+			UnifrakturMaguntia: "UnifrakturMaguntia-Book.ttf",
+			Vibur: "Vibur-Regular.ttf",
+			Viga: "Viga-Regular.ttf",
+			Wellfleet: "Wellfleet-Regular.ttf",
+			'"Wendy One"': "WendyOne-Regular.ttf",
+			Yellowtail: "Yellowtail-Regular.ttf"
+		};
     </script>
 <body>
 <div class="title">
@@ -133,6 +191,7 @@
                                 <td><label>Center Ice: </label></td>
                                 <td style="text-align:right;">
                                     <input class="selector enabledSelector" type="text" id="centerCircleColor" data-element="centerCircle">
+									<input class="selector enabledSelector" type="text" id="centerCircleFillColor" data-element="centerCircleFill">
                                     <input class="selector enabledSelector" type="text" id="centerDotColor" data-element="centerDot">
                                 </td>
                             </tr>
@@ -292,13 +351,244 @@
 							</tr></table>
 						</div>
 					</div>
+					<div class="accord-header inactive-header">Text</div>
+					<div class="accord-content">
+						<table style="width:100%;">
+							<tr>
+								<td class="checkCell"><input type="checkbox" id="textLogoCheck" class="wordmarkToggle" data-id="wordmark"></td>
+								<td colspan="2"><label>Text: </label><input class="textOption" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:79%; text-align:center;"/></td>
+							</tr>
+						</table>
+						<table style="width:100%;">
+							<tr>
+								<td style="text-align:center;"><input class="textColorSelector" type="text" id="textColor" data-element="wordmarkText"></td>	
+								<td style="text-align:center;">
+									Text Size: <input type="number" id="fontSize" value="30" min="1" class="textOption scaling" style="width:50px;">&nbsp;&nbsp;&nbsp;
+									Text Spacing: <input type="number" id="fontSpacing" value="0" class="textOption spacing" style="width:50px;">
+								</td>
+								<td><input type="button" class="button" id="flipBottomtext" value="Flip Bottom Text"></td>
+							<tr>
+						</table>
+						<table style="width:100%;">
+							<!-- <tr>
+								<td style="width:20%;">
+									<select id="warpEffect" class="textOption msDropDown" style="width:100%;">
+										<option value="none" data-image="./images/none.png"></option>
+										<option value="arch" data-value="15" data-image="./images/arched.png"></option>
+										<option value="arc" data-value="70" data-image="./images/arced.png"></option>
+										<option value="skewUp" data-value="25" data-image="./images/skewup.png"></option>
+										<option value="skewDown" data-value="25" data-image="./images/skewdown.png"></option>
+										<option value="skewLeft" data-value="25" data-image="./images/skewleft.png"></option>
+										<option value="skewRight" data-value="25" data-image="./images/skewright.png"></option>
+										<option value="bilinearUp" data-value="40" data-image="./images/angleup.png"></option>
+										<option value="bilinearDown" data-value="40" data-image="./images/angledown.png"></option>
+										<option value="archUp" data-value="15" data-image="./images/archup.png"></option>
+										<option value="archDown" data-value="15" data-image="./images/archdown.png"></option>
+										<option value="diagonalText" data-value="15" data-image="./images/diag.png"></option>
+										<option value="pinch" data-value="10" data-image="./images/pinch.png"></option>
+										<option value="sandbox" data-value="15" data-image="./images/warpTBD.png"></option>
+									</select>
+								</td>
+								<td style="width:80%;" colspan="2">
+									<div style="width:80%; text-align:center;" class="standardWarp">
+										<input type="range" class="range" class="textOption" id="warpAmount" value="0" min="1" max="100" style="width:100%; float:left;">
+									</div>
+									<div style="width:15%; text-align:right; float:right;" class="standardWarp">
+										<input type="number" class="textOption" style="width:50px; text-align:center;" id="warpAmountDisplay" val="0">
+									</div>
+									<div style="width:49%; display:none; float:left; text-align:center;" class="diagonalWarp">
+										Horizontal Spacing: <input type="number" id="hSpacing" value="22" class="textOption spacing" style="width:40px;">
+									</div>
+									<div style="width:49%; display:none; text-align:center;" class="diagonalWarp">
+										Vertical Spacing: <input type="number" id="vSpacing" value="25" class="textOption spacing" style="width:40px;">
+									</div>
+								</td>
+							</tr>
+							<tr><td colspan="3" style="text-align:center; font-size:.8em;">Text effects may take a moment or two to process - be patient!</td></tr> -->
+						</table>	
+						<table style="width:100%;">
+							<tr>
+								<td colspan="3">
+									<select id="fontTypeCombo" class='textOption ProFullBlock' style="width:100%;">
+										<optgroup class='Acme'>
+										<option value='Acme'>Acme</option>
+										</optgroup>
+										<optgroup class='AthleticGothic'>
+										<option value='AthleticGothic'>Athletic Gothic</option>
+										</optgroup>
+										<optgroup class='AthleticGothicShadow'>
+										<option value='AthleticGothicShadow'>Athletic Gothic Shadow</option>
+										</optgroup>
+										<optgroup class='BeavertonScript'>
+										<option value='BeavertonScript'>Fancy Block</option>
+										</optgroup>
+										<optgroup class='Berkshire_Swash'>
+										<option value='Berkshire_Swash'>Berkshire Swash</option>
+										</optgroup>
+										<optgroup class='Cantora_One'>
+										<option value='Cantora_One'>Cantora</option>
+										</optgroup>
+										<optgroup class='CaxtonRoman'>
+										<option value='CaxtonRoman'>Caxton Roman</option>
+										</optgroup>
+										<optgroup class='Chela_One'>
+										<option value='Chela_One'>Chela</option>
+										</optgroup>
+										<optgroup class='Circus'>
+										<option value='Circus'>Circus</option>
+										</optgroup>
+										<optgroup class='Condiment'>
+										<option value='Condiment'>Condiment</option>
+										</optgroup>
+										<optgroup class='Cookie'>
+										<option value='Cookie'>Cookie</option>
+										</optgroup>
+										<optgroup class='Courgette'>
+										<option value='Courgette'>Courgette</option>
+										</optgroup>
+										<optgroup class='Croissant_One'>
+										<option value='Croissant_One'>Croissant</option>
+										</optgroup>
+										<optgroup class='Damion'>
+										<option value='Damion'>Damion</option>
+										</optgroup>
+										<optgroup class='Engagement'>
+										<option value='Engagement'>Engagement</option>
+										</optgroup>
+										<optgroup class='RawlingsFancyBlock'>
+										<option value='RawlingsFancyBlock'>Fancy Block</option>
+										</optgroup>
+										<optgroup class='Germania_One'>
+										<option value='Germania_One'>Germania</option>
+										</optgroup>
+										<optgroup class='Graduate'>
+										<option value='Graduate'>Graduate</option>
+										</optgroup>
+										<optgroup class='Grand_Hotel'>
+										<option value='Grand_Hotel'>Grand Hotel</option>
+										</optgroup>
+										<optgroup class='Jockey_One'>
+										<option value='Jockey_One'>Jockey</option>
+										</optgroup>
+										<optgroup class='Kansas'>
+										<option value='Kansas'>Kansas Tuscan</option>
+										</optgroup>
+										<optgroup class='Kaushan_Script'>
+										<option value='Kaushan_Script'>Kaushan Script</option>
+										</optgroup>
+										<optgroup class='Leckerli_One'>
+										<option value='Leckerli_One'>Leckerli</option>
+										</optgroup>
+										<optgroup class='Lily_Script_One'>
+										<option value='Lily_Script_One'>Lily Script</option>
+										</optgroup>
+										<optgroup class='Lobster'>
+										<option value='Lobster'>Lobster</option>
+										</optgroup>
+										<optgroup class='Lobster_Two'>
+										<option value='Lobster_Two'>Lobster Two</option>
+										</optgroup>
+										<optgroup class='Metal_Mania'>
+										<option value='Metal_Mania'>Metal Mania</option>
+										</optgroup>
+										<optgroup class='Miniver'>
+										<option value='Miniver'>Miniver</option>
+										</optgroup>
+										<optgroup class='Molle'>
+										<option value='Molle'>Molle</option>
+										</optgroup>
+										<optgroup class='New_Rocker'>
+										<option value='New_Rocker'>New Rocker</option>
+										</optgroup>
+										<optgroup class='Norican'>
+										<option value='Norican'>Norican</option>
+										</optgroup>
+										<optgroup class='OldEnglish'>
+										<option value='OldEnglish'>Old English</option>
+										</optgroup>
+										<optgroup class='Oleo_Script'>
+										<option value='Oleo_Script'>Oleo Script</option>
+										</optgroup>
+										<optgroup class='Oleo_Script_Swash_Caps'>
+										<option value='Oleo_Script_Swash_Caps'>Oleo Script Swash Caps</option>
+										</optgroup>
+										<optgroup class='Pacifico'>
+										<option value='Pacifico'>Pacifico</option>
+										</optgroup>
+										<optgroup class='Pirata_One'>
+										<option value='Pirata_One'>Pirata</option>
+										</optgroup>
+										<optgroup class='Playball'>
+										<option value='Playball'>Playball</option>
+										</optgroup>
+										<optgroup class='ProFullBlock'>
+										<option value='ProFullBlock' selected>Pro Full Block</option>
+										</optgroup>
+										<!--<optgroup class='Quicksand'>
+										<option value='Quicksand'>Quicksand</option>
+										</optgroup>-->
+										<optgroup class='RichardsonFancyBlock'>
+										<option value='RichardsonFancyBlock'>Richardson Block</option>
+										</optgroup>
+										<optgroup class='Rubik_One'>
+										<option value='Rubik_One'>Rubik</option>
+										</optgroup>
+										<optgroup class='Rum_Raisin'>
+										<option value='Rum_Raisin'>Rum Raisin</option>
+										</optgroup>
+										<optgroup class='Satisfy'>
+										<option value='Satisfy'>Satisfy</option>
+										</optgroup>
+										<optgroup class='Seymour_One'>
+										<option value='Seymour_One'>Seymour</option>
+										</optgroup>
+										<optgroup class='spl28'>
+										<option value='spl28'>SPL28 Script</option>
+										</optgroup>
+										<optgroup class='TiffanyRegular'>
+										<option value='TiffanyRegular'>Tiffany Regular</option>
+										</optgroup>
+										<optgroup class='Trade_Winds'>
+										<option value='Trade_Winds'>Trade Winds</option>
+										</optgroup>
+										<optgroup class='Tuscan'>
+										<option value='Tuscan'>Tuscan</option>
+										</optgroup>
+										<optgroup class='UnifrakturCook'>
+										<option value='UnifrakturCook'>Unifraktur Cook</option>
+										</optgroup>
+										<optgroup class='UnifrakturMaguntia'>
+										<option value='UnifrakturMaguntia'>Unifraktur Maguntia</option>
+										</optgroup>
+										<optgroup class='Vibur'>
+										<option value='Vibur'>Vibur</option>
+										</optgroup>
+										<optgroup class='Viga'>
+										<option value='Viga'>Viga</option>
+										</optgroup>
+										<optgroup class='Wellfleet'>
+										<option value='Wellfleet'>Wellfleet</option>
+										</optgroup>
+										<optgroup class='Wendy_One'>
+										<option value='Wendy_One'>Wendy</option>
+										</optgroup>
+										<optgroup class='Yellowtail'>
+										<option value='Yellowtail'>Yellowtail</option>
+										</optgroup>
+									</select>
+								</td>
+							</tr>
+							<tr><td colspan="3" align="center">
+								<input id="customFont" type="file" name="customFont" accept=".ttf,.otf,.woff,.woff2" style="display:none;" />
+								<input type="button" class="button textOption" id="fakeFontButton" value="Choose a Local Font..." />
+								<input type="button" class="button textOption" id="uploadTheFont" value="Upload Font" style="display:none;" />
+							</td></tr>
+						</table>
+					</div>
                 </div>
 				<div style="text-align:center; margin-top:5px;">
 					<input type="button" class="button" id="straightenObject" value="Reset Object Rotation" style="display:none;">
 					<input type="button" class="button" id="save" value="Save Rink">
-					<!--<input type="button" class="button" id="zip" value="Zip Sweater">-->
-					<!--<input type="button" class="button" id="imgur" value="Upload To Imgur">-->
-					<!--<input type="button" class="button" id="clearTexture" value="Clear Custom Texture" style="display:none;">-->
 					<input type="button" class="button" id="aboutRinkFactory" value="About Rink Factory">
 				</div>
             </div>
@@ -794,14 +1084,6 @@
 			evented: false
 		});
 
-/*         centerCircle = new fabric.Path("M 480.32227 156.79492 C 443.28967 156.79522 413.23664 186.85021 413.23633 223.88281 C 413.23551 260.91621 443.28887 290.96845 480.32227 290.96875 C 517.35566 290.96845 547.41098 260.91621 547.41016 223.88281 C 547.40985 186.85021 517.35486 156.79522 480.32227 156.79492 z M 480.32617 158.29492 A 65.586461 65.586461 0 0 1 545.91211 223.88086 A 65.586461 65.586461 0 0 1 480.32617 289.46875 A 65.586461 65.586461 0 0 1 414.74023 223.88086 A 65.586461 65.586461 0 0 1 480.32617 158.29492 z",{
-			fill: initialColors["blueLineColor"],
-			id: 'centerCircle',
-			visible: true,
-			selectable:false,
-			evented: false,
-		}); */
-
 		centerCircle = new fabric.Path("M 478.19727 156.84961 C 442.14905 157.97588 413.23663 187.56279 413.23633 223.88281 C 413.23552 260.20362 442.14828 289.78789 478.19727 290.91406 L 478.19727 289.31641 A 65.586461 65.586461 0 0 1 414.74023 223.88086 A 65.586461 65.586461 0 0 1 478.19727 158.44727 L 478.19727 156.84961 z M 482.45117 156.84961 L 482.45117 158.44727 A 65.586461 65.586461 0 0 1 545.91211 223.88086 A 65.586461 65.586461 0 0 1 482.45117 289.41406 L 482.45117 290.91406 C 518.49841 289.78588 547.41096 260.20231 547.41016 223.88281 C 547.40985 187.56409 518.49764 157.97789 482.45117 156.84961 z",{
 			fill: initialColors["blueLineColor"],
 			id: 'centerCircle',
@@ -809,14 +1091,6 @@
 			selectable:false,
 			evented: false,
 		});
-
-/* 		centerCircleStroke = new fabric.Path("M 480.32031 154.9082 C 442.26529 154.90851 411.34407 185.82981 411.34375 223.88477 C 411.34291 261.94053 442.26461 292.86101 480.32031 292.86133 C 518.37601 292.86101 549.29772 261.9406 549.29688 223.88477 C 549.29656 185.82975 518.37532 154.90851 480.32031 154.9082 z M 480.32812 160.1875 C 515.52879 160.18778 544.01925 188.67629 544.01953 223.87695 C 544.0203 259.07836 515.52953 287.57589 480.32812 287.57617 C 445.12672 287.57589 416.63009 259.07836 416.63086 223.87695 C 416.63114 188.67629 445.12746 160.18778 480.32812 160.1875 z",{
-			fill: initialColors["rinkColor"],
-			id: 'strokeCenterCircle',
-			visible: true,
-			selectable:false,
-			evented: false,
-		}); */
 		
 		centerCircleStroke = new fabric.Path("M 478.19727 154.96289 C 441.12414 156.09017 411.34406 186.54164 411.34375 223.88477 C 411.34293 261.22867 441.12348 291.67938 478.19727 292.80664 L 478.19727 287.52344 C 443.98623 286.39815 416.63011 258.36357 416.63086 223.87695 C 416.63113 189.39107 443.98693 161.36517 478.19727 160.24023 L 478.19727 154.96289 z M 482.45117 154.96289 L 482.45117 160.24023 C 516.66493 161.36117 544.01926 189.38845 544.01953 223.87695 C 544.02029 258.36619 516.66563 286.40215 482.45117 287.52344 L 482.45117 292.80664 C 519.52134 291.67535 549.29769 261.22613 549.29688 223.88477 C 549.29656 186.5442 519.52067 156.0942 482.45117 154.96289 z",{
 			fill: initialColors["rinkColor"],
@@ -824,6 +1098,14 @@
 			visible: true,
 			selectable:false,
 			evented: false,
+		});
+
+		centerCircleFill = new fabric.Path("M 480.32227 156.79492 C 466.36363 156.79503 453.39798 161.06677 442.6582 168.37109 A 67.087002 67.087002 0 0 1 480.32227 156.79492 z M 483.91602 156.89258 A 67.087002 67.087002 0 0 1 493.32422 158.08594 C 490.25501 157.48161 487.11994 157.06197 483.91602 156.89258 z M 493.32422 158.08594 C 493.47311 158.11525 493.62295 158.14157 493.77148 158.17188 A 67.087002 67.087002 0 0 0 493.32422 158.08594 z M 493.77148 158.17188 A 67.087002 67.087002 0 0 1 502.83008 160.69336 C 499.89873 159.64759 496.87444 158.80488 493.77148 158.17188 z M 502.83008 160.69336 C 502.92507 160.72725 503.01849 160.76452 503.11328 160.79883 A 67.087002 67.087002 0 0 0 502.83008 160.69336 z M 503.11328 160.79883 A 67.087002 67.087002 0 0 1 511.85352 164.66602 C 509.05547 163.17206 506.12932 161.89028 503.11328 160.79883 z M 480.32617 158.29492 A 65.586461 65.586461 0 0 0 414.74023 223.88086 A 65.586461 65.586461 0 0 0 480.32617 289.46875 A 65.586461 65.586461 0 0 0 545.91211 223.88086 A 65.586461 65.586461 0 0 0 480.32617 158.29492 z M 516.69922 167.51758 A 67.087002 67.087002 0 0 1 523.91406 172.93359 C 521.63153 170.9785 519.23176 169.15615 516.69922 167.51758 z M 523.91406 172.93359 C 524.12417 173.11356 524.33708 173.29015 524.54492 173.47266 A 67.087002 67.087002 0 0 0 523.91406 172.93359 z M 524.54492 173.47266 A 67.087002 67.087002 0 0 1 530.73242 179.66016 C 528.80552 177.4657 526.73937 175.39956 524.54492 173.47266 z M 530.73242 179.66016 C 530.91493 179.868 531.09152 180.08091 531.27148 180.29102 A 67.087002 67.087002 0 0 0 530.73242 179.66016 z M 531.27148 180.29102 A 67.087002 67.087002 0 0 1 536.6875 187.50586 C 535.04892 184.97332 533.22657 182.57355 531.27148 180.29102 z M 422.22461 190.33789 C 417.90215 197.80439 414.98343 206.18044 413.81445 215.10547 A 67.087002 67.087002 0 0 1 422.22461 190.33789 z M 413.81445 215.10547 A 67.087002 67.087002 0 0 0 413.80664 215.18164 C 413.80991 215.15646 413.81116 215.13064 413.81445 215.10547 z M 413.80664 215.18164 C 413.43686 218.03006 413.23644 220.93216 413.23633 223.88086 A 67.087002 67.087002 0 0 1 413.80664 215.18164 z M 539.53906 192.35156 A 67.087002 67.087002 0 0 1 543.40625 201.0918 C 542.3148 198.07576 541.03302 195.14961 539.53906 192.35156 z M 543.40625 201.0918 C 543.44055 201.18659 543.47783 201.28001 543.51172 201.375 A 67.087002 67.087002 0 0 0 543.40625 201.0918 z M 543.51172 201.375 A 67.087002 67.087002 0 0 1 546.0332 210.43359 C 545.4002 207.33064 544.55749 204.30635 543.51172 201.375 z M 546.0332 210.43359 C 546.0635 210.58213 546.08982 210.73197 546.11914 210.88086 A 67.087002 67.087002 0 0 0 546.0332 210.43359 z M 546.11914 210.88086 A 67.087002 67.087002 0 0 1 547.3125 220.28906 C 547.1431 217.08513 546.72346 213.95007 546.11914 210.88086 z M 413.23633 223.88281 C 413.23602 237.85475 417.51566 250.83057 424.83203 261.57617 A 67.087002 67.087002 0 0 1 413.23633 223.88281 z M 547.41016 223.88281 A 67.087002 67.087002 0 0 1 535.83398 261.54688 C 543.13824 250.80712 547.41047 237.84174 547.41016 223.88281 z M 442.61523 279.36523 C 453.36325 286.68644 466.34526 290.96864 480.32227 290.96875 A 67.087002 67.087002 0 0 1 442.61523 279.36523 z M 513.86719 281.98047 A 67.087002 67.087002 0 0 1 489.09961 290.39062 C 498.02465 289.22163 506.4006 286.30286 513.86719 281.98047 z M 489.09961 290.39062 C 489.07443 290.39392 489.04862 290.39517 489.02344 290.39844 A 67.087002 67.087002 0 0 0 489.09961 290.39062 z M 489.02344 290.39844 A 67.087002 67.087002 0 0 1 480.32422 290.96875 C 483.27299 290.96864 486.17501 290.76823 489.02344 290.39844 z",{
+			fill: 'transparent',
+			id: 'centerCircleFill',
+			visible: true,
+			selectable:false,
+			evented: false
 		});
 
         blueLines = new fabric.Path("M 586.19727 25.845703 L 586.19727 421.1543 L 590.45117 421.1543 L 590.45117 25.845703 L 586.19727 25.845703 z M 368.87109 25.935547 L 368.87109 421.24414 L 373.125 421.24414 L 373.125 25.935547 L 368.87109 25.935547 z",{
@@ -1027,16 +1309,167 @@
 			width: 100
 		})
 
-		rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
+		rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerCircleFill, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
 			id: 'rinkElementGroup',
 			visible: true,
 			selectable: false,
 			evented: false
 		})
+
+		wordmarkTextTop = new fabric.Text('ARENA NAME',{
+			fontFamily: "pro_full_blockregular",
+			fontSize: 20,
+			originX: 'center',
+			originY: 'center',
+			textAlign: 'center',
+			id: 'wordmarkTextTop',
+			fill: 'black',
+			stroke: 'transparent',
+			strokeWidth: 35,
+			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
+				visible: false,
+				selectable:false,
+				evented: false,
+			}),
+			pathSide: 'left',
+			pathAlign: 'descender'
+		})
+
+		wordmarkTextBottom = new fabric.Text('ARENA NAME',{
+			fontFamily: 'pro_full_blockregular',
+			fontSize: 20,
+			originX: 'center',
+			originY: 'center',
+			textAlign: 'center',
+			id: 'wordmarkTextBottom',
+			fill: 'black',
+			stroke: 'transparent',
+			strokeWidth: 35,
+			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
+				visible: false,
+				selectable:false,
+				evented: false
+			}),
+			pathSide: 'right',
+			pathAlign: 'ascender'
+		})
+
+		wordmarkTextBottom.rotate(180)
 		
+		wordmark = new fabric.Group( [wordmarkTextTop, wordmarkTextBottom], {
+			originX: 'center',
+			originY:' center',
+			visible: false,
+			id: 'wordmark',
+			borderColor: 'red',
+			cornerColor: 'yellow',
+			cornerSize: 12,
+			transparentCorners: false,
+			lockScalingFlip: true,
+			lockScalingX: true,
+			lockScalingY: true,
+			lockMovementX: true,
+			lockMovementY: true,
+			left: wmLeft,
+			top: wmTop,
+			snapAngle: 15,
+		});
+
+		wordmark.rotate(90)
+		wordmark.setControlsVisibility({
+			mt: false,
+			mb: false,
+			ml: false,
+			mr: false,
+			tr: false,
+			tl: false,
+			br: false,
+			bl: false,
+			mtr: true //the rotating point (defaut: true)
+		})
+
 		below.add(rinkElementGroup)
+		below.add(wordmark)
 		below.renderAll()
     }
+
+	$(".textColorSelector").each(function() {
+		var color = $(this).attr('id');
+		var change = false;
+		if (color == 'transparent') {
+			color = null;
+		}
+		$(this).spectrum({
+			showInput: true,
+			preferredFormat: prefColorFormat,
+			showInitial: true,
+			showPalette: true,
+			showButtons: true,
+			allowEmpty: true,
+			showSelectionPalette: true,
+			localStorageKey: "spectrum.rinkfactory",
+			palette: [ ],
+			color: initialColors[$(this).attr('id')],
+			show: function(color) {
+				var original_color = color;
+				$(this).data('changed', false);
+			},
+			move: function(color) {
+				change = true;
+				if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+				objects = wordmark.getObjects();
+				for (x in objects) {
+					objects[x].fill = colorX;
+					//objects[x].stroke = colorX;
+				}
+				wordmark.addWithUpdate()
+				below.renderAll();
+				//initializeWarp();
+			},
+			change: function(color) {
+				change = true;
+				if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+				objects = wordmark.getObjects();
+				for (x in objects) {
+					objects[x].fill = colorX;
+					//objects[x].stroke = colorX;
+				}
+				wordmark.addWithUpdate()
+				below.renderAll();
+				//initializeWarp();
+			},
+			hide: function(color) {
+				change = true;
+				if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+				objects = wordmark.getObjects();
+				for (x in objects) {
+					objects[x].fill = colorX;
+					//objects[x].stroke = colorX;
+				}
+				wordmark.addWithUpdate()
+				below.renderAll();
+				//initializeWarp();
+			}
+		})
+	})
 
     $("#rinkColor").spectrum({
 		showInput: true,
@@ -1637,6 +2070,26 @@
 		rinkElementGroup.addWithUpdate()
 		below.renderAll()
 	})
+
+	$("#textLogoCheck").on("click",function(e) {
+		if ($(this).is(':checked')) {
+			state = true;
+		} else {
+			state = false;
+		}
+		var objects = below.getObjects()
+		for (x in objects) {
+			if (objects[x].id == "wordmark") {
+				if (state == true) {
+					objects[x].visible = true;
+				} else {
+					objects[x].visible = false;
+				}
+			wordmark.addWithUpdate();
+			below.renderAll()
+			}
+		}
+	})
 	
 	$(".belowTextureToggle").on("click",function() {
 		if ($(this).is(':checked')) {
@@ -1801,7 +2254,7 @@
 		$("#overlay").css("display","inline-block");	
 
 		belowFull.loadFromJSON(below.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']), belowFull.renderAll.bind(belowFull), function(o, object) {
-			if (object.id == 'rinkElementGroup') {
+			if (object.id == 'rinkElementGroup' || object.id == "wordmark") {
 				object.set({
 				scaleX: object.scaleX * 3,
 				scaleY: object.scaleY * 3,
@@ -1817,7 +2270,7 @@
 
 		var objects = below.getObjects()
 		for (x in objects) {
-			if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup') {
+			if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup' || objects[x].id == "wordmark") {
 				objects[x].set({
 					visible: false
 				})
@@ -1834,7 +2287,7 @@
 			success: function(result) {
 				var objects = below.getObjects()
 				for (x in objects) {
-					if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup') {
+					if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup' || objects[x].id == "wordmark") {
 						objects[x].set({
 							visible: true
 						})
@@ -1844,6 +2297,19 @@
 				$("#overlay").css("display","none");
 			}
 		})
+	})
+
+	$("#flipBottomtext").on("click",function(e) {
+		var objects = wordmark.getObjects()
+		if (objects[1].pathSide == 'right') {
+			objects[1].pathSide = 'left'
+			objects[1].pathAlign = 'descender'
+		} else {
+			objects[1].pathSide = 'right'
+			objects[1].pathAlign = 'ascender'
+		}
+		wordmark.addWithUpdate()
+		below.renderAll()	
 	})
 
 	$(".makeAd").on("click",function(e) {
