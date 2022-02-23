@@ -409,7 +409,7 @@
 						<table style="width:100%;">
 							<tr>
 								<td colspan="3">
-									<select id="fontTypeCombo" class='textOption ProFullBlock' style="width:100%;">
+									<select id="fontTypeCombo" class='textOption Rubik_One' style="width:100%;">
 										<optgroup class='Acme'>
 										<option value='Acme'>Acme</option>
 										</optgroup>
@@ -522,7 +522,7 @@
 										<option value='Playball'>Playball</option>
 										</optgroup>
 										<optgroup class='ProFullBlock'>
-										<option value='ProFullBlock' selected>Pro Full Block</option>
+										<option value='ProFullBlock'>Pro Full Block</option>
 										</optgroup>
 										<!--<optgroup class='Quicksand'>
 										<option value='Quicksand'>Quicksand</option>
@@ -531,7 +531,7 @@
 										<option value='RichardsonFancyBlock'>Richardson Block</option>
 										</optgroup>
 										<optgroup class='Rubik_One'>
-										<option value='Rubik_One'>Rubik</option>
+										<option value='Rubik_One' selected>Rubik</option>
 										</optgroup>
 										<optgroup class='Rum_Raisin'>
 										<option value='Rum_Raisin'>Rum Raisin</option>
@@ -1317,7 +1317,7 @@
 		})
 
 		wordmarkTextTop = new fabric.Text('ARENA NAME',{
-			fontFamily: "pro_full_blockregular",
+			fontFamily: "Rubik One",
 			fontSize: 20,
 			originX: 'center',
 			originY: 'center',
@@ -1336,7 +1336,7 @@
 		})
 
 		wordmarkTextBottom = new fabric.Text('ARENA NAME',{
-			fontFamily: 'pro_full_blockregular',
+			fontFamily: 'Rubik One',
 			fontSize: 20,
 			originX: 'center',
 			originY: 'center',
@@ -1350,8 +1350,8 @@
 				selectable:false,
 				evented: false
 			}),
-			pathSide: 'right',
-			pathAlign: 'ascender'
+			pathSide: 'left',
+			pathAlign: 'descender'
 		})
 
 		wordmarkTextBottom.rotate(180)
@@ -1372,7 +1372,7 @@
 			lockMovementY: true,
 			left: wmLeft,
 			top: wmTop,
-			snapAngle: 15,
+			snapAngle: 5,
 		});
 
 		wordmark.rotate(90)
@@ -1392,6 +1392,15 @@
 		below.add(wordmark)
 		below.renderAll()
     }
+
+	$("#wordmarkTextBox").on("change",function(e) {
+		objects = wordmark.getObjects();
+		for (x in objects) {
+			objects[x].text = $(this).val();
+		}
+		wordmark.addWithUpdate()
+		below.renderAll();
+	})
 
 	$(".textColorSelector").each(function() {
 		var color = $(this).attr('id');
@@ -2164,6 +2173,19 @@
 		}
 		rinkElementGroup.addWithUpdate();
 		below.renderAll();
+	})
+
+	$("#fontTypeCombo").on("change",function() {
+		var style = $(this).val();
+		var font_family = $("."+style).css("font-family");
+		var objects = wordmark.getObjects();
+		for (x in objects) {
+			objects[x].fontFamily = font_family;
+		}
+		wordmark.addWithUpdate()
+		below.renderAll();
+		$(this).removeClass().addClass(style);
+		//initializeWarp();
 	})
 
     $("#fakeImageButton").on("click",function() {
