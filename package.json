@@ -1,20 +1,61 @@
 {
   "name": "fhm-rink-factory",
   "version": "0.1.0",
-  "description": "",
+  "description": "A utility for making rinks for Franchise Hockey Manager",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
-  "author": "",
+  "author": {
+    "name": "Eriq Jaffe",
+    "email": "eriqjaffe@gmail.com",
+    "url": "https://github.com/eriqjaffe/FHM-Rink-Factory"
+  },
   "license": "ISC",
   "dependencies": {
-    "electron": "^17.0.0",
     "express": "^4.17.3",
     "image-output": "^2.4.2",
     "imagemagick-cli": "^0.5.0",
     "jimp": "^0.16.1",
     "open-file-explorer": "^1.0.2",
     "ttfinfo": "^0.2.0"
+  },
+  "packageManager": "yarn@3.1.0",
+  "devDependencies": {
+    "electron": "^17.0.0",
+    "electron-builder": "^22.14.5"
+  },
+  "build": {
+    "appId": "com.ootputilities.rinkfactory",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": [
+        "zip",
+        "dmg"
+      ]
+    },
+    "portable": {
+      "artifactName": "${productName}_${version}_portable.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "artifactName": "${productName}_${version}_setup.${ext}",
+      "menuCategory": "OOTP Utilities",
+      "shortcutName": "FHM Rink Factory",
+      "include": "build/installer.nsh"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm",
+        "tar.gz"
+      ]
+    },
+    "deb": {}
   }
 }
