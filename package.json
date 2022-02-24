@@ -1,5 +1,6 @@
 {
   "name": "fhm-rink-factory",
+  "productName": "FHM Rink Factory",
   "version": "0.1.0",
   "description": "A utility for making rinks for Franchise Hockey Manager",
   "main": "main.js",
@@ -44,10 +45,13 @@
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
       "allowElevation": true,
-      "artifactName": "${productName}_${version}_setup.${ext}",
+      "artifactName": "FHM Rink Factory ${version} setup.${ext}",
       "menuCategory": "OOTP Utilities",
       "shortcutName": "FHM Rink Factory",
-      "include": "build/installer.nsh"
+      "include": "build/installer.nsh",
+      "uninstallDisplayName": "FHM Rink Factory ${version}",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
     },
     "linux": {
       "target": [
