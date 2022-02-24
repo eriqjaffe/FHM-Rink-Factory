@@ -609,6 +609,18 @@
 	 		wmTop = obj.get('top');
 		}
 	})
+
+/* 	below.on('object:scaling', function(e) {
+		var o = e.target;
+		const objHeight = o.scaleY ? o.height * o.scaleY : o.height;
+		console.log(objHeight)
+	})
+
+	below.on('object:scaled', function(e) {
+		var o = e.target;
+		const objHeight = o.scaleY ? o.height * o.scaleY : o.height;
+		console.log(objHeight)
+	}) */
 	
 	below.on('selection:cleared', function(e) {
 		$("#straightenObject").css("display","none");
@@ -2435,7 +2447,7 @@
 			success: function(result) {
 				var objects = below.getObjects()
 				for (x in objects) {
-					if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup' || objects[x].id == "wordmark") {
+					if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup') {
 						objects[x].set({
 							visible: true
 						})
@@ -2587,17 +2599,19 @@
 		if (object.type == "image") {
 			var imageHeight = object.height;
 			var imageWidth = object.width;
-			if (imageHeight > imageWidth && imageHeight > 394) {
-				object.scaleToHeight(394);
-			} else if (imageWidth > imageHeight && imageWidth > 394) {
-				object.scaleToWidth(394);
+			if (imageHeight > imageWidth && imageHeight > 132) {
+				object.scaleToHeight(132);
+			} else if (imageWidth > imageHeight && imageWidth > 132) {
+				object.scaleToWidth(132);
 			} else {
 				if (imageWidth > 394) {
-					object.scaleToWidth(394);
+					object.scaleToWidth(132);
 				} 
 			}
 			below.centerObject(object);
 			object.setCoords();
+			const objHeight = object.scaleY ? object.height * object.scaleY : object.height;
+			console.log(objHeight)
 		}
 		below.renderAll();
 		$("#overlay").css("display","none");
@@ -2697,13 +2711,19 @@
 			if (object.get('type') == "image") {
 				//$("#overlay").css("display","inline-block");
 				var pictureName = object.get('name');
+				var pLeft = object.get('left')
+				var pTop = object.get('top')
+				var pScaleX = object.get('scaleX')
+				var pScaleY = object.get('scaleY')
+				var pX = x / pScaleX
+				var pY = y / pScaleY
 				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
 				var theImage = object._originalElement.currentSrc;
 				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();			
 				$.ajax({
 					type: "POST",
 					url: "http://127.0.0.1:8086/removeColorRange",
-					data: {imgdata: theImage, x: x, y: y, color: color, action: action, fuzz: fuzz, filename: pictureName},
+					data: {imgdata: theImage, x: pX, y: pY, color: color, action: action, fuzz: fuzz, filename: pictureName},
 					success: function(data) {
 						var imgObj = new Image();
 						imgObj.src = data;
@@ -2712,8 +2732,10 @@
 							image.set({
 								originX: 'center',
 								originY: 'center',
-								left: imLeft,
-								top: imTop,
+								left: pLeft,
+								top: pTop,
+								scaleX: pScaleX,
+								scaleY: pScaleY,
 								perPixelTargetFind: true,
 								centeredScaling: true,
 								centeredRotation: true,
@@ -2764,6 +2786,12 @@
 			if (object.get('type') == "image") {
 				$("#overlay").css("display","inline-block");
 				var pictureName = object.get('name');
+				var pLeft = object.get('left')
+				var pTop = object.get('top')
+				var pScaleX = object.get('scaleX')
+				var pScaleY = object.get('scaleY')
+				var pX = x / pScaleX
+				var pY = y / pScaleY
 				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
 				var theImage = object._originalElement.currentSrc;
 				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();			
@@ -2771,7 +2799,7 @@
 					type: "POST",
 					//url: "./scripts/changecolor.php",
 					url: "http://127.0.0.1:8086/removeAllColor",
-					data: {imgdata: theImage, x: x, y: y, color: color, action: action, fuzz: fuzz, filename: pictureName},
+					data: {imgdata: theImage, x: pX, y: pY, color: color, action: action, fuzz: fuzz, filename: pictureName},
 					success: function(data) {
 						var imgObj = new Image();
 						imgObj.src = data;
@@ -2780,8 +2808,10 @@
 							image.set({
 								originX: 'center',
 								originY: 'center',
-								left: imLeft,
-								top: imTop,
+								left: pLeft,
+								top: pTop,
+								scaleX: pScaleX,
+								scaleY: pScaleY,
 								perPixelTargetFind: true,
 								centeredScaling: true,
 								centeredRotation: true,
@@ -2846,12 +2876,19 @@
 				
 				var theImage = object._originalElement.currentSrc;
 
+				var pLeft = object.get('left')
+				var pTop = object.get('top')
+				var pScaleX = object.get('scaleX')
+				var pScaleY = object.get('scaleY')
+				var pX = x / pScaleX
+				var pY = y / pScaleY
+
 				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();
 				
 				$.ajax({
 					type: "POST",
 					url: "http://127.0.0.1:8086/replaceColor",
-					data: {imgdata: theImage, x: x, y: y, action: action, color: color, newcolor: newcolor, fuzz: fuzz, filename: pictureName},
+					data: {imgdata: theImage, x: pX, y: pY, action: action, color: color, newcolor: newcolor, fuzz: fuzz, filename: pictureName},
 					success: function(data) {
 					//$("#testImage").attr("src","data:image/png;base64,"+data);
 						var imgObj = new Image();
@@ -2861,8 +2898,10 @@
 							image.set({
 								originX: 'center',
 								originY: 'center',
-								left: imLeft,
-								top: imTop,
+								left: pLeft,
+								top: pTop,
+								scaleX: pScaleX,
+								scaleY: pScaleY,
 								perPixelTargetFind: true,
 								centeredScaling: true,
 								centeredRotation: true,

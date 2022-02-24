@@ -313,13 +313,13 @@ app2.post('/saveRink', (req, res) => {
 
 	dialog.showOpenDialog(null, { properties: ['openFile', 'openDirectory', 'createDirectory', 'promptToCreate' ] }).then((result) => {
 		if (!result.canceled) {
-      var scratches0 = fs.readFileSync(__dirname + "\\images\\boards2.png", {encoding: 'base64'});
+      var scratches0 = fs.readFileSync(__dirname + "/images/boards2.png", {encoding: 'base64'});
       var scratchLayer0 = Buffer.from(scratches0, 'base64');
-      var scratches1 = fs.readFileSync(__dirname + "\\images\\overlay_1.png", {encoding: 'base64'});
+      var scratches1 = fs.readFileSync(__dirname + "/images/overlay_1.png", {encoding: 'base64'});
       var scratchLayer1 = Buffer.from(scratches1, 'base64');
-      var scratches2 = fs.readFileSync(__dirname + "\\images\\overlay_2.png", {encoding: 'base64'});
+      var scratches2 = fs.readFileSync(__dirname + "/images/overlay_2.png", {encoding: 'base64'});
       var scratchLayer2 = Buffer.from(scratches2, 'base64');
-      var scratches3 = fs.readFileSync(__dirname + "\\images\\overlay_3.png", {encoding: 'base64'});
+      var scratches3 = fs.readFileSync(__dirname + "/images/overlay_3.png", {encoding: 'base64'});
       var scratchLayer3 = Buffer.from(scratches3, 'base64');
       
       createFile (scratchLayer0, req.body.name+"_0.png")
@@ -334,7 +334,7 @@ app2.post('/saveRink', (req, res) => {
         await base.resize(2880, 1344, Jimp.RESIZE_BEZIER).quality(100)
         await base.composite(lines, 0, 0)
         await base.composite(ice, 0, 0)
-        await base.writeAsync(result.filePaths[0] +"\\"  +filename)
+        await base.writeAsync(result.filePaths[0] +"/"  +filename)
         if (filename.substr(filename.length - 5) == "3.png") {
           openExplorer(result.filePaths[0])
           res.end("success")
