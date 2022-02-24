@@ -4,7 +4,7 @@ An Electron-based dekstop app allowing users to fairy easily make custom rinks f
 
 # Pre-requisites
 
-Image processing (for uploaded logos) *requires* a working installation of [ImageMagick](https://imagemagick.org/index.php), version 7 is recommended as it's what I was developing against.
+Image processing (for uploaded logos) *requires* a working installation of [ImageMagick](https://imagemagick.org/script/download.php), version 7 is recommended as it's what I was developing against.
 
 # macOS notes
 
