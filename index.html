@@ -14,6 +14,7 @@
 	<script type="text/javascript" src="./scripts/jquery.fileDownload.js"></script>
 	<script type="text/javascript" src="./scripts/jquery.html5storage.min.js"></script>
 	<script type="text/javascript" src="./scripts/spin.min.js"></script>
+	<script type="text/javascript" src="./scripts/fontfaceobserver.js"></script>
     <link href='./scripts/rinkfactory.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/spectrum.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/menu.css' rel='stylesheet' type='text/css'>
@@ -93,32 +94,18 @@
         <div class="section group" style="position: relative;">
             <div class="col span_2_of_3" style="float:left;">
                 <div id="hiddenContainer" style="display:none;">
-					<img src="./images/ice_scratches.png" id="iceScratches">
-					<img src="./images/boards2.png" id="boards">
-					<img src="./images/nets.png" id="nets">
-					<canvas id="textWarp" width="2880" height="1344"></canvas>
 					<canvas id="belowFull" width="2880" height="1344"></canvas>
-					<canvas id="textureFull" width="2880" height="1344"></canvas>
-					<canvas id="compositeFull" width="2880" height="1344"></canvas>
-					<canvas id="aboveFull" width="2880" height="1344"></canvas>
-					<canvas id="finalFull" width="2880" height="1344"></canvas>
-					<!-- <canvas id="texture" width="512" height="512"></canvas>
-					<canvas id="below" width="512" height="512"></canvas>
-					<canvas id="final" width="512" height="512"></canvas>
-					<form id="theForm" method="post" action="./scripts/canvassaverSVG2.php">
-						<input type="hidden" id="fileName" name="fileName" value="">
-						<input type="hidden" id="belowTexture" name="belowTexture" value="">
-						<input type="hidden" id="textureFrm" name="texture" value="">
-						<input type="hidden" id="aboveTexture" name="aboveTexture" value="">
-					</form> -->
 				</div>
-                <div id="canvasContainer" style="width:960px; height:575px;">
+                <div id="canvasContainer" style="width:960px; height:515px;">
                     <div id="overlay" class="sample" style="width:960px; height:448px;"></div>
-                    <!--<canvas id="composite" width="960" height="448" style="position:absolute; top:10; left:10; z-index:1;"></canvas>-->
                     <canvas id="below" width="960" height="448" style="position:absolute; top:10; left:10;"></canvas>
-                    <!--<canvas id="above" width="960" height="448" style="position:absolute; top:10; left:10; z-index:3;"></canvas>
-                    <!--<canvas id="guides" width="512" height="512" style="position:absolute; top:10; left:10; z-index:3; display:none;"></canvas>-->
                     <div id="tipContainer" style="height:60px; padding-top:5px; font-weight:bold;"></div>
+					<br>
+					<div id="donateContainer" style="width:512px; height: 50px; text-align:right; padding-top:10px">
+						<a href="https://www.paypal.com/donate?business=UTTZRPAMBFCWA&no_recurring=1&currency_code=USD" target="_blank">
+							<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button">
+						</a>
+					</div>	
                 </div>
             </div>
             <div class="col span_1_of_3 " style="float:right; max-height:500px; width:32%;">
@@ -211,7 +198,7 @@
                                 <td>&nbsp;</td>
                                 <td><label>Neutral Zone Face-Off Dots: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="selector enabledSelector" type="text" id="nzFaceOffSpotsColor" data-element="nzFaceOffSpots">
+                                    <input class="dotSelector2 enabledSelector" type="text" id="nzFaceOffSpotsColor" data-element="nzFaceOffSpots">
                                 </td>
                             </tr>
                             <tr class="color_tr">
@@ -361,55 +348,18 @@
 						</table>
 						<table style="width:100%;">
 							<tr>
-								<td style="text-align:center;"><input class="textColorSelector" type="text" id="textColor" data-element="wordmarkText"></td>	
+								<td style="text-align:center;"><input class="textOption textColorSelector" type="text" id="textColor" data-element="wordmarkText" disabled></td>	
 								<td style="text-align:center;">
-									Text Size: <input type="number" id="fontSize" value="30" min="1" class="textOption scaling" style="width:50px;">&nbsp;&nbsp;&nbsp;
-									Text Spacing: <input type="number" id="fontSpacing" value="0" class="textOption spacing" style="width:50px;">
+									Text Size: <input type="number" id="fontSize" value="20" min="1" class="textOption scaling" style="width:50px;" disabled>&nbsp;&nbsp;&nbsp;
+									Text Spacing: <input type="number" id="fontSpacing" value="0" class="textOption spacing" style="width:50px;" disabled>
 								</td>
-								<td><input type="button" class="button" id="flipBottomtext" value="Flip Bottom Text"></td>
+								<td><input type="button" class="textOption button" id="flipBottomtext" value="Flip Bottom Text" disabled></td>
 							<tr>
-						</table>
-						<table style="width:100%;">
-							<!-- <tr>
-								<td style="width:20%;">
-									<select id="warpEffect" class="textOption msDropDown" style="width:100%;">
-										<option value="none" data-image="./images/none.png"></option>
-										<option value="arch" data-value="15" data-image="./images/arched.png"></option>
-										<option value="arc" data-value="70" data-image="./images/arced.png"></option>
-										<option value="skewUp" data-value="25" data-image="./images/skewup.png"></option>
-										<option value="skewDown" data-value="25" data-image="./images/skewdown.png"></option>
-										<option value="skewLeft" data-value="25" data-image="./images/skewleft.png"></option>
-										<option value="skewRight" data-value="25" data-image="./images/skewright.png"></option>
-										<option value="bilinearUp" data-value="40" data-image="./images/angleup.png"></option>
-										<option value="bilinearDown" data-value="40" data-image="./images/angledown.png"></option>
-										<option value="archUp" data-value="15" data-image="./images/archup.png"></option>
-										<option value="archDown" data-value="15" data-image="./images/archdown.png"></option>
-										<option value="diagonalText" data-value="15" data-image="./images/diag.png"></option>
-										<option value="pinch" data-value="10" data-image="./images/pinch.png"></option>
-										<option value="sandbox" data-value="15" data-image="./images/warpTBD.png"></option>
-									</select>
-								</td>
-								<td style="width:80%;" colspan="2">
-									<div style="width:80%; text-align:center;" class="standardWarp">
-										<input type="range" class="range" class="textOption" id="warpAmount" value="0" min="1" max="100" style="width:100%; float:left;">
-									</div>
-									<div style="width:15%; text-align:right; float:right;" class="standardWarp">
-										<input type="number" class="textOption" style="width:50px; text-align:center;" id="warpAmountDisplay" val="0">
-									</div>
-									<div style="width:49%; display:none; float:left; text-align:center;" class="diagonalWarp">
-										Horizontal Spacing: <input type="number" id="hSpacing" value="22" class="textOption spacing" style="width:40px;">
-									</div>
-									<div style="width:49%; display:none; text-align:center;" class="diagonalWarp">
-										Vertical Spacing: <input type="number" id="vSpacing" value="25" class="textOption spacing" style="width:40px;">
-									</div>
-								</td>
-							</tr>
-							<tr><td colspan="3" style="text-align:center; font-size:.8em;">Text effects may take a moment or two to process - be patient!</td></tr> -->
 						</table>	
 						<table style="width:100%;">
 							<tr>
 								<td colspan="3">
-									<select id="fontTypeCombo" class='textOption Rubik_One' style="width:100%;">
+									<select id="fontTypeCombo" class='textOption Rubik_One' style="width:100%;" disabled>
 										<optgroup class='Acme'>
 										<option value='Acme'>Acme</option>
 										</optgroup>
@@ -580,7 +530,7 @@
 							</tr>
 							<tr><td colspan="3" align="center">
 								<input id="customFont" type="file" name="customFont" accept=".ttf,.otf,.woff,.woff2" style="display:none;" />
-								<input type="button" class="button textOption" id="fakeFontButton" value="Choose a Local Font..." />
+								<input type="button" class="button textOption" id="fakeFontButton" value="Choose a Local Font..." disabled/>
 								<input type="button" class="button textOption" id="uploadTheFont" value="Upload Font" style="display:none;" />
 							</td></tr>
 						</table>
@@ -595,6 +545,21 @@
             </div>
         </div>
     </div>
+	<div id="FAQ" class="jm-white-popup mfp-hide">
+		<div style="width:100%; text-align:center;">	
+			<span class="header" style="color:#0032a0!important;">About The FHM Rink Factory</span>
+		</div>
+		<div id="faqContainer" style="width:100%; height:90%; overflow:auto;">
+			<div class="question" style="margin-top:10px!important;">So what is this thing?</div><br>
+			<div class="answer">This is a utility designed to make it easy to create custom rinks for <a href="https://www.ootpdevelopments.com/franchise-hockey-manager-home/" target="_blank">Franchise Hockey Manager</a>.  If you don't have FHM, then this is really of little use to you.</div><br>
+			<div class="question">What is Franchise Hockey Manager?</div><br>
+			<div class="answer">Franchise Hockey Manager is a hockey management simulation published by OOTP Developments, the developers of the award-winning Out Of The Park Baseball series.  For more information about FHM, as well as the other games they make, <a href="http://www.ootpdevelopments.com" target="_blank">visit their site</a>.</div><br>
+			<div class="question">How did you do this?</div><br>
+			<div class="answer">The Rink Factory is built using <a href="https://nodejs.org/en/about/" target="_blank">Node.js</a> and <a href="https://www.electronjs.org/" target="_blank">Electron</a>.  So it's written entirely in HTML and JavaScript like pretty much every website under the sun.  It also leverages the <a href="http://fabricjs.com/" target="_blank">Fabric.js</a> library for all of the graphical stuff.</div><br>
+			<div class="question">Who is responsible for this thing?</div><br>
+			<div class="answer">That would be me.  My name is Eriq Jaffe, and while I don't have Franchise Hockey Manager, I've been playing OOTP Baseball since 2004.  Feel free to <a href="mailto:eriqjaffe@gmail.com" target="_blank">shoot me an email</a> with any questions or comments about this site.<br><br>The rink layout is based heavily on the Photoshop template (available <a href="https://forums.ootpdevelopments.com/showthread.php?t=330958" target="_blank">here</a>) created by Flying Canuck.<br><br>I'd also like to give an additional shout out to Conrad Burry, who created some of the fonts that can be used on the sweaters.</div><br>
+		</div>
+	</div>
 </div>
 </body>
 <script>
@@ -610,14 +575,6 @@
 
 	var canFull = document.getElementById('belowFull');
 
-	var can2Full = document.getElementById('textureFull');
-	var textureFullCTX = can2Full.getContext('2d');
-
-    //var can2 = document.getElementById('texture')
-    //var texture = can2.getContext('2d')
-
-	var can4Full = document.getElementById('aboveFull');
-
     var below = new fabric.Canvas('below',{
 		enableRetinaScaling: false,
 		preserveObjectStacking: true
@@ -627,6 +584,9 @@
 		$("#straightenObject").css("display","inline-block");
 		var obj = e.selected[0];
 		console.log(obj.id)
+		if (obj.id == 'wordmark') {
+			$("#tipContainer").html("If you're trying to select an image instead of the text, you have to hide the text first.");
+		}
 		if (obj.type == 'image') {
 			$("#fileName").html(obj.get('name'));
 			if ($("#trimImageDiv").css("display") == "none") {
@@ -634,7 +594,7 @@
 				$("#uploadImageDiv").css("display","none");
 				$("#selectedImageDiv").css("display","block");
 			}
-			$("#tipContainer").html("Use Arrow keys to move image 1 pixel.<br>Use Shift + Arrow keys to move image 10 pixels.<br>Use Delete key to remove image");
+			$("#tipContainer").html("Use Arrow keys to move image 1 pixel.<br>Use Shift + Arrow keys to move image 10 pixels.<br>Use Delete key to remove image.");
 		}
 	})
 	
@@ -1140,10 +1100,18 @@
 			evented: false
         });
 
-        nzFaceOffSpots = new fabric.Path("M 392.48438 122.79297 A 5.0880853 5.0880853 0 0 0 387.39648 127.88086 A 5.0880853 5.0880853 0 0 0 392.48438 132.96875 A 5.0880853 5.0880853 0 0 0 397.57227 127.88086 A 5.0880853 5.0880853 0 0 0 392.48438 122.79297 z M 566.48438 122.79297 A 5.0880853 5.0880853 0 0 0 561.39453 127.88086 A 5.0880853 5.0880853 0 0 0 566.48438 132.96875 A 5.0880853 5.0880853 0 0 0 571.57227 127.88086 A 5.0880853 5.0880853 0 0 0 566.48438 122.79297 z M 392.48438 314.79297 A 5.0880853 5.0880853 0 0 0 387.39648 319.88086 A 5.0880853 5.0880853 0 0 0 392.48438 324.9707 A 5.0880853 5.0880853 0 0 0 397.57227 319.88086 A 5.0880853 5.0880853 0 0 0 392.48438 314.79297 z M 566.48438 314.79297 A 5.0880853 5.0880853 0 0 0 561.39453 319.88086 A 5.0880853 5.0880853 0 0 0 566.48438 324.9707 A 5.0880853 5.0880853 0 0 0 571.57227 319.88086 A 5.0880853 5.0880853 0 0 0 566.48438 314.79297 z",{
+		nzFaceOffSpots1 = new fabric.Path("M 392.48438 122.79297 C 392.35141 122.79296 392.21849 122.79839 392.08594 122.80859 C 391.98604 122.81729 391.88636 122.82901 391.78711 122.84375 C 391.77426 122.84505 391.76109 122.8461 391.74805 122.84766 C 391.72802 122.85015 391.70768 122.85478 391.6875 122.85742 C 391.55631 122.87821 391.42605 122.90444 391.29688 122.93555 C 391.23187 122.95255 391.16777 122.97069 391.10352 122.99023 C 391.07328 122.99893 391.04076 123.00618 391.00977 123.01562 C 390.97575 123.02432 390.94461 123.03352 390.91211 123.04297 C 390.7855 123.0836 390.66032 123.12923 390.53711 123.17969 C 390.4978 123.19745 390.45885 123.21559 390.41992 123.23438 C 390.38591 123.24949 390.352 123.26534 390.31836 123.28125 C 390.26998 123.30279 390.22145 123.32479 390.17383 123.34766 C 390.06422 123.40427 389.95701 123.46486 389.85156 123.5293 L 389.85156 123.53711 C 388.33068 124.45665 387.4 126.1039 387.39648 127.88086 C 387.3955 130.69095 389.67366 132.96865 392.48438 132.96875 C 395.29511 132.96864 397.57323 130.69095 397.57227 127.88086 C 397.56811 126.1039 396.63808 124.45665 395.11719 123.53711 L 395.11719 123.5293 C 395.012 123.46489 394.90453 123.40427 394.79492 123.34766 C 394.74711 123.3246 394.69892 123.3026 394.65039 123.28125 C 394.61675 123.26538 394.58288 123.24953 394.54883 123.23438 C 394.51001 123.21586 394.47095 123.19734 394.43164 123.17969 C 394.30847 123.12923 394.18337 123.08364 394.05664 123.04297 C 394.02414 123.03352 393.99168 123.02432 393.95898 123.01562 C 393.92799 123.00618 393.89653 122.99893 393.86523 122.99023 C 393.80113 122.97058 393.73669 122.95244 393.67188 122.93555 C 393.54273 122.90455 393.41242 122.87832 393.28125 122.85742 C 393.26122 122.85462 393.24089 122.84992 393.2207 122.84766 C 393.20785 122.84625 393.19464 122.84521 393.18164 122.84375 C 393.08243 122.82901 392.98274 122.81729 392.88281 122.80859 C 392.75026 122.79801 392.61734 122.79297 392.48438 122.79297 z M 566.48438 122.79297 C 566.35141 122.79296 566.21849 122.79839 566.08594 122.80859 C 565.98604 122.81729 565.88636 122.82901 565.78711 122.84375 C 565.77426 122.84505 565.76109 122.8461 565.74805 122.84766 C 565.72802 122.85015 565.70768 122.85282 565.6875 122.85547 C 565.55631 122.87626 565.42603 122.90249 565.29688 122.93359 C 565.23206 122.9506 565.16762 122.96874 565.10352 122.98828 C 565.07215 122.99697 565.04087 123.00618 565.00977 123.01562 C 564.97688 123.02432 564.94461 123.03352 564.91211 123.04297 C 564.78538 123.0836 564.66028 123.12923 564.53711 123.17969 C 564.4978 123.19745 564.45874 123.21559 564.41992 123.23438 C 564.38591 123.24949 564.35203 123.26534 564.31836 123.28125 C 564.26987 123.30279 564.22168 123.32479 564.17383 123.34766 C 564.06422 123.40427 563.95675 123.46486 563.85156 123.5293 L 563.85156 123.53711 C 562.33067 124.45665 561.40001 126.1039 561.39648 127.88086 C 561.39551 130.69095 563.67364 132.96865 566.48438 132.96875 C 569.29511 132.96864 571.57323 130.69095 571.57227 127.88086 C 571.56811 126.1039 570.63808 124.45665 569.11719 123.53711 L 569.11719 123.5293 C 569.012 123.46489 568.90453 123.40427 568.79492 123.34766 C 568.74711 123.3246 568.69892 123.3026 568.65039 123.28125 C 568.61675 123.26538 568.58288 123.24953 568.54883 123.23438 C 568.51001 123.21586 568.47095 123.19734 568.43164 123.17969 C 568.30847 123.12923 568.18337 123.08364 568.05664 123.04297 C 568.02414 123.03352 567.99168 123.02432 567.95898 123.01562 C 567.92799 123.00618 567.89653 122.99697 567.86523 122.98828 C 567.80113 122.96863 567.73669 122.95049 567.67188 122.93359 C 567.54273 122.9026 567.41242 122.87637 567.28125 122.85547 C 567.26122 122.85267 567.24089 122.84992 567.2207 122.84766 C 567.20785 122.84625 567.19464 122.84521 567.18164 122.84375 C 567.08243 122.82901 566.98274 122.81729 566.88281 122.80859 C 566.75026 122.79801 566.61734 122.79297 566.48438 122.79297 z M 389.85156 124.80664 L 389.85156 130.95898 C 388.94863 130.19089 388.42641 129.06612 388.42188 127.88086 C 388.42943 126.69697 388.94965 125.57384 389.85156 124.80664 z M 395.11719 124.80664 C 396.01909 125.57384 396.54119 126.69697 396.54688 127.88086 C 396.54632 129.0709 396.02375 130.20147 395.11719 130.97266 L 395.11719 124.80664 z M 563.85156 124.80664 L 563.85156 130.95703 C 562.94864 130.18894 562.42642 129.06612 562.42188 127.88086 C 562.42792 126.69697 562.94967 125.57384 563.85156 124.80664 z M 569.11719 124.80664 C 570.01909 125.57384 570.54119 126.69697 570.54688 127.88086 C 570.54632 129.0709 570.02375 130.19951 569.11719 130.9707 L 569.11719 124.80664 z M 392.48438 314.79297 C 392.35141 314.79296 392.21849 314.79839 392.08594 314.80859 C 391.98604 314.81729 391.88636 314.82901 391.78711 314.84375 C 391.77426 314.84505 391.76109 314.8461 391.74805 314.84766 C 391.72802 314.85015 391.70768 314.85478 391.6875 314.85742 C 391.55631 314.87821 391.42601 314.90444 391.29688 314.93555 C 391.23187 314.95255 391.16777 314.97069 391.10352 314.99023 C 391.07328 314.99893 391.04076 315.00618 391.00977 315.01562 C 390.97575 315.02432 390.94461 315.03352 390.91211 315.04297 C 390.7855 315.0836 390.66032 315.12923 390.53711 315.17969 C 390.4978 315.19745 390.45885 315.21559 390.41992 315.23438 C 390.38591 315.24949 390.352 315.26534 390.31836 315.28125 C 390.26998 315.30279 390.22145 315.32479 390.17383 315.34766 C 390.06422 315.40427 389.95701 315.46486 389.85156 315.5293 L 389.85156 315.53711 C 388.33064 316.45665 387.4 318.1039 387.39648 319.88086 C 387.3955 322.69095 389.67365 324.96865 392.48438 324.96875 C 395.29511 324.96864 397.57323 322.69095 397.57227 319.88086 C 397.56811 318.1039 396.63808 316.45665 395.11719 315.53711 L 395.11719 315.5293 C 395.012 315.46489 394.90453 315.40427 394.79492 315.34766 C 394.74711 315.3246 394.69892 315.3026 394.65039 315.28125 C 394.61675 315.26538 394.58288 315.24953 394.54883 315.23438 C 394.51001 315.21586 394.47095 315.19734 394.43164 315.17969 C 394.30847 315.12923 394.18337 315.08364 394.05664 315.04297 C 394.02414 315.03352 393.99168 315.02432 393.95898 315.01562 C 393.92799 315.00618 393.89653 314.99893 393.86523 314.99023 C 393.80113 314.97058 393.73669 314.95244 393.67188 314.93555 C 393.54273 314.90455 393.41242 314.87832 393.28125 314.85742 C 393.26122 314.85462 393.24089 314.84992 393.2207 314.84766 C 393.20785 314.84625 393.19464 314.84521 393.18164 314.84375 C 393.08243 314.82901 392.98274 314.81729 392.88281 314.80859 C 392.75026 314.79801 392.61734 314.79297 392.48438 314.79297 z M 566.48438 314.79297 C 566.35141 314.79296 566.21849 314.79839 566.08594 314.80859 C 565.98604 314.81729 565.88636 314.82901 565.78711 314.84375 C 565.77426 314.84505 565.76109 314.8461 565.74805 314.84766 C 565.72802 314.85015 565.70768 314.85478 565.6875 314.85742 C 565.55631 314.87821 565.42603 314.90444 565.29688 314.93555 C 565.23206 314.95255 565.16762 314.97069 565.10352 314.99023 C 565.07215 314.99893 565.04087 315.00618 565.00977 315.01562 C 564.97688 315.02432 564.94461 315.03352 564.91211 315.04297 C 564.78538 315.0836 564.66028 315.12923 564.53711 315.17969 C 564.4978 315.19745 564.45874 315.21559 564.41992 315.23438 C 564.38591 315.24949 564.35203 315.26534 564.31836 315.28125 C 564.26987 315.30279 564.22168 315.32479 564.17383 315.34766 C 564.06422 315.40427 563.95675 315.46486 563.85156 315.5293 L 563.85156 315.53711 C 562.33067 316.45665 561.40001 318.1039 561.39648 319.88086 C 561.39551 322.69095 563.67364 324.96865 566.48438 324.96875 C 569.29511 324.96864 571.57323 322.69095 571.57227 319.88086 C 571.56811 318.1039 570.63808 316.45665 569.11719 315.53711 L 569.11719 315.5293 C 569.012 315.46489 568.90453 315.40427 568.79492 315.34766 C 568.74711 315.3246 568.69892 315.3026 568.65039 315.28125 C 568.61675 315.26538 568.58288 315.24953 568.54883 315.23438 C 568.51001 315.21586 568.47095 315.19734 568.43164 315.17969 C 568.30847 315.12923 568.18337 315.08364 568.05664 315.04297 C 568.02414 315.03352 567.99168 315.02432 567.95898 315.01562 C 567.92799 315.00618 567.89653 314.99893 567.86523 314.99023 C 567.80113 314.97058 567.73669 314.95244 567.67188 314.93555 C 567.54273 314.90455 567.41242 314.87832 567.28125 314.85742 C 567.26122 314.85462 567.24089 314.84992 567.2207 314.84766 C 567.20785 314.84625 567.19464 314.84521 567.18164 314.84375 C 567.08243 314.82901 566.98274 314.81729 566.88281 314.80859 C 566.75026 314.79801 566.61734 314.79297 566.48438 314.79297 z M 389.85156 316.80664 L 389.85156 322.95898 C 388.94863 322.19089 388.42641 321.06612 388.42188 319.88086 C 388.42943 318.69697 388.94965 317.57384 389.85156 316.80664 z M 395.11719 316.80664 C 396.01909 317.57384 396.54119 318.69697 396.54688 319.88086 C 396.54632 321.0709 396.02375 322.20147 395.11719 322.97266 L 395.11719 316.80664 z M 563.85156 316.80664 L 563.85156 322.95898 C 562.94864 322.19089 562.42642 321.06612 562.42188 319.88086 C 562.42792 318.69697 562.94967 317.57384 563.85156 316.80664 z M 569.11719 316.80664 C 570.01909 317.57384 570.54119 318.69697 570.54688 319.88086 C 570.54632 321.0709 570.02375 322.20147 569.11719 322.97266 L 569.11719 316.80664 z",{
 			fill: initialColors["centerLineColor"],
-			id: 'nzFaceOffSpots',
+			id: 'nzFaceOffSpots1',
 			visible: true,
+			selectable:false,
+			evented: false
+        });
+
+        nzFaceOffSpots2 = new fabric.Path("M 392.48438 122.79297 A 5.0880853 5.0880853 0 0 0 387.39648 127.88086 A 5.0880853 5.0880853 0 0 0 392.48438 132.96875 A 5.0880853 5.0880853 0 0 0 397.57227 127.88086 A 5.0880853 5.0880853 0 0 0 392.48438 122.79297 z M 566.48438 122.79297 A 5.0880853 5.0880853 0 0 0 561.39453 127.88086 A 5.0880853 5.0880853 0 0 0 566.48438 132.96875 A 5.0880853 5.0880853 0 0 0 571.57227 127.88086 A 5.0880853 5.0880853 0 0 0 566.48438 122.79297 z M 392.48438 314.79297 A 5.0880853 5.0880853 0 0 0 387.39648 319.88086 A 5.0880853 5.0880853 0 0 0 392.48438 324.9707 A 5.0880853 5.0880853 0 0 0 397.57227 319.88086 A 5.0880853 5.0880853 0 0 0 392.48438 314.79297 z M 566.48438 314.79297 A 5.0880853 5.0880853 0 0 0 561.39453 319.88086 A 5.0880853 5.0880853 0 0 0 566.48438 324.9707 A 5.0880853 5.0880853 0 0 0 571.57227 319.88086 A 5.0880853 5.0880853 0 0 0 566.48438 314.79297 z",{
+			fill: initialColors["centerLineColor"],
+			id: 'nzFaceOffSpots2',
+			visible: false,
 			selectable:false,
 			evented: false
         });
@@ -1309,7 +1277,7 @@
 			width: 100
 		})
 
-		rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerCircleFill, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
+		rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerCircleFill, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots1, nzFaceOffSpots2, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
 			id: 'rinkElementGroup',
 			visible: true,
 			selectable: false,
@@ -1400,6 +1368,75 @@
 		}
 		wordmark.addWithUpdate()
 		below.renderAll();
+	})
+
+	$("#fontSize").on("change", function(e) {
+		objects = wordmark.getObjects();
+		for (x in objects) {
+			objects[x].fontSize = $(this).val();
+		}
+		wordmark.addWithUpdate()
+		below.renderAll();
+	})
+
+	$("#fontSpacing").on("change", function(e) {
+		objects = wordmark.getObjects();
+		for (x in objects) {
+			objects[x].charSpacing = ($(this).val() * 10);
+		}
+		wordmark.addWithUpdate()
+		below.renderAll();
+	})
+
+	$("#fakeFontButton").on("click", function(e) {
+		e.preventDefault;
+		$("#uploadTheFont").click();
+	})
+
+	$("#uploadTheFont").on("click", function(e) {
+		//$("#fontTypeCombo").removeClass().addClass('alegreya');
+		$.ajax({
+			type: "GET",
+			url: "http://127.0.0.1:8086/customFont",
+			success: function(data) {
+				//console.log(data)
+				$("head").prepend("<style>@font-face {\n   font-family: '"+data.familyName+"';\n   src: url('"+data.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+data.familyName+"'; font-size: 1.1em;}\n</style>");
+				fontSources[data.familyName] = data.fontData;
+				console.log(fontSources)
+				var style = data.familyName;
+				var font_family = $("."+style).css("font-family");
+				var objects = wordmark.getObjects();
+				var myfont = new FontFaceObserver(data.familyName)
+				myfont.load()
+					.then(function() {
+					// when font is loaded, use it.
+						for (x in objects) {
+							objects[x].fontFamily = data.familyName;
+						}
+						wordmark.addWithUpdate()
+						below.renderAll();
+						var optgroup = $("<optgroup class='"+data.familyName+"'>");
+						optgroup.append("<option value='"+data.familyName+"'>"+data.fontName+"</option>")
+						$("#fontTypeCombo").append(optgroup)
+						$("#fontTypeCombo").children().remove("optgroup[class='alegreya']");
+						//optgroup = $("<optgroup class='alegreya'>");
+						//optgroup.append("<option value='custom'>Custom Font</option>")
+						//$("#fontTypeCombo").append(optgroup)
+						$("#fontTypeCombo").val(data.familyName)
+						$("#fontTypeCombo").removeClass().addClass(data.familyName);
+						$("#fontTypeCombo").change()
+					}).catch(function(e) {
+						console.log(e)
+						alert('font loading failed ' + data.familyName);
+					});
+				
+				//wordmarkText.fontFamily = font_family;
+				//wordmarkTextStroke1.fontFamily = font_family;
+				//wordmarkTextStroke2.fontFamily = font_family;
+				//logoCanvas.renderAll();
+				//$(this).removeClass().addClass(style);
+			}
+		})
 	})
 
 	$(".textColorSelector").each(function() {
@@ -1843,6 +1880,80 @@
 		})
 	})
 
+	$(".dotSelector2").each(function() {
+		var color = $(this).attr('id');
+		var change = false;
+		if (color == 'transparent') {
+			color = null;
+		}
+		$(this).spectrum({
+			showInput: true,
+			preferredFormat: prefColorFormat,
+			showInitial: true,
+			showPalette: true,
+			showButtons: true,
+			allowEmpty: true,
+			showSelectionPalette: true,
+			localStorageKey: "spectrum.rinkfactory",
+			palette: [ "#C8102E", "#0032a0", "#41b6e6", "#eef0f2" ],
+			color: initialColors[$(this).attr('id')],
+			show: function(color) {
+				var original_color = color;
+                $(this).data('changed', false);
+			},
+			move: function(color) {
+                if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var objects = rinkElementGroup.getObjects();
+				for (x in objects) {
+					if (objects[x].id.substring(0,6) == "nzFace") {
+						objects[x].set('fill', colorX)
+					}
+				}
+				rinkElementGroup.addWithUpdate();
+				below.renderAll();
+			},
+			change: function(color) {
+                if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+				var objects = rinkElementGroup.getObjects();
+				for (x in objects) {
+					if (objects[x].id.substring(0,6) == "nzFace") {
+						objects[x].set('fill', colorX)
+					}
+				}
+				rinkElementGroup.addWithUpdate();
+				below.renderAll();
+			},
+			hide: function(color) {
+                if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				var id = $(this).data('element');
+				var objects = rinkElementGroup.getObjects();
+				for (x in objects) {
+					if (objects[x].id.substring(0,6) == "nzFace") {
+						objects[x].set('fill', colorX)
+					}
+				}
+				rinkElementGroup.addWithUpdate();
+				below.renderAll();
+			}
+		})
+	})
+
 	$(".circleSelector").each(function() {
 		var color = $(this).attr('id');
 		var change = false;
@@ -2009,6 +2120,7 @@
 				}
 			}
 		}
+		rinkElementGroup.addWithUpdate()
 		below.renderAll()
 	})
 
@@ -2051,7 +2163,7 @@
 		var objects = rinkElementGroup.getObjects();
 		for (x in objects) {
 			console.log(objects[x].id)
-			if (objects[x].id.substring(0,6) == "ezDots") {
+			if (objects[x].id.substring(0,6) == "ezDots" || objects[x].id.substring(0,6) == "nzFace") {
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					objects[x].visible = true;
 				} else {
@@ -2086,6 +2198,20 @@
 		} else {
 			state = false;
 		}
+		$(".textOption").each(function() {
+			if (state == true) {
+				$(this).prop( "disabled", false );
+			} else {
+				$(this).prop( "disabled", true );
+			}
+		})
+		$(".textColorSelector").each(function() {
+			if (state == true) {
+				$(this).spectrum('enable');
+			} else {
+				$(this).spectrum('disable');
+			}
+		})
 		var objects = below.getObjects()
 		for (x in objects) {
 			if (objects[x].id == "wordmark") {
@@ -2450,22 +2576,6 @@
 					console.log("dunno")
 					break;
 			}
-/* 			if (imageHeight > imageWidth && imageHeight > 29) {
-				object.scaleToHeight(29);
-			} else if (imageWidth > imageHeight && imageWidth > 29) {
-				object.scaleToWidth(29);
-			} else {
-				if (imageWidth > 29) {
-					object.scaleToWidth(29);
-				} 
-			}
-			if ($(this).data("adLoc") == "left") {
-				object.set({"left":318.5,"top":263.5,"angle":270});
-				object.setCoords();
-			} else if ($(this).data("sleeve") == "right") {
-				object.set({"left":190.5,"top":263.5,"angle":90});
-				object.setCoords();
-			} */
 		}
 		below.renderAll();
 		$("#overlay").css("display","none");
@@ -2788,6 +2898,13 @@
 			}
 		}	
 	})
+
+	$("#aboutRinkFactory").magnificPopup({
+		items: {
+			src: '#FAQ',
+			type: 'inline'
+		}
+	});
     
     function getDataUri(url, callback) {
 		var image = new Image();
