@@ -111,7 +111,7 @@ app2.get("/uploadImage", (req, res) => {
 	dialog.showOpenDialog(null, {
 		properties: ['openFile'],
 		filters: [
-			{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }
+			{ name: 'Images', extensions: ['jpg', 'png'] }
 		]
 	  }).then(result => {
 		  if(!result.canceled) {
