@@ -131,3 +131,4 @@ dist
 
 # holding pen for some stuff
 .ignore
+.DS_Store
