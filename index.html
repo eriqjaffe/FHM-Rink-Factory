@@ -20,6 +20,9 @@
 	<link href='./scripts/menu.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
     <script>	
+		const params = new URLSearchParams(window.location.search)
+		const port = params.get('port')
+
         var initialColors = {centerLineColor:"#C8102E",creaseLineColor:"#C8102E",faceOffCircleColor:"#C8102E",faceOffDotColor:"#C8102E",faceOffTargetColor:"#C8102E",blueLineColor:"#0032a0",creaseFillColor:"#41b6e6",creaseStrokeColor:"#C8102E",rinkColor:"#eef0f2",trapezoidFillColor:"rgba(0,0,0,0)",trapezoidStrokeColor:"#C8102E",goalLinesColor:"#C8102E",centerCircleColor:"#0032a0",centerDotColor:"#0032a0",nzFaceOffSpotsColor:"#C8102E",ezCircle1Color:"#C8102E",hashmarks1Color:"#C8102E",ezCircle1Color:"#C8102E",ezDots1Color:"#C8102E",textColor:"#000000"};
         var defaultTexture = "ice_scratches.png";
         var prefColorFormat = $.localStorage.getItem('rinkfactory.color_format');
@@ -1409,7 +1412,7 @@
 		//$("#fontTypeCombo").removeClass().addClass('alegreya');
 		$.ajax({
 			type: "GET",
-			url: "http://127.0.0.1:8086/customFont",
+			url: "http://127.0.0.1:"+port+"/customFont",
 			success: function(data) {
 				//console.log(data)
 				$("head").prepend("<style>@font-face {\n   font-family: '"+data.familyName+"';\n   src: url('"+data.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+data.familyName+"'; font-size: 1.1em;}\n</style>");
@@ -2329,7 +2332,7 @@
     $("#fakeImageButton").on("click",function() {
 		$.ajax({
 			type: "GET",
-			url: "http://127.0.0.1:8086/uploadImage",
+			url: "http://127.0.0.1:"+port+"/uploadImage",
 			success: function(data) {
 				console.log(data)
 				var imgObj = new Image();
@@ -2442,7 +2445,7 @@
 
 		$.ajax({
 			type: "POST",
-			url: "http://127.0.0.1:8086/saveRink",
+			url: "http://127.0.0.1:"+port+"/saveRink",
 			data: {rinkLines:lines,imgdata:img,name:fileName},
 			success: function(result) {
 				var objects = below.getObjects()
@@ -2651,7 +2654,7 @@
 				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();
 				$.ajax({
 					type: "POST",
-					url: "http://127.0.0.1:8086/removeBorder",
+					url: "http://127.0.0.1:"+port+"/removeBorder",
 					data: {imgdata: theImage, x: "1", y: "1", action: "removeBorder", color: "null", newcolor: "null", fuzz: fuzz, filename: pictureName},
 					success: function(data) {
 						$("#overlay").css("display","none");
@@ -2722,7 +2725,7 @@
 				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();			
 				$.ajax({
 					type: "POST",
-					url: "http://127.0.0.1:8086/removeColorRange",
+					url: "http://127.0.0.1:"+port+"/removeColorRange",
 					data: {imgdata: theImage, x: pX, y: pY, color: color, action: action, fuzz: fuzz, filename: pictureName},
 					success: function(data) {
 						var imgObj = new Image();
@@ -2798,7 +2801,7 @@
 				$.ajax({
 					type: "POST",
 					//url: "./scripts/changecolor.php",
-					url: "http://127.0.0.1:8086/removeAllColor",
+					url: "http://127.0.0.1:"+port+"/removeAllColor",
 					data: {imgdata: theImage, x: pX, y: pY, color: color, action: action, fuzz: fuzz, filename: pictureName},
 					success: function(data) {
 						var imgObj = new Image();
@@ -2887,7 +2890,7 @@
 				
 				$.ajax({
 					type: "POST",
-					url: "http://127.0.0.1:8086/replaceColor",
+					url: "http://127.0.0.1:"+port+"/replaceColor",
 					data: {imgdata: theImage, x: pX, y: pY, action: action, color: color, newcolor: newcolor, fuzz: fuzz, filename: pictureName},
 					success: function(data) {
 					//$("#testImage").attr("src","data:image/png;base64,"+data);

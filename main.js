@@ -8,10 +8,8 @@ const openExplorer = require('open-file-explorer');
 const imagemagickCli = require('imagemagick-cli');
 const ttfInfo = require('ttfinfo')
 const url = require('url');
-const output = require('image-output')
 
 const app2 = express()
-const port = 8086;
 const tempDir = os.tmpdir()
 const isMac = process.platform === 'darwin'
 
@@ -103,8 +101,8 @@ const template = [
 const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu)
 
-app2.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+const server = app2.listen(0, () => {
+	console.log(`Server running on port ${server.address().port}`);
 });
 
 app2.use(express.urlencoded({limit: '50mb', extended: true, parameterLimit: 50000}));
@@ -364,7 +362,7 @@ function createWindow () {
       }
     })
   
-    mainWindow.loadFile('index.html')
+    mainWindow.loadURL(`file://${__dirname}/index.html?port=${server.address().port}`);
 
 	mainWindow.webContents.on('new-window', function(e, url) {
 		e.preventDefault();
