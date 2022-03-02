@@ -8,6 +8,7 @@ const openExplorer = require('open-file-explorer');
 const imagemagickCli = require('imagemagick-cli');
 const ttfInfo = require('ttfinfo')
 const url = require('url');
+const archiver = require('archiver');
 
 const app2 = express()
 const tempDir = os.tmpdir()
@@ -301,49 +302,127 @@ app2.post('/removeAllColor', (req, res) => {
 });
 
 app2.post('/saveRink', (req, res) => {
-  const images = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
-  const staticLines = Buffer.from(req.body.rinkLines.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+  	const images = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+  	const staticLines = Buffer.from(req.body.rinkLines.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
 
-	const options = {
-		defaultPath: app.getPath('desktop'),
-    title: "Choose a folder to save the rink images",
-	}
+	var scratches0 = fs.readFileSync(__dirname + "/images/boards2.png", {encoding: 'base64'});
+	var scratchLayer0 = Buffer.from(scratches0, 'base64');
+	var scratches1 = fs.readFileSync(__dirname + "/images/overlay_1.png", {encoding: 'base64'});
+	var scratchLayer1 = Buffer.from(scratches1, 'base64');
+	var scratches2 = fs.readFileSync(__dirname + "/images/overlay_2.png", {encoding: 'base64'});
+	var scratchLayer2 = Buffer.from(scratches2, 'base64');
+	var scratches3 = fs.readFileSync(__dirname + "/images/overlay_3.png", {encoding: 'base64'});
+	var scratchLayer3 = Buffer.from(scratches3, 'base64');
 
-	dialog.showOpenDialog(null, { properties: ['openFile', 'openDirectory', 'createDirectory', 'promptToCreate' ] }).then((result) => {
-		if (!result.canceled) {
-      var scratches0 = fs.readFileSync(__dirname + "/images/boards2.png", {encoding: 'base64'});
-      var scratchLayer0 = Buffer.from(scratches0, 'base64');
-      var scratches1 = fs.readFileSync(__dirname + "/images/overlay_1.png", {encoding: 'base64'});
-      var scratchLayer1 = Buffer.from(scratches1, 'base64');
-      var scratches2 = fs.readFileSync(__dirname + "/images/overlay_2.png", {encoding: 'base64'});
-      var scratchLayer2 = Buffer.from(scratches2, 'base64');
-      var scratches3 = fs.readFileSync(__dirname + "/images/overlay_3.png", {encoding: 'base64'});
-      var scratchLayer3 = Buffer.from(scratches3, 'base64');
-      
-      createFile (scratchLayer0, req.body.name+"_0.png")
-      createFile (scratchLayer1, req.body.name+"_1.png")
-      createFile (scratchLayer2, req.body.name+"_2.png")
-      createFile (scratchLayer3, req.body.name+"_3.png")
+	const output = fs.createWriteStream(tempDir + '/'+req.body.name+'.zip');
 
-      async function createFile(overlay, filename) {
-        const base = await Jimp.read(images)
-        const lines = await Jimp.read(staticLines)
-        const ice = await Jimp.read(overlay)
-        await base.resize(2880, 1344, Jimp.RESIZE_BEZIER).quality(100)
-        await base.composite(lines, 0, 0)
-        await base.composite(ice, 0, 0)
-        await base.writeAsync(result.filePaths[0] +"/"  +filename)
-        if (filename.substr(filename.length - 5) == "3.png") {
-          openExplorer(result.filePaths[0])
-          res.end("success")
-        }
-      }
-		} else {
-      res.end("success")
-    }
-	}).catch((err) => {
-		res.end(err);
+	output.on('close', function() {
+		var data = fs.readFileSync(tempDir + '/'+req.body.name+'.zip');
+		var saveOptions = {
+		  defaultPath: app.getPath('downloads') + '/' + req.body.name+'.zip',
+		}
+		dialog.showSaveDialog(null, saveOptions).then((result) => { 
+		  if (!result.canceled) {
+			fs.writeFile(result.filePath, data, function(err) {
+			  if (err) {
+				res.end(err)
+				fs.unlink(tempDir + '/'+req.body.name+'.zip', (err) => {
+				  if (err) {
+					console.error(err)
+					return
+				  }
+				})
+			  } else {
+				fs.unlink(tempDir + '/'+req.body.name+'.zip', (err) => {
+				  if (err) {
+					console.error(err)
+					return
+				  }
+				})
+				res.end("success")
+			  };
+			})
+		  } else {
+			fs.unlink(tempDir + '/'+req.body.name+'.zip', (err) => {
+			  if (err) {
+				console.error(err)
+				return
+			  }
+			})
+			res.end("success");
+		  }
+		})
 	});
+
+	const archive = archiver('zip', {
+		lib: { level: 9 } // Sets the compression level.
+	});
+		
+	archive.on('error', function(err) {
+		throw err;
+	});
+
+	archive.pipe(output)
+
+
+    createFile (scratchLayer0)
+	.then(function(response) {
+		const buff0 = response;
+		createFile (scratchLayer1)
+		.then(function(response) {
+			const buff1 = response;
+			createFile (scratchLayer2)
+			.then(function(response) {
+				const buff2 = response;
+				createFile (scratchLayer3)
+				.then(function(response) {
+					const buff3 = response;
+					archive.append(buff0,  {name: req.body.name+"_0.png"})
+					archive.append(buff1,  {name: req.body.name+"_1.png"})
+					archive.append(buff2,  {name: req.body.name+"_2.png"})
+					archive.append(buff3,  {name: req.body.name+"_3.png"})
+					archive.finalize()
+				}) 
+			}) 
+		}) 
+	})
+
+ 	
+
+	
+
+	
+
+	//archive.append(buff1, {name: req.body.name+"_0png"})
+	
+
+	//createFile (scratchLayer1, req.body.name+"_1.png")
+	//createFile (scratchLayer2, req.body.name+"_2.png")
+	//createFile (scratchLayer3, req.body.name+"_3.png")
+
+	async function createFile(overlay) {
+		let base = await Jimp.read(images)
+		let lines = await Jimp.read(staticLines)
+		let ice = await Jimp.read(overlay)
+		await base.resize(2880, 1344, Jimp.RESIZE_BEZIER).quality(100)
+		await base.composite(lines, 0, 0)
+		await base.composite(ice, 0, 0)
+		let buffer = await base.getBufferAsync(Jimp.MIME_PNG)
+		return buffer
+	}
+	/* async function createFile(overlay, filename) {
+		const base = await Jimp.read(images)
+		const lines = await Jimp.read(staticLines)
+		const ice = await Jimp.read(overlay)
+		await base.resize(2880, 1344, Jimp.RESIZE_BEZIER).quality(100)
+		await base.composite(lines, 0, 0)
+		await base.composite(ice, 0, 0)
+		await base.writeAsync(result.filePaths[0] +"/"  +filename)
+		if (filename.substr(filename.length - 5) == "3.png") {
+		  openExplorer(result.filePaths[0])
+		  res.end("success")
+		}
+	} */
 });
 
 function getExtension(filename) {
