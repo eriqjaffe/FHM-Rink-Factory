@@ -542,6 +542,8 @@
 				<div style="text-align:center; margin-top:5px;">
 					<input type="button" class="button" id="straightenObject" value="Reset Object Rotation" style="display:none;">
 					<input type="button" class="button" id="save" value="Save Rink">
+					<input type="button" class="button" id="load" value="Load Rink">
+					<input type="file" id="uploadedJSON" accept=".rink" style="display:none;"/>
 					<input type="button" class="button" id="aboutRinkFactory" value="About Rink Factory">
 				</div>
             </div>
@@ -813,83 +815,7 @@
 		
         below.setBackgroundColor(initialColors["rinkColor"], below.renderAll.bind(below))
 
-		overlayGroup = new fabric.Group([], {
-			id: 'overlayGroup',
-			visible: true,
-			selectable: false,
-			evented: false,
-			excludeFromExport: true
-		})
-
-		below.add(overlayGroup)
-
-		fabric.Image.fromURL("./images/ice_scratches.png", function (img) {
-			var ice = img.set({
-				left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'ice',
-				visible: true,
-				selectable: false,
-				evented: false
-			})
-			overlayGroup.addWithUpdate(ice)
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll();
-		})
-
-		fabric.Image.fromURL("./images/guides.png", function (img) {
-			var guides = img.set({
-				left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'guides',
-				visible: true,
-				selectable: false,
-				evented: false
-			})
-			overlayGroup.addWithUpdate(guides)
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll();
-		})
-
-		fabric.Image.fromURL("./images/nets.png", function (img) {
-			var nets = img.set({
-				left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'nets',
-				visible: true,
-				selectable: false,
-				evented: false
-			})
-			overlayGroup.addWithUpdate(nets)
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll()
-		})
-
-		fabric.Image.fromURL("./images/boards2.png", function (img) {
-            var boards = img.set({
-                left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'boards',
-				visible: true,
-				selectable: false,
-				evented: false
-            })
-            overlayGroup.addWithUpdate(boards);
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll()
-        })
+		initializeOverlay()
 
 		centerLineBoards = new fabric.Path("M 476.11719 24.183594 L 476.11719 39.951172 L 484.53125 39.951172 L 484.53125 24.183594 L 476.11719 24.183594 z M 476.11719 407.99023 L 476.11719 423.75781 L 484.53125 423.75781 L 484.53125 407.99023 L 476.11719 407.99023 z",{
 			fill: initialColors["centerLineColor"],
@@ -1376,6 +1302,86 @@
 		below.renderAll()
     }
 
+	function initializeOverlay() {
+		overlayGroup = new fabric.Group([], {
+			id: 'overlayGroup',
+			visible: true,
+			selectable: false,
+			evented: false,
+			excludeFromExport: true
+		})
+
+		below.add(overlayGroup)
+
+		fabric.Image.fromURL("./images/ice_scratches.png", function (img) {
+			var ice = img.set({
+				left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'ice',
+				visible: true,
+				selectable: false,
+				evented: false
+			})
+			overlayGroup.addWithUpdate(ice)
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll();
+		})
+
+		fabric.Image.fromURL("./images/guides.png", function (img) {
+			var guides = img.set({
+				left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'guides',
+				visible: true,
+				selectable: false,
+				evented: false
+			})
+			overlayGroup.addWithUpdate(guides)
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll();
+		})
+
+		fabric.Image.fromURL("./images/nets.png", function (img) {
+			var nets = img.set({
+				left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'nets',
+				visible: true,
+				selectable: false,
+				evented: false
+			})
+			overlayGroup.addWithUpdate(nets)
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll()
+		})
+
+		fabric.Image.fromURL("./images/boards2.png", function (img) {
+            var boards = img.set({
+                left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'boards',
+				visible: true,
+				selectable: false,
+				evented: false
+            })
+            overlayGroup.addWithUpdate(boards);
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll()
+        })
+	}
+	
 	$("#wordmarkTextBox").on("change",function(e) {
 		objects = wordmark.getObjects();
 		for (x in objects) {
@@ -1407,6 +1413,7 @@
 		e.preventDefault;
 		$("#uploadTheFont").click();
 	})
+
 
 	$("#uploadTheFont").on("click", function(e) {
 		//$("#fontTypeCombo").removeClass().addClass('alegreya');
@@ -2414,7 +2421,7 @@
 		teamName = teamName.split(' ').join('_');
 		var fileName = "rink_"+teamName+yearRange;
 
-		$("#overlay").css("display","inline-block");	
+		$("#overlay").css("display","inline-block");
 
 		belowFull.loadFromJSON(below.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']), belowFull.renderAll.bind(belowFull), function(o, object) {
 			if (object.id == 'rinkElementGroup' || object.id == "wordmark") {
@@ -2429,10 +2436,13 @@
 		});
 
 		belowFull.setBackgroundColor(null, belowFull.renderAll.bind(belowFull))
-		var objects = belowFull.getObjects()
+
+		const json = JSON.stringify(below.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']));
 
 		var objects = below.getObjects()
 		for (x in objects) {
+			console.log(objects.id)
+			console.log(objects.visible)
 			if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup' || objects[x].id == "wordmark") {
 				objects[x].set({
 					visible: false
@@ -2443,10 +2453,12 @@
 		var lines = belowFull.toDataURL();
 		var img = below.toDataURL()
 
+		//var json = JSON.stringify(below.toJSON());
+
 		$.ajax({
 			type: "POST",
 			url: "http://127.0.0.1:"+port+"/saveRink",
-			data: {rinkLines:lines,imgdata:img,name:fileName},
+			data: {rinkLines:lines,imgdata:img,name:fileName,canvas:json},
 			success: function(result) {
 				var objects = below.getObjects()
 				for (x in objects) {
@@ -2460,6 +2472,29 @@
 				$("#overlay").css("display","none");
 			}
 		})
+	})
+
+	$("#load").on("click",function(e) {
+		$("#uploadedJSON").click()
+	})
+
+	$("#uploadedJSON").on("change",function(e) {
+		var fileReader = new FileReader();
+		fileReader.onload = function () {
+			below.clear()
+      		var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
+			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
+				below.add(object)
+			});
+			initializeOverlay()
+			//overlayGroup.bringToFront();
+			below.getObjects().forEach(function (o) {
+				console.log(o.id)
+			})
+			below.renderAll.bind(below)
+			
+    	};
+    	fileReader.readAsText($(this).prop('files')[0]);
 	})
 
 	$("#flipBottomtext").on("click",function(e) {

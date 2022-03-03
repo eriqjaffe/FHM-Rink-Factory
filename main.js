@@ -304,6 +304,7 @@ app2.post('/removeAllColor', (req, res) => {
 app2.post('/saveRink', (req, res) => {
   	const images = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
   	const staticLines = Buffer.from(req.body.rinkLines.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	const json = Buffer.from(req.body.canvas, 'utf-8')
 
 	var scratches0 = fs.readFileSync(__dirname + "/images/boards2.png", {encoding: 'base64'});
 	var scratchLayer0 = Buffer.from(scratches0, 'base64');
@@ -377,10 +378,11 @@ app2.post('/saveRink', (req, res) => {
 				createFile (scratchLayer3)
 				.then(function(response) {
 					const buff3 = response;
-					archive.append(buff0,  {name: req.body.name+"_0.png"})
-					archive.append(buff1,  {name: req.body.name+"_1.png"})
-					archive.append(buff2,  {name: req.body.name+"_2.png"})
-					archive.append(buff3,  {name: req.body.name+"_3.png"})
+					archive.append(buff0, {name: req.body.name+"_0.png"})
+					archive.append(buff1, {name: req.body.name+"_1.png"})
+					archive.append(buff2, {name: req.body.name+"_2.png"})
+					archive.append(buff3, {name: req.body.name+"_3.png"})
+					archive.append(json, {name: req.body.name+".rink"})
 					archive.finalize()
 				}) 
 			}) 
@@ -449,8 +451,8 @@ function createWindow () {
 	});
   
     // Open the DevTools.
-    // mainWindow.maximize()
-    // mainWindow.webContents.openDevTools()
+     mainWindow.maximize()
+     mainWindow.webContents.openDevTools()
   }
   
   app.whenReady().then(() => {
