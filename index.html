@@ -585,6 +585,8 @@
 		preserveObjectStacking: true
 	});
 
+	fabric.Object.NUM_FRACTION_DIGITS = 17;
+
 	below.on('selection:created', function(e) {
 		$("#straightenObject").css("display","inline-block");
 		var obj = e.selected[0];
@@ -1307,8 +1309,7 @@
 			id: 'overlayGroup',
 			visible: true,
 			selectable: false,
-			evented: false,
-			excludeFromExport: true
+			evented: false
 		})
 
 		below.add(overlayGroup)
@@ -1367,14 +1368,13 @@
 		fabric.Image.fromURL("./images/boards2.png", function (img) {
             var boards = img.set({
                 left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
+                top: 0,
 				id: 'boards',
 				visible: true,
 				selectable: false,
 				evented: false
             })
+			boards.scaleToHeight(448)
             overlayGroup.addWithUpdate(boards);
 			overlayGroup.setCoords();
 			overlayGroup.bringToFront();
@@ -2390,6 +2390,8 @@
 
 	$("#save").on("click",function(e) {
 		e.preventDefault()
+		const json = JSON.stringify(below.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']));
+
 		var startYear = parseInt($("#startYear").val());
 		var endYear = parseInt($("#endYear").val())
 		var yearRange = "";
@@ -2436,8 +2438,6 @@
 		});
 
 		belowFull.setBackgroundColor(null, belowFull.renderAll.bind(belowFull))
-
-		const json = JSON.stringify(below.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']));
 
 		var objects = below.getObjects()
 		for (x in objects) {
@@ -2487,7 +2487,7 @@
 				below.add(object)
 			});
 			initializeOverlay()
-			//overlayGroup.bringToFront();
+			//overlayGroup.addWithUpdate()//overlayGroup.bringToFront();
 			below.getObjects().forEach(function (o) {
 				console.log(o.id)
 			})

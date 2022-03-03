@@ -326,13 +326,14 @@ app2.post('/saveRink', (req, res) => {
 		  if (!result.canceled) {
 			fs.writeFile(result.filePath, data, function(err) {
 			  if (err) {
-				res.end(err)
+				res.end("success")
 				fs.unlink(tempDir + '/'+req.body.name+'.zip', (err) => {
 				  if (err) {
 					console.error(err)
 					return
 				  }
 				})
+				res.end("success")
 			  } else {
 				fs.unlink(tempDir + '/'+req.body.name+'.zip', (err) => {
 				  if (err) {
