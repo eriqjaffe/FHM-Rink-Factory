@@ -590,7 +590,7 @@
 	below.on('selection:created', function(e) {
 		$("#straightenObject").css("display","inline-block");
 		var obj = e.selected[0];
-		console.log(obj.id)
+		//console.log(obj.id)
 		if (obj.id == 'wordmark') {
 			$("#tipContainer").html("If you're trying to select an image instead of the text, you have to hide the text first.");
 		}
@@ -1220,12 +1220,61 @@
 			width: 100
 		})
 
-		rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerCircleFill, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots1, nzFaceOffSpots2, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
+		below.add(centerCircleStroke)
+		below.add(centerCircle)
+		below.add(centerLineStroke)
+		below.add(centerLine01)
+		below.add(centerLine02)
+		below.add(centerLine03)
+		below.add(centerLine04)
+		below.add(centerLine05)
+		below.add(centerLine06)
+		below.add(centerLine07)
+		below.add(centerLine08)
+		below.add(centerLine09)
+		below.add(centerLine10)
+		below.add(centerLine11)
+		below.add(centerLine12)
+		below.add(centerLine13)
+		below.add(centerLine14)
+		below.add(centerLine15)
+		below.add(centerLine16)
+		below.add(centerLine17)
+		below.add(centerLine18)
+		below.add(centerLine19)
+		below.add(centerCircleFill)
+		below.add(centerLineBoards)
+		below.add(blueLines)
+		below.add(trapezoidStroke)
+		below.add(creaseFill1)
+		below.add(creaseStroke1)
+		below.add(creaseFill2)
+		below.add(creaseStroke2)
+		below.add(creaseFill3)
+		below.add(creaseStroke3)
+		below.add(creaseFill4)
+		below.add(creaseStroke4)
+		below.add(goalLines)
+		below.add(nzFaceOffSpots1)
+		below.add(nzFaceOffSpots2)
+		below.add(hashmarks1)
+		below.add(hashmarks2)
+		below.add(hashmarks3)
+		below.add(hashmarks4)
+		below.add(hashmarks5)
+		below.add(ezDots1)
+		below.add(ezDots2)
+		below.add(ezCircle1)
+		below.add(ezCircle2)
+		below.add(ezCircle3)
+		below.add(centerDot)
+
+		/* rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerCircleFill, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots1, nzFaceOffSpots2, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
 			id: 'rinkElementGroup',
 			visible: true,
 			selectable: false,
 			evented: false
-		})
+		}) */
 
 		wordmarkTextTop = new fabric.Text('ARENA NAME',{
 			fontFamily: "Rubik One",
@@ -1299,7 +1348,7 @@
 			mtr: true //the rotating point (defaut: true)
 		})
 
-		below.add(rinkElementGroup)
+		//below.add(rinkElementGroup)
 		below.add(wordmark)
 		below.renderAll()
     }
@@ -1556,12 +1605,12 @@
 		move: function(color) {
 			$(this).data('changed', true);
             below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
-            var objects = rinkElementGroup.getObjects();
+            var objects = below.getObjects();
 			for (x in objects) {
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
 					objects[x].set('fill', color.toHexString())
 					//objects[x].fill = color.toHexString();
-					rinkElementGroup.addWithUpdate()
+					//below.addWithUpdate()
                     below.renderAll()
 				}
 			}
@@ -1569,12 +1618,12 @@
 		change: function(color) {
 			$(this).data('changed', true);
 			below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
-            var objects = rinkElementGroup.getObjects();
+            var objects = below.getObjects();
 			for (x in objects) {
-				console.log(objects[x].id)
+				//console.log(objects[x].id)
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
                     objects[x].set('fill', color.toHexString())
-					rinkElementGroup.addWithUpdate()
+					//below.addWithUpdate()
                     below.renderAll()
 				}
 			}
@@ -1582,21 +1631,21 @@
 		hide: function(color) {
 			if ($(this).data('changed')) {
 				below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
                 for (x in objects) {
                     if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
                         objects[x].set('fill', color.toHexString())
-					    rinkElementGroup.addWithUpdate()
+					    //below.addWithUpdate()
                         below.renderAll()
                     }
                 }
 			} else {
                 below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
                 for (x in objects) {
                     if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
                         objects[x].set('fill', original_color.toHexString())
-					    rinkElementGroup.addWithUpdate()
+					    //below.addWithUpdate()
                         below.renderAll()
                     }
                 }
@@ -1633,13 +1682,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id == id) {
                         objects[x].set('fill', colorX);
                     } 						
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1650,14 +1699,14 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id == id) {
 						console.log("found it!")
                         objects[x].set('fill', colorX);
                     } 						
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1668,13 +1717,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id == id) {
                         objects[x].set('fill', colorX);
                     } 						
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -1708,13 +1757,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id == "centerLineBoards" || objects[x].id.substring(0,10) == "centerLine") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1725,13 +1774,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id == "centerLineBoards" || objects[x].id.substring(0,10) == "centerLine") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1742,13 +1791,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id == "centerLineBoards" || objects[x].id.substring(0,10) == "centerLine") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -1782,13 +1831,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "hashmark") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1799,13 +1848,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "hashmark") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1816,13 +1865,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "hashmark") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -1856,13 +1905,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "ezDots") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1873,13 +1922,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "ezDots") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1890,13 +1939,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "ezDots") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -1930,13 +1979,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "nzFace") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1947,13 +1996,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "nzFace") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1964,13 +2013,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "nzFace") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -2004,13 +2053,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "ezCircle") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -2021,13 +2070,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "ezCircle") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -2038,13 +2087,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "ezCircle") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -2080,13 +2129,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id.substring(0, elLength) == id) {
                         objects[x].set('fill', colorX);
                     } 						
 				}
-				rinkElementGroup.addWithUpdate()
+				//below.addWithUpdate()
 				below.renderAll();
 			},
 			change: function(color) {
@@ -2098,7 +2147,7 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id.substring(0, elLength) == id) {
                         objects[x].set('fill', colorX);
@@ -2115,7 +2164,7 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id.substring(0, elLength) == id) {
                         objects[x].set('fill', colorX);
@@ -2128,7 +2177,7 @@
 
     $("#creaseStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
 			if (objects[x].id.substring(0,6) == "crease") {
 				console.log('found a crease')
@@ -2142,15 +2191,15 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
 	$("#centerLineStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
-			console.log(objects[x].id)
+			//console.log(objects[x].id)
 			if (objects[x].id.substring(0,10) == "centerLine" && objects[x].id != "centerLineBoards") {
 				if (objects[x].id.slice(-2) == id) {
 					objects[x].visible = true;
@@ -2159,15 +2208,15 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
 	$("#circleStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
-			console.log(objects[x].id)
+			//console.log(objects[x].id)
 			if (objects[x].id.substring(0,8) == "ezCircle") {
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					objects[x].visible = true;
@@ -2176,15 +2225,15 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
 	$("#dotStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
-			console.log(objects[x].id)
+			//console.log(objects[x].id)
 			if (objects[x].id.substring(0,6) == "ezDots" || objects[x].id.substring(0,6) == "nzFace") {
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					objects[x].visible = true;
@@ -2193,15 +2242,15 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
 	$("#hashmarkStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
-			console.log(objects[x].id)
+			//console.log(objects[x].id)
 			if (objects[x].id.substring(0,8) == "hashmark") {
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					objects[x].visible = true;
@@ -2210,7 +2259,7 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
@@ -2255,7 +2304,7 @@
 			state = false;
 		}
 		var id = $(this).data("id");
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
 			if (objects[x].id == id) {
 				if (state == true) {
@@ -2264,7 +2313,7 @@
 					objects[x].visible = false;
 				}
 			}
-			rinkElementGroup.addWithUpdate();
+			//below.addWithUpdate();
 		}
 		var objects = overlayGroup.getObjects();
 		for (x in objects) {
@@ -2309,7 +2358,7 @@
 		}
         var elLength = $(this).data("id").length
 		var id = $(this).data("id");
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
 			if (objects[x].id.substring(0,elLength) == id) {
 				if (state == true) {
@@ -2319,7 +2368,7 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate();
+		//below.addWithUpdate();
 		below.renderAll();
 	})
 
@@ -2392,6 +2441,14 @@
 		e.preventDefault()
 		const json = JSON.stringify(below.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']));
 
+		//console.log(JSON.stringify(rinkElementGroup))
+
+		below.getObjects().forEach(function (o) {
+			if (o.id == "centerLine01") {
+				console.log(o)
+			}
+		})
+
 		var startYear = parseInt($("#startYear").val());
 		var endYear = parseInt($("#endYear").val())
 		var yearRange = "";
@@ -2441,8 +2498,8 @@
 
 		var objects = below.getObjects()
 		for (x in objects) {
-			console.log(objects.id)
-			console.log(objects.visible)
+			//console.log(objects.id)
+			//console.log(objects.visible)
 			if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup' || objects[x].id == "wordmark") {
 				objects[x].set({
 					visible: false
@@ -2483,17 +2540,59 @@
 		fileReader.onload = function () {
 			below.clear()
       		var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
+			const tmp = JSON.parse(data)
+			const newBG = tmp.background;
 			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
 				below.add(object)
+				console.log(object.id)
+				switch (object.id) {
+					case "blueLines":
+						$("#blueLineColor").spectrum("set", object.fill)
+						break;
+					case "centerCircleFill":
+						$("#centerCircleFillColor").spectrum("set", object.fill)
+						break;
+					case "centerCircle":
+						$("#centerCircleColor").spectrum("set", object.fill)
+						break;
+						$("#centerDotColor").spectrum("set", object.fill)
+						break;
+					case "centerLine01":
+						$("#centerLineColor").spectrum("set", object.fill)
+						break;
+					case "nzFaceOffSpots1":
+						$("#nzFaceOffSpotsColor").spectrum("set", object.fill)
+						break;
+					case "ezCircle1":
+						$("#ezCircle1Color").spectrum("set", object.fill)
+						break;
+					case "ezDots1":
+						$("#ezDots1Color").spectrum("set", object.fill)
+						break;
+					case "hashmarks1":
+						$("#hasmkarks1Color").spectrum("set", object.fill)
+						break;
+					case "goalLines":
+						$("#goalLinesColor").spectrum("set", object.fill)
+						break;
+					case "creaseFill1":
+						$("#creaseFillColor").spectrum("set", object.fill)
+						break;
+					case "creaseStroke1":
+						$("#creaseStrokeColor").spectrum("set", object.fill)
+						break;
+					case "trapezoidStroke":
+						$("#trapezoidStrokeColor").spectrum("set", object.fill)
+						break;
+					default:
+						break;
+				}
 			});
-			initializeOverlay()
-			//overlayGroup.addWithUpdate()//overlayGroup.bringToFront();
-			below.getObjects().forEach(function (o) {
-				console.log(o.id)
-			})
-			below.renderAll.bind(below)
 			
-    	};
+			$("#rinkColor").spectrum("set", newBG)
+			initializeOverlay()
+			below.renderAll.bind(below)
+		}	
     	fileReader.readAsText($(this).prop('files')[0]);
 	})
 
@@ -2516,7 +2615,7 @@
 		if (object.get('type') == "image") {
 			var imageHeight = object.height
 			var imageWidth = object.width
-			console.log($(this).data("adloc"))
+			//console.log($(this).data("adloc"))
 			switch ($(this).data("adloc")) {
 				case 1:
 					if (imageHeight > imageWidth && imageHeight > 42) {
@@ -2649,7 +2748,7 @@
 			below.centerObject(object);
 			object.setCoords();
 			const objHeight = object.scaleY ? object.height * object.scaleY : object.height;
-			console.log(objHeight)
+			//console.log(objHeight)
 		}
 		below.renderAll();
 		$("#overlay").css("display","none");
@@ -3065,6 +3164,20 @@
 			B: parseInt(b, 16)
 		};
 	}
+
+	fabric.Canvas.prototype.getItem = function(canvas, id) {
+    var object = null,
+        objects = canvas.getObjects();
+
+    for (var i = 0, len = this.size(); i < len; i++) {
+        if (objects[i].id && objects[i].id === id) {
+            object = objects[i];
+            break;
+        }
+    }
+
+    return object;
+};
 </script>
 </head>    
 </html>
