@@ -187,8 +187,8 @@
                             </tr>
 							<tr class="color_tr">
 								<td>&nbsp;</td>
-								<td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterLine" checked>&nbsp;Center Line Stroke</td>
-								<td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterCircle" checked>&nbsp;Center Circle Stroke</td>
+								<td class="checkCell"><input type="checkbox" id="strokeCenterLine" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterLine" checked>&nbsp;Center Line Stroke</td>
+								<td class="checkCell"><input type="checkbox" id="strokeCenterCircle" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterCircle" checked>&nbsp;Center Circle Stroke</td>
 							</tr>
                             <tr class="color_tr">
                                 <td>&nbsp;</td>
@@ -264,7 +264,7 @@
                                 </td>
                             </tr>
                             <tr class="color_tr">
-                                <td class="checkCell"><input type="checkbox" class="multiToggle" data-canvas="below" data-id="trapezoid" checked></td>
+                                <td class="checkCell"><input type="checkbox" id="trapezoidStroke" class="multiToggle" data-canvas="below" data-id="trapezoid" checked></td>
                                 <td><label>Trapezoid: </label></td>
                                 <td style="text-align:right;">
                                     <!--<input class="selector enabledSelector" type="text" id="trapezoidFillColor" data-element="trapezoidFill">-->
@@ -582,7 +582,10 @@
 
     var below = new fabric.Canvas('below',{
 		enableRetinaScaling: false,
-		preserveObjectStacking: true
+		preserveObjectStacking: true,
+		team: "Unknown Team",
+		start: "",
+		end: ""
 	});
 
 	fabric.Object.NUM_FRACTION_DIGITS = 17;
@@ -2439,15 +2442,12 @@
 
 	$("#save").on("click",function(e) {
 		e.preventDefault()
-		const json = JSON.stringify(below.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']));
+		below.set("team", $("#teamName").val())
+		below.set("start", $("#startYear").val())
+		below.set("end", $("#endYear").val())
+		const json = JSON.stringify(below.toJSON(['team','start','end','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']));
 
-		//console.log(JSON.stringify(rinkElementGroup))
-
-		below.getObjects().forEach(function (o) {
-			if (o.id == "centerLine01") {
-				console.log(o)
-			}
-		})
+		console.log(json)
 
 		var startYear = parseInt($("#startYear").val());
 		var endYear = parseInt($("#endYear").val())
@@ -2542,9 +2542,32 @@
       		var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
 			const tmp = JSON.parse(data)
 			const newBG = tmp.background;
+			$("#teamName").val(tmp.team)
+			$("#startYear").val(tmp.start)
+			$("#endYear").val(tmp.end)
 			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
 				below.add(object)
-				console.log(object.id)
+				if (object.id.substring(0,10) == "centerLine" && object.id.slice(-6) != "Boards" && object.visible == true) {
+					$("#centerLineStyle").val(object.id.slice(-2))
+				}
+				if (object.id.substring(0,8) == "ezCircle" && object.visible == true) {
+					$("#circleStyle").val(object.id.slice(-1))
+				}
+				if (object.id.substring(0,9) == "hashmarks" && object.visible == true) {
+					$("#hashmarkStyle").val(object.id.slice(-1))
+				}
+				if (object.id.substring(0,6) == "ezDots" && object.visible == true) {
+					$("#dotStyle").val(object.id.slice(-1))
+				}
+				if (object.id == "strokeCenterCircle") {
+					$("#strokeCenterCircle").attr('checked', object.visible);
+				}
+				if (object.id == "strokeCenterLine") {
+					$("#strokeCenterLine").attr('checked', object.visible);
+				}
+				if (object.id == "trapezoidStroke") {
+					$("#trapezoidStroke").attr('checked', object.visible);
+				}
 				switch (object.id) {
 					case "blueLines":
 						$("#blueLineColor").spectrum("set", object.fill)
@@ -2594,6 +2617,7 @@
 			below.renderAll.bind(below)
 		}	
     	fileReader.readAsText($(this).prop('files')[0]);
+		console.log($(this).prop('files')[0].name)
 	})
 
 	$("#flipBottomtext").on("click",function(e) {
