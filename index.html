@@ -138,7 +138,7 @@
 								</td>
 							</tr>
 							<tr class="color_tr">
-                                <td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="nets" checked></td>
+                                <td class="checkCell"><input type="checkbox" id="nets" class="belowTextureToggle" data-canvas="below" data-id="nets" checked></td>
                                 <td>Nets</td>
                                 <td>&nbsp;</td>
                             </tr>
@@ -1272,6 +1272,38 @@
 		below.add(ezCircle3)
 		below.add(centerDot)
 
+		fabric.Image.fromURL("./images/guides.png", function (img) {
+			var guides = img.set({
+				left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'guides',
+				visible: true,
+				selectable: false,
+				evented: false
+			})
+			below.add(guides)
+			guides.bringToFront()
+			below.renderAll();
+		})
+
+		fabric.Image.fromURL("./images/nets.png", function (img) {
+			var nets = img.set({
+				left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'nets',
+				visible: true,
+				selectable: false,
+				evented: false
+			})
+			below.add(nets)
+			nets.bringToFront()
+			below.renderAll()
+		})
+
 		/* rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerCircleFill, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots1, nzFaceOffSpots2, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
 			id: 'rinkElementGroup',
 			visible: true,
@@ -1381,40 +1413,6 @@
 			overlayGroup.setCoords();
 			overlayGroup.bringToFront();
 			below.renderAll();
-		})
-
-		fabric.Image.fromURL("./images/guides.png", function (img) {
-			var guides = img.set({
-				left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'guides',
-				visible: true,
-				selectable: false,
-				evented: false
-			})
-			overlayGroup.addWithUpdate(guides)
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll();
-		})
-
-		fabric.Image.fromURL("./images/nets.png", function (img) {
-			var nets = img.set({
-				left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'nets',
-				visible: true,
-				selectable: false,
-				evented: false
-			})
-			overlayGroup.addWithUpdate(nets)
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll()
 		})
 
 		fabric.Image.fromURL("./images/boards2.png", function (img) {
@@ -2568,6 +2566,37 @@
 				if (object.id == "trapezoidStroke") {
 					$("#trapezoidStroke").attr('checked', object.visible);
 				}
+				if (object.id == "nets") {
+					$("#nets").attr("checked", object.visible)
+				}
+				if (object.id == "guides") {
+					$("#guides").attr("checked", object.visible)
+				}
+				if (object.id == "wordmark") {
+					$("#wordmarkTextBox").val(object._objects[0].text)
+					$("#textColor").spectrum("set", object._objects[0].fill)
+					$("#fontSpacing").val(object._objects[0].charSpacing)
+					$("#fontSize").val(object._objects[0].fontSize)
+					$("#fontTypeCombo").val(object._objects[0].fontFamily)
+					$("#textLogoCheck").attr("checked", object.visible)
+						$(".textOption").each(function() {
+						if (object.visible) {
+							$(this).prop( "disabled", false );
+						} else {
+							$(this).prop( "disabled", true );
+						}
+					})
+					$(".textColorSelector").each(function() {
+						if (object.visible) {
+							$(this).spectrum('enable');
+						} else {
+							$(this).spectrum('disable');
+						}
+					})
+					wordmark.addWithUpdate();
+					below.renderAll()
+				}
+				
 				switch (object.id) {
 					case "blueLines":
 						$("#blueLineColor").spectrum("set", object.fill)
