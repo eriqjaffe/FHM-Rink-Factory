@@ -87,6 +87,63 @@
 			'"Wendy One"': "WendyOne-Regular.ttf",
 			Yellowtail: "Yellowtail-Regular.ttf"
 		};
+
+		var fontFamilies = {
+			Acme: "Acme",
+			athletic_gothicregular: "AthleticGothic",
+			athletic_gothic_shadowregular: "AthleticGothicShadow",
+			beaverton_scriptregular: "BeavertonScript",
+			'Berkshire Swash': "Berkshire_Swash",
+			'Cantora One': "Cantora_One",
+			caxton_romanregular: "CaxtonRoman",
+			'Chela One': "Chela_One",
+			russell_circusregular: "Circus",
+			Condiment: "Comdiment",
+			Cookie: "Coookie",
+			Courgette: "Courgette",
+			'Croissant One': "Croissant_one",
+			Damion: "Damion",
+			Engagement: "Engagement",
+			rawlings_fancy_blockregular: "RawlingsFancyBlock",
+			'Germania One': "Germania_One",
+			Graduate: "Graduate",
+			'Grand Hotel': "Grand_Hotel",
+			'Jockey One': "Jockey_One",
+			kansasregular: "Kansas",
+			'Kaushan Script': "Kaushan_Script",
+			'Leckerli One': "Leckerli_One",
+			'Lily Script One': "Lily_Script_One",
+			Lobster: "Lobster",
+			'Lobster Two': "Lobster_Two",
+			'Metal Mania': "Metal_Mania",
+			Miniver: "Miniver",
+			'Molle, italic': "Molle",
+			'New Rocker': "New_Rocker",
+			Norican: "Norican",
+			rawlings_old_englishmedium: "OldEnglish",
+			'Oleo Script': "Oleo_Script",
+			'Oleo Script Swash Caps': "Oleo_Script_Swash_Caps",
+			Pacifico: "Pacifico",
+			'Pirata One': "Pirata_One",
+			Playball: "Playball",
+			pro_full_blockregular: "ProFullBlock",
+			richardson_fancy_blockregular: "RichardsonFancyBlock",
+			'Rubik One': "Rubik_One",
+			'Rum Raisin': "Rum_Raisin",
+			Satisfy: "Satisfy",
+			'Seymour One': "Seymour_One",
+			spl28scriptregular: "spl28",
+			ua_tiffanyregular: "TiffanyRegular",
+			'Trade Winds': "Trade_Winds",
+			mlb_tuscan_newmedium: "Tuscan",
+			UnifrakturCook: "UnifrakturCook",
+			UnifrakturMaguntia: "UnifrakturMaguntia",
+			Vibur: "Vibur",
+			Viga: "Viga",
+			Wellfleet: "Wellfleet",
+			'Wendy One': "Wendy_One",
+			Yellowtail: "Yellowtail"
+		};
     </script>
 <body>
 <div class="title">
@@ -593,7 +650,7 @@
 	below.on('selection:created', function(e) {
 		$("#straightenObject").css("display","inline-block");
 		var obj = e.selected[0];
-		//console.log(obj.id)
+		console.log(obj.id)
 		if (obj.id == 'wordmark') {
 			$("#tipContainer").html("If you're trying to select an image instead of the text, you have to hide the text first.");
 		}
@@ -617,6 +674,13 @@
 		if (obj.id == "wordmark") {
 			wmLeft = obj.get('left');
 	 		wmTop = obj.get('top');
+		}
+	})
+
+	below.on('object:rotating', function(e) {
+		if (e.target.id == "wordmarkTextTop") {
+			bottomText = below.getObjects('text')[0]
+			bottomText.set("angle", (e.target.angle + 180) % 360)
 		}
 	})
 
@@ -1215,13 +1279,57 @@
 			evented: false
         });
 
-		tempRect = new fabric.Rect({
-			top: 0,
-			left: 0,
-			fill: 'red',
-			height: 100,
-			width: 100
+		wordmarkTextTop = new fabric.Text('ARENA NAME',{
+			fontFamily: "Rubik One",
+			fontSize: 20,
+			originX: 'center',
+			originY: 'center',
+			textAlign: 'center',
+			id: 'wordmarkTextTop',
+			fill: 'black',
+			stroke: 'transparent',
+			strokeWidth: 35,
+			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
+				visible: false,
+				selectable:false,
+				evented: false,
+			}),
+			pathSide: 'left',
+			pathAlign: 'descender',
+			borderColor: 'red',
+			cornerColor: 'yellow',
+			cornerSize: 12,
+			transparentCorners: false,
+			lockScalingFlip: true,
+			lockScalingX: true,
+			lockScalingY: true,
+			lockMovementX: true,
+			lockMovementY: true,
+			snapAngle: 5
 		})
+
+		wordmarkTextBottom = new fabric.Text('ARENA NAME',{
+			selectable: false,
+			fontFamily: 'Rubik One',
+			fontSize: 20,
+			originX: 'center',
+			originY: 'center',
+			textAlign: 'center',
+			id: 'wordmarkTextBottom',
+			fill: 'black',
+			stroke: 'transparent',
+			strokeWidth: 35,
+			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
+				visible: false,
+				selectable:false,
+				evented: false
+			}),
+			pathSide: 'left',
+			pathAlign: 'descender'
+		})
+
+		wordmarkTextTop.rotate(270)
+		wordmarkTextBottom.rotate(90)
 
 		below.add(centerCircleStroke)
 		below.add(centerCircle)
@@ -1271,6 +1379,11 @@
 		below.add(ezCircle2)
 		below.add(ezCircle3)
 		below.add(centerDot)
+		below.add(wordmarkTextBottom)
+		below.add(wordmarkTextTop)
+
+		below.centerObject(wordmarkTextTop)
+		below.centerObject(wordmarkTextBottom)
 
 		fabric.Image.fromURL("./images/guides.png", function (img) {
 			var guides = img.set({
@@ -1310,48 +1423,8 @@
 			selectable: false,
 			evented: false
 		}) */
-
-		wordmarkTextTop = new fabric.Text('ARENA NAME',{
-			fontFamily: "Rubik One",
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextTop',
-			fill: 'black',
-			stroke: 'transparent',
-			strokeWidth: 35,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false,
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender'
-		})
-
-		wordmarkTextBottom = new fabric.Text('ARENA NAME',{
-			fontFamily: 'Rubik One',
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextBottom',
-			fill: 'black',
-			stroke: 'transparent',
-			strokeWidth: 35,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender'
-		})
-
-		wordmarkTextBottom.rotate(180)
 		
-		wordmark = new fabric.Group( [wordmarkTextTop, wordmarkTextBottom], {
+		/* wordmark = new fabric.Group( [wordmarkTextTop, wordmarkTextBottom], {
 			originX: 'center',
 			originY:' center',
 			visible: false,
@@ -1384,8 +1457,18 @@
 		})
 
 		//below.add(rinkElementGroup)
+
 		below.add(wordmark)
+		//var words = wordmark._objects;
+		//below.remove(wordmark)
+		//for (var i=0; i<words.length; i++) {
+		//	below.add(words[i])
+		//} */
 		below.renderAll()
+
+		below.getObjects('text').forEach(function(o) {
+			console.log(o.visible)
+		})
     }
 
 	function initializeOverlay() {
@@ -1433,11 +1516,13 @@
 	}
 	
 	$("#wordmarkTextBox").on("change",function(e) {
+		console.log(wordmark)
 		objects = wordmark.getObjects();
 		for (x in objects) {
+			console.log("hmm? "+objects[x].id)
 			objects[x].text = $(this).val();
 		}
-		wordmark.addWithUpdate()
+		//wordmark.addWithUpdate()
 		below.renderAll();
 	})
 
@@ -2443,9 +2528,20 @@
 		below.set("team", $("#teamName").val())
 		below.set("start", $("#startYear").val())
 		below.set("end", $("#endYear").val())
-		const json = JSON.stringify(below.toJSON(['team','start','end','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']));
-
-		console.log(json)
+		var wordmarkVisible = wordmark.visible;
+ 		var wordmarks = wordmark.getObjects();
+		wordmark.destroy();
+		below.remove(wordmark)
+		wordmarks[0].set({
+			visible: wordmarkVisible
+		})
+		wordmarks[1].set({
+			visible: wordmarkVisible
+		})
+		below.add(wordmarks[0])
+		below.add(wordmarks[1])
+		
+		const json = JSON.stringify(below.toJSON(['team','start','end','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']),null,2);
 
 		var startYear = parseInt($("#startYear").val());
 		var endYear = parseInt($("#endYear").val())
@@ -2523,8 +2619,49 @@
 						})
 					}
 				}
+
+				/* wordmark = new fabric.Group( [wordmarkTextTop, wordmarkTextBottom], {
+					originX: 'center',
+					originY:' center',
+					visible: wordmarkVisible,
+					id: 'wordmark',
+					borderColor: 'red',
+					cornerColor: 'yellow',
+					cornerSize: 12,
+					transparentCorners: false,
+					lockScalingFlip: true,
+					lockScalingX: true,
+					lockScalingY: true,
+					lockMovementX: true,
+					lockMovementY: true,
+					left: wmLeft,
+					top: wmTop,
+					snapAngle: 5,
+				});
+
+				wordmark.setControlsVisibility({
+					mt: false,
+					mb: false,
+					ml: false,
+					mr: false,
+					tr: false,
+					tl: false,
+					br: false,
+					bl: false,
+					mtr: true //the rotating point (defaut: true)
+				})
+
+				below.add(wordmark)
+
+				below.remove(wordmarkTextTop)
+				below.remove(wordmarkTextBottom)
+
+				*/
 				below.renderAll()
 				$("#overlay").css("display","none");
+				below.getObjects().forEach(function(p) {
+					console.log(p.id)
+				})
 			}
 		})
 	})
@@ -2543,8 +2680,37 @@
 			$("#teamName").val(tmp.team)
 			$("#startYear").val(tmp.start)
 			$("#endYear").val(tmp.end)
+			var wordmarkVisible = null;
 			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
 				below.add(object)
+					/*console.log(object._objects[0].fontFamily)
+					$("#wordmarkTextBox").val(object._objects[0].text)
+					$("#textColor").spectrum("set", object._objects[0].fill)
+					$("#fontSpacing").val(object._objects[0].charSpacing)
+					$("#fontSize").val(object._objects[0].fontSize)
+					$("#fontTypeCombo").val(fontFamilies[object._objects[0].fontFamily])
+					$("#fontTypeCombo").removeClass().addClass(fontFamilies[object._objects[0].fontFamily]);
+					$("#fontTypeCombo").addClass("textOption")
+					$("#textLogoCheck").attr("checked", object.visible)
+					$(".textOption").each(function() {
+						if (object.visible) {
+							$(this).prop( "disabled", false );
+						} else {
+							$(this).prop( "disabled", true );
+						}
+					})
+					$(".textColorSelector").each(function() {
+						if (object.visible) {
+							$(this).spectrum('enable');
+						} else {
+							$(this).spectrum('disable');
+						}
+					})
+					wordmark.AddWithUpdate();
+					below.renderAll() */
+				if (object.id == "wordmarkTextTop") {
+					wordmarkVisible = object.visible
+				}
 				if (object.id.substring(0,10) == "centerLine" && object.id.slice(-6) != "Boards" && object.visible == true) {
 					$("#centerLineStyle").val(object.id.slice(-2))
 				}
@@ -2571,30 +2737,6 @@
 				}
 				if (object.id == "guides") {
 					$("#guides").attr("checked", object.visible)
-				}
-				if (object.id == "wordmark") {
-					$("#wordmarkTextBox").val(object._objects[0].text)
-					$("#textColor").spectrum("set", object._objects[0].fill)
-					$("#fontSpacing").val(object._objects[0].charSpacing)
-					$("#fontSize").val(object._objects[0].fontSize)
-					$("#fontTypeCombo").val(object._objects[0].fontFamily)
-					$("#textLogoCheck").attr("checked", object.visible)
-						$(".textOption").each(function() {
-						if (object.visible) {
-							$(this).prop( "disabled", false );
-						} else {
-							$(this).prop( "disabled", true );
-						}
-					})
-					$(".textColorSelector").each(function() {
-						if (object.visible) {
-							$(this).spectrum('enable');
-						} else {
-							$(this).spectrum('disable');
-						}
-					})
-					wordmark.addWithUpdate();
-					below.renderAll()
 				}
 				
 				switch (object.id) {
@@ -2641,12 +2783,62 @@
 				}
 			});
 			
+			/* wordmark = new fabric.Group( [wordmarkTextTop, wordmarkTextBottom], {
+				originX: 'center',
+				originY:' center',
+				visible: true,
+				id: 'wordmark',
+				borderColor: 'red',
+				cornerColor: 'yellow',
+				cornerSize: 12,
+				transparentCorners: false,
+				lockScalingFlip: true,
+				lockScalingX: true,
+				lockScalingY: true,
+				lockMovementX: true,
+				lockMovementY: true,
+				left: wmLeft,
+				top: wmTop,
+				snapAngle: 5,
+			});
+
+			wordmark.setControlsVisibility({
+				mt: false,
+				mb: false,
+				ml: false,
+				mr: false,
+				tr: false,
+				tl: false,
+				br: false,
+				bl: false,
+				mtr: true //the rotating point (defaut: true)
+			})
+
+			below.renderAll()
+
+			below.getObjects('text').forEach(function (o) {
+				below.remove(o)
+				below.renderAll()
+			})
+			
+
+			below.renderAll()
+
+			wordmark.addWithUpdate()
+			below.add(wordmark) */
+
 			$("#rinkColor").spectrum("set", newBG)
 			initializeOverlay()
 			below.renderAll.bind(below)
+			below.getObjects().forEach(function (o) {
+				console.log(o.id + " " + o.visible)
+			})
+			wordmark.getObjects().forEach(function (o) {
+				console.log(o.id + " " + o.visible)
+			})
 		}	
     	fileReader.readAsText($(this).prop('files')[0]);
-		console.log($(this).prop('files')[0].name)
+		
 	})
 
 	$("#flipBottomtext").on("click",function(e) {
