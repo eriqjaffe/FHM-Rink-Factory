@@ -647,6 +647,17 @@
 
 	fabric.Object.NUM_FRACTION_DIGITS = 17;
 
+	fabric.Object.prototype.controls.mtr = new fabric.Control({
+		x: 0,
+		y: -0.5,
+		offsetY: -40,
+		cursorStyle: 'grab',
+		actionHandler: fabric.controlsUtils.rotationWithSnapping,
+		actionName: 'rotate',
+		cornerSize: 28,
+		withConnection: true
+	});
+
 	below.on('selection:created', function(e) {
 		$("#straightenObject").css("display","inline-block");
 		var obj = e.selected[0];
@@ -1306,7 +1317,20 @@
 			lockScalingY: true,
 			lockMovementX: true,
 			lockMovementY: true,
-			snapAngle: 5
+			snapAngle: 5,
+			hoverCursor: 'pointer'
+		})
+
+		wordmarkTextTop.setControlsVisibility({
+			mt: false,
+			mb: false,
+			ml: false,
+			mr: false,
+			tr: false,
+			tl: false,
+			br: false,
+			bl: false,
+			mtr: true
 		})
 
 		wordmarkTextBottom = new fabric.Text('ARENA NAME',{
