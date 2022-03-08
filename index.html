@@ -200,7 +200,7 @@
                                 <td>&nbsp;</td>
                             </tr>
 							<tr class="color_tr">
-                                <td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="guides" checked></td>
+                                <td class="checkCell"><input type="checkbox" id="guidesToggle" class="belowTextureToggle" data-canvas="below" data-id="guides" checked></td>
                                 <td>Guides (Automatically hidden on export)</td>
                                 <td>&nbsp;</td>
                             </tr>
@@ -403,12 +403,15 @@
 						<table style="width:100%;">
 							<tr>
 								<td class="checkCell"><input type="checkbox" id="textLogoCheck" class="wordmarkToggle" data-id="wordmark"></td>
-								<td colspan="2"><label>Text: </label><input class="textOption" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:79%; text-align:center;"/></td>
+								<td><label>Text: </label><input class="textOption" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:79%; text-align:center;"/></td>
+								<td style="text-align:right;"><input type="checkbox" class="textOption" id="textStrokeCheck" checked disabled>&nbsp;Text Border</td>
 							</tr>
 						</table>
 						<table style="width:100%;">
 							<tr>
-								<td style="text-align:center;"><input class="textOption textColorSelector" type="text" id="textColor" data-element="wordmarkText" disabled></td>	
+								<td style="text-align:center;">
+									<input class="textOption textColorSelector" type="text" id="textColor" data-element="wordmarkText" disabled>
+								</td>	
 								<td style="text-align:center;">
 									Text Size: <input type="number" id="fontSize" value="20" min="1" class="textOption scaling" style="width:50px;" disabled>&nbsp;&nbsp;&nbsp;
 									Text Spacing: <input type="number" id="fontSpacing" value="0" class="textOption spacing" style="width:50px;" disabled>
@@ -640,9 +643,10 @@
     var below = new fabric.Canvas('below',{
 		enableRetinaScaling: false,
 		preserveObjectStacking: true,
-		team: "Unknown Team",
+		team: "",
 		start: "",
-		end: ""
+		end: "",
+		selectedFont: ""
 	});
 
 	fabric.Object.NUM_FRACTION_DIGITS = 17;
@@ -661,7 +665,6 @@
 	below.on('selection:created', function(e) {
 		$("#straightenObject").css("display","inline-block");
 		var obj = e.selected[0];
-		console.log(obj.id)
 		if (obj.id == 'wordmark') {
 			$("#tipContainer").html("If you're trying to select an image instead of the text, you have to hide the text first.");
 		}
@@ -690,8 +693,19 @@
 
 	below.on('object:rotating', function(e) {
 		if (e.target.id == "wordmarkTextTop") {
-			bottomText = below.getObjects('text')[0]
-			bottomText.set("angle", (e.target.angle + 180) % 360)
+			below.getObjects('text').forEach(function(o) {
+				switch (o.id) {
+					case "wordmarkTextBottom":
+						o.set("angle", (e.target.angle + 180) % 360)
+						break;
+					case "wordmarkTextBottomStroke":
+						o.set("angle", (e.target.angle + 180) % 360)
+						break;
+					case "wordmarkTextTopStroke":
+						o.set("angle", e.target.angle)
+						break;
+				}
+			})
 		}
 	})
 
@@ -1318,7 +1332,26 @@
 			lockMovementX: true,
 			lockMovementY: true,
 			snapAngle: 5,
-			hoverCursor: 'pointer'
+		})
+
+		wordmarkTextTopStroke = new fabric.Text('ARENA NAME',{
+			visible: false,
+			fontFamily: "Rubik One",
+			fontSize: 20,
+			originX: 'center',
+			originY: 'center',
+			textAlign: 'center',
+			id: 'wordmarkTextTopStroke',
+			fill: initialColors['rinkColor'],
+			stroke: initialColors['rinkColor'],
+			strokeWidth: 4,
+			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
+				visible: false,
+				selectable:false,
+				evented: false,
+			}),
+			pathSide: 'left',
+			pathAlign: 'descender'
 		})
 
 		wordmarkTextTop.setControlsVisibility({
@@ -1354,7 +1387,30 @@
 			pathAlign: 'descender'
 		})
 
+		wordmarkTextBottomStroke = new fabric.Text('ARENA NAME',{
+			visible: false,
+			selectable: false,
+			fontFamily: 'Rubik One',
+			fontSize: 20,
+			originX: 'center',
+			originY: 'center',
+			textAlign: 'center',
+			id: 'wordmarkTextBottomStroke',
+			fill: initialColors['rinkColor'],
+			stroke: initialColors['rinkColor'],
+			strokeWidth: 4,
+			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
+				visible: false,
+				selectable:false,
+				evented: false
+			}),
+			pathSide: 'left',
+			pathAlign: 'descender'
+		})
+
+		wordmarkTextTopStroke.rotate(270)
 		wordmarkTextTop.rotate(270)
+		wordmarkTextBottomStroke.rotate(90)
 		wordmarkTextBottom.rotate(90)
 
 		below.add(centerCircleStroke)
@@ -1405,10 +1461,14 @@
 		below.add(ezCircle2)
 		below.add(ezCircle3)
 		below.add(centerDot)
+		below.add(wordmarkTextBottomStroke)
+		below.add(wordmarkTextTopStroke)
 		below.add(wordmarkTextBottom)
 		below.add(wordmarkTextTop)
 
+		below.centerObject(wordmarkTextTopStroke)
 		below.centerObject(wordmarkTextTop)
+		below.centerObject(wordmarkTextBottomStroke)
 		below.centerObject(wordmarkTextBottom)
 
 		fabric.Image.fromURL("./images/guides.png", function (img) {
@@ -1443,58 +1503,7 @@
 			below.renderAll()
 		})
 
-		/* rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerCircleFill, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots1, nzFaceOffSpots2, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
-			id: 'rinkElementGroup',
-			visible: true,
-			selectable: false,
-			evented: false
-		}) */
-		
-		/* wordmark = new fabric.Group( [wordmarkTextTop, wordmarkTextBottom], {
-			originX: 'center',
-			originY:' center',
-			visible: false,
-			id: 'wordmark',
-			borderColor: 'red',
-			cornerColor: 'yellow',
-			cornerSize: 12,
-			transparentCorners: false,
-			lockScalingFlip: true,
-			lockScalingX: true,
-			lockScalingY: true,
-			lockMovementX: true,
-			lockMovementY: true,
-			left: wmLeft,
-			top: wmTop,
-			snapAngle: 5,
-		});
-
-		wordmark.rotate(90)
-		wordmark.setControlsVisibility({
-			mt: false,
-			mb: false,
-			ml: false,
-			mr: false,
-			tr: false,
-			tl: false,
-			br: false,
-			bl: false,
-			mtr: true //the rotating point (defaut: true)
-		})
-
-		//below.add(rinkElementGroup)
-
-		below.add(wordmark)
-		//var words = wordmark._objects;
-		//below.remove(wordmark)
-		//for (var i=0; i<words.length; i++) {
-		//	below.add(words[i])
-		//} */
 		below.renderAll()
-
-		below.getObjects('text').forEach(function(o) {
-			console.log(o.visible)
-		})
     }
 
 	function initializeOverlay() {
@@ -1580,7 +1589,6 @@
 				//console.log(data)
 				$("head").prepend("<style>@font-face {\n   font-family: '"+data.familyName+"';\n   src: url('"+data.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+data.familyName+"'; font-size: 1.1em;}\n</style>");
 				fontSources[data.familyName] = data.fontData;
-				console.log(fontSources)
 				var style = data.familyName;
 				var font_family = $("."+style).css("font-family");
 				var objects = below.getObjects('text');
@@ -1645,12 +1653,10 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var id = $(this).data('element');
-				objects = below.getObjects('text');
-				for (x in objects) {
-					objects[x].fill = colorX;
-					//objects[x].stroke = colorX;
-				}
+				objects = below.getObjects('text').forEach(function(o){
+					o.fill = colorX
+				});
+				
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1661,12 +1667,9 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var id = $(this).data('element');
-				objects = below.getObjects('text');
-				for (x in objects) {
-					objects[x].fill = colorX;
-					//objects[x].stroke = colorX;
-				}
+				objects = below.getObjects('text').forEach(function(o){
+					o.fill = colorX
+				});
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1677,12 +1680,9 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var id = $(this).data('element');
-				objects = below.getObjects('text');
-				for (x in objects) {
-					objects[x].fill = colorX;
-					//objects[x].stroke = colorX;
-				}
+				objects = below.getObjects('text').forEach(function(o){
+					o.fill = colorX
+				});
 				below.renderAll();
 			}
 		})
@@ -1709,9 +1709,11 @@
 			for (x in objects) {
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
 					objects[x].set('fill', color.toHexString())
-					//objects[x].fill = color.toHexString();
-					//below.addWithUpdate()
                     below.renderAll()
+				}
+				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
+					objects[x].set('stroke', color.toHexString())
+					below.renderAll()
 				}
 			}
 		},
@@ -1722,9 +1724,12 @@
 			for (x in objects) {
 				//console.log(objects[x].id)
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-                    objects[x].set('fill', color.toHexString())
-					//below.addWithUpdate()
+					objects[x].set('fill', color.toHexString())
                     below.renderAll()
+				}
+				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
+					objects[x].set('stroke', color.toHexString())
+					below.renderAll()
 				}
 			}
 		},
@@ -1734,20 +1739,26 @@
                 var objects = below.getObjects();
                 for (x in objects) {
                     if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-                        objects[x].set('fill', color.toHexString())
-					    //below.addWithUpdate()
-                        below.renderAll()
-                    }
+					objects[x].set('fill', color.toHexString())
+                    below.renderAll()
+				}
+				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
+					objects[x].set('stroke', color.toHexString())
+					below.renderAll()
+				}
                 }
 			} else {
                 below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
                 var objects = below.getObjects();
                 for (x in objects) {
                     if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-                        objects[x].set('fill', original_color.toHexString())
-					    //below.addWithUpdate()
-                        below.renderAll()
-                    }
+						objects[x].set('fill', color.toHexString())
+                    	below.renderAll()
+					}
+					if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
+						objects[x].set('stroke', color.toHexString())
+						below.renderAll()
+					}
                 }
 			}
 		}
@@ -1802,8 +1813,7 @@
 				var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id == id) {
-						console.log("found it!")
-                        objects[x].set('fill', colorX);
+						objects[x].set('fill', colorX);
                     } 						
 				}
 				//below.addWithUpdate();
@@ -2280,7 +2290,6 @@
 		var objects = below.getObjects();
 		for (x in objects) {
 			if (objects[x].id.substring(0,6) == "crease") {
-				console.log('found a crease')
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					if (objects[x].id.substring(0,7) == "creaseF") {
 						$("#creaseFillColor").spectrum("set", objects[x].fill)
@@ -2388,6 +2397,20 @@
 			below.renderAll()
 		})
 	})
+
+	$("#textStrokeCheck").on("click",function() {
+		state = ($(this).is(':checked')) ? true : false;
+		below.getObjects('text').forEach(function(o) {
+			if (o.id == "wordmarkTextTopStroke" || o.id == "wordmarkTextBottomStroke") {
+				if (state == true) {
+					o.visible = true;
+				} else {
+					o.visible = false;
+				}
+			}
+			below.renderAll()
+		})
+	})
 	
 	$(".belowTextureToggle").on("click",function() {
 		if ($(this).is(':checked')) {
@@ -2428,7 +2451,6 @@
 			state = false;
 		}
 		var id = $(this).data("id");
-		console.log(id)
 		var objects = above.getObjects();
 		for (x in objects) {
 			if (objects[x].id == id) {
@@ -2480,7 +2502,6 @@
 			type: "GET",
 			url: "http://127.0.0.1:"+port+"/uploadImage",
 			success: function(data) {
-				console.log(data)
 				var imgObj = new Image();
 				imgObj.src = data.image;
 				$("#fileName").html(data.filename);
@@ -2532,20 +2553,9 @@
 		below.set("team", $("#teamName").val())
 		below.set("start", $("#startYear").val())
 		below.set("end", $("#endYear").val())
-		var wordmarkVisible = wordmark.visible;
- 		var wordmarks = below.getObjects('text');
-		wordmark.destroy();
-		below.remove(wordmark)
-		wordmarks[0].set({
-			visible: wordmarkVisible
-		})
-		wordmarks[1].set({
-			visible: wordmarkVisible
-		})
-		below.add(wordmarks[0])
-		below.add(wordmarks[1])
-		
-		const json = JSON.stringify(below.toJSON(['team','start','end','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']),null,2);
+		below.set("selectedFont", $("#fontTypeCombo").val())
+
+		const json = JSON.stringify(below.toJSON(['team','start','end','selectedFont','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners','snapAngle']),null,2);
 
 		var startYear = parseInt($("#startYear").val());
 		var endYear = parseInt($("#endYear").val())
@@ -2598,7 +2608,7 @@
 		for (x in objects) {
 			//console.log(objects.id)
 			//console.log(objects.visible)
-			if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup' || objects[x].id == "wordmark") {
+			if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup' || objects[x].id == "guides") {
 				objects[x].set({
 					visible: false
 				})
@@ -2622,50 +2632,16 @@
 							visible: true
 						})
 					}
+					if (objects[x].id == 'guides') {
+						if ($("#guidesToggle").is(':checked')) {
+							objects[x].set({
+								visible: true
+							})
+						}
+					}
 				}
-
-				/* wordmark = new fabric.Group( [wordmarkTextTop, wordmarkTextBottom], {
-					originX: 'center',
-					originY:' center',
-					visible: wordmarkVisible,
-					id: 'wordmark',
-					borderColor: 'red',
-					cornerColor: 'yellow',
-					cornerSize: 12,
-					transparentCorners: false,
-					lockScalingFlip: true,
-					lockScalingX: true,
-					lockScalingY: true,
-					lockMovementX: true,
-					lockMovementY: true,
-					left: wmLeft,
-					top: wmTop,
-					snapAngle: 5,
-				});
-
-				wordmark.setControlsVisibility({
-					mt: false,
-					mb: false,
-					ml: false,
-					mr: false,
-					tr: false,
-					tl: false,
-					br: false,
-					bl: false,
-					mtr: true //the rotating point (defaut: true)
-				})
-
-				below.add(wordmark)
-
-				below.remove(wordmarkTextTop)
-				below.remove(wordmarkTextBottom)
-
-				*/
 				below.renderAll()
 				$("#overlay").css("display","none");
-				below.getObjects().forEach(function(p) {
-					console.log(p.id)
-				})
 			}
 		})
 	})
@@ -2681,19 +2657,20 @@
       		var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
 			const tmp = JSON.parse(data)
 			const newBG = tmp.background;
+			const selectedFont = tmp.selectedFont;
 			$("#teamName").val(tmp.team)
 			$("#startYear").val(tmp.start)
 			$("#endYear").val(tmp.end)
 			var wordmarkVisible = null;
 			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
 				below.add(object)
-					/*console.log(object._objects[0].fontFamily)
-					$("#wordmarkTextBox").val(object._objects[0].text)
-					$("#textColor").spectrum("set", object._objects[0].fill)
-					$("#fontSpacing").val(object._objects[0].charSpacing)
-					$("#fontSize").val(object._objects[0].fontSize)
-					$("#fontTypeCombo").val(fontFamilies[object._objects[0].fontFamily])
-					$("#fontTypeCombo").removeClass().addClass(fontFamilies[object._objects[0].fontFamily]);
+				if (object.id == "wordmarkTextTop") {
+					$("#wordmarkTextBox").val(object.text)
+					$("#textColor").spectrum("set", object.fill)
+					$("#fontSpacing").val(object.charSpacing)
+					$("#fontSize").val(object.fontSize)
+					$("#fontTypeCombo").val(selectedFont).trigger('change')
+					$("#fontTypeCombo").removeClass().addClass(object.fontFamily);
 					$("#fontTypeCombo").addClass("textOption")
 					$("#textLogoCheck").attr("checked", object.visible)
 					$(".textOption").each(function() {
@@ -2710,10 +2687,9 @@
 							$(this).spectrum('disable');
 						}
 					})
-					wordmark.AddWithUpdate();
-					below.renderAll() */
-				if (object.id == "wordmarkTextTop") {
-					wordmarkVisible = object.visible
+				}
+				if (object.id == "wordmarkTextTopStroke") {
+					$("#textStrokeColor").spectrum("set", object.fill)
 				}
 				if (object.id.substring(0,10) == "centerLine" && object.id.slice(-6) != "Boards" && object.visible == true) {
 					$("#centerLineStyle").val(object.id.slice(-2))
@@ -2786,60 +2762,10 @@
 						break;
 				}
 			});
-			
-			/* wordmark = new fabric.Group( [wordmarkTextTop, wordmarkTextBottom], {
-				originX: 'center',
-				originY:' center',
-				visible: true,
-				id: 'wordmark',
-				borderColor: 'red',
-				cornerColor: 'yellow',
-				cornerSize: 12,
-				transparentCorners: false,
-				lockScalingFlip: true,
-				lockScalingX: true,
-				lockScalingY: true,
-				lockMovementX: true,
-				lockMovementY: true,
-				left: wmLeft,
-				top: wmTop,
-				snapAngle: 5,
-			});
-
-			wordmark.setControlsVisibility({
-				mt: false,
-				mb: false,
-				ml: false,
-				mr: false,
-				tr: false,
-				tl: false,
-				br: false,
-				bl: false,
-				mtr: true //the rotating point (defaut: true)
-			})
-
-			below.renderAll()
-
-			below.getObjects('text').forEach(function (o) {
-				below.remove(o)
-				below.renderAll()
-			})
-			
-
-			below.renderAll()
-
-			wordmark.addWithUpdate()
-			below.add(wordmark) */
 
 			$("#rinkColor").spectrum("set", newBG)
 			initializeOverlay()
 			below.renderAll.bind(below)
-			below.getObjects().forEach(function (o) {
-				console.log(o.id + " " + o.visible)
-			})
-			below.getObjects('text').forEach(function (o) {
-				console.log(o.id + " " + o.visible)
-			})
 		}	
     	fileReader.readAsText($(this).prop('files')[0]);
 		
