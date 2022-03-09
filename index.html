@@ -87,6 +87,63 @@
 			'"Wendy One"': "WendyOne-Regular.ttf",
 			Yellowtail: "Yellowtail-Regular.ttf"
 		};
+
+		var fontFamilies = {
+			Acme: "Acme",
+			athletic_gothicregular: "AthleticGothic",
+			athletic_gothic_shadowregular: "AthleticGothicShadow",
+			beaverton_scriptregular: "BeavertonScript",
+			'Berkshire Swash': "Berkshire_Swash",
+			'Cantora One': "Cantora_One",
+			caxton_romanregular: "CaxtonRoman",
+			'Chela One': "Chela_One",
+			russell_circusregular: "Circus",
+			Condiment: "Comdiment",
+			Cookie: "Coookie",
+			Courgette: "Courgette",
+			'Croissant One': "Croissant_one",
+			Damion: "Damion",
+			Engagement: "Engagement",
+			rawlings_fancy_blockregular: "RawlingsFancyBlock",
+			'Germania One': "Germania_One",
+			Graduate: "Graduate",
+			'Grand Hotel': "Grand_Hotel",
+			'Jockey One': "Jockey_One",
+			kansasregular: "Kansas",
+			'Kaushan Script': "Kaushan_Script",
+			'Leckerli One': "Leckerli_One",
+			'Lily Script One': "Lily_Script_One",
+			Lobster: "Lobster",
+			'Lobster Two': "Lobster_Two",
+			'Metal Mania': "Metal_Mania",
+			Miniver: "Miniver",
+			'Molle, italic': "Molle",
+			'New Rocker': "New_Rocker",
+			Norican: "Norican",
+			rawlings_old_englishmedium: "OldEnglish",
+			'Oleo Script': "Oleo_Script",
+			'Oleo Script Swash Caps': "Oleo_Script_Swash_Caps",
+			Pacifico: "Pacifico",
+			'Pirata One': "Pirata_One",
+			Playball: "Playball",
+			pro_full_blockregular: "ProFullBlock",
+			richardson_fancy_blockregular: "RichardsonFancyBlock",
+			'Rubik One': "Rubik_One",
+			'Rum Raisin': "Rum_Raisin",
+			Satisfy: "Satisfy",
+			'Seymour One': "Seymour_One",
+			spl28scriptregular: "spl28",
+			ua_tiffanyregular: "TiffanyRegular",
+			'Trade Winds': "Trade_Winds",
+			mlb_tuscan_newmedium: "Tuscan",
+			UnifrakturCook: "UnifrakturCook",
+			UnifrakturMaguntia: "UnifrakturMaguntia",
+			Vibur: "Vibur",
+			Viga: "Viga",
+			Wellfleet: "Wellfleet",
+			'Wendy One': "Wendy_One",
+			Yellowtail: "Yellowtail"
+		};
     </script>
 <body>
 <div class="title">
@@ -138,12 +195,12 @@
 								</td>
 							</tr>
 							<tr class="color_tr">
-                                <td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="nets" checked></td>
+                                <td class="checkCell"><input type="checkbox" id="nets" class="belowTextureToggle" data-canvas="below" data-id="nets" checked></td>
                                 <td>Nets</td>
                                 <td>&nbsp;</td>
                             </tr>
 							<tr class="color_tr">
-                                <td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="guides" checked></td>
+                                <td class="checkCell"><input type="checkbox" id="guidesToggle" class="belowTextureToggle" data-canvas="below" data-id="guides" checked></td>
                                 <td>Guides (Automatically hidden on export)</td>
                                 <td>&nbsp;</td>
                             </tr>
@@ -187,8 +244,8 @@
                             </tr>
 							<tr class="color_tr">
 								<td>&nbsp;</td>
-								<td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterLine" checked>&nbsp;Center Line Stroke</td>
-								<td class="checkCell"><input type="checkbox" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterCircle" checked>&nbsp;Center Circle Stroke</td>
+								<td class="checkCell"><input type="checkbox" id="strokeCenterLine" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterLine" checked>&nbsp;Center Line Stroke</td>
+								<td class="checkCell"><input type="checkbox" id="strokeCenterCircle" class="belowTextureToggle" data-canvas="below" data-id="strokeCenterCircle" checked>&nbsp;Center Circle Stroke</td>
 							</tr>
                             <tr class="color_tr">
                                 <td>&nbsp;</td>
@@ -264,7 +321,7 @@
                                 </td>
                             </tr>
                             <tr class="color_tr">
-                                <td class="checkCell"><input type="checkbox" class="multiToggle" data-canvas="below" data-id="trapezoid" checked></td>
+                                <td class="checkCell"><input type="checkbox" id="trapezoidStroke" class="multiToggle" data-canvas="below" data-id="trapezoid" checked></td>
                                 <td><label>Trapezoid: </label></td>
                                 <td style="text-align:right;">
                                     <!--<input class="selector enabledSelector" type="text" id="trapezoidFillColor" data-element="trapezoidFill">-->
@@ -346,12 +403,15 @@
 						<table style="width:100%;">
 							<tr>
 								<td class="checkCell"><input type="checkbox" id="textLogoCheck" class="wordmarkToggle" data-id="wordmark"></td>
-								<td colspan="2"><label>Text: </label><input class="textOption" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:79%; text-align:center;"/></td>
+								<td><label>Text: </label><input class="textOption" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:79%; text-align:center;"/></td>
+								<td style="text-align:right;"><input type="checkbox" class="textOption" id="textStrokeCheck" checked disabled>&nbsp;Text Border</td>
 							</tr>
 						</table>
 						<table style="width:100%;">
 							<tr>
-								<td style="text-align:center;"><input class="textOption textColorSelector" type="text" id="textColor" data-element="wordmarkText" disabled></td>	
+								<td style="text-align:center;">
+									<input class="textOption textColorSelector" type="text" id="textColor" data-element="wordmarkText" disabled>
+								</td>	
 								<td style="text-align:center;">
 									Text Size: <input type="number" id="fontSize" value="20" min="1" class="textOption scaling" style="width:50px;" disabled>&nbsp;&nbsp;&nbsp;
 									Text Spacing: <input type="number" id="fontSpacing" value="0" class="textOption spacing" style="width:50px;" disabled>
@@ -542,6 +602,8 @@
 				<div style="text-align:center; margin-top:5px;">
 					<input type="button" class="button" id="straightenObject" value="Reset Object Rotation" style="display:none;">
 					<input type="button" class="button" id="save" value="Save Rink">
+					<input type="button" class="button" id="load" value="Load Rink">
+					<input type="file" id="uploadedJSON" accept=".rink" style="display:none;"/>
 					<input type="button" class="button" id="aboutRinkFactory" value="About Rink Factory">
 				</div>
             </div>
@@ -580,13 +642,29 @@
 
     var below = new fabric.Canvas('below',{
 		enableRetinaScaling: false,
-		preserveObjectStacking: true
+		preserveObjectStacking: true,
+		team: "",
+		start: "",
+		end: "",
+		selectedFont: ""
+	});
+
+	fabric.Object.NUM_FRACTION_DIGITS = 17;
+
+	fabric.Object.prototype.controls.mtr = new fabric.Control({
+		x: 0,
+		y: -0.5,
+		offsetY: -40,
+		cursorStyle: 'grab',
+		actionHandler: fabric.controlsUtils.rotationWithSnapping,
+		actionName: 'rotate',
+		cornerSize: 28,
+		withConnection: true
 	});
 
 	below.on('selection:created', function(e) {
 		$("#straightenObject").css("display","inline-block");
 		var obj = e.selected[0];
-		console.log(obj.id)
 		if (obj.id == 'wordmark') {
 			$("#tipContainer").html("If you're trying to select an image instead of the text, you have to hide the text first.");
 		}
@@ -610,6 +688,24 @@
 		if (obj.id == "wordmark") {
 			wmLeft = obj.get('left');
 	 		wmTop = obj.get('top');
+		}
+	})
+
+	below.on('object:rotating', function(e) {
+		if (e.target.id == "wordmarkTextTop") {
+			below.getObjects('text').forEach(function(o) {
+				switch (o.id) {
+					case "wordmarkTextBottom":
+						o.set("angle", (e.target.angle + 180) % 360)
+						break;
+					case "wordmarkTextBottomStroke":
+						o.set("angle", (e.target.angle + 180) % 360)
+						break;
+					case "wordmarkTextTopStroke":
+						o.set("angle", e.target.angle)
+						break;
+				}
+			})
 		}
 	})
 
@@ -813,83 +909,7 @@
 		
         below.setBackgroundColor(initialColors["rinkColor"], below.renderAll.bind(below))
 
-		overlayGroup = new fabric.Group([], {
-			id: 'overlayGroup',
-			visible: true,
-			selectable: false,
-			evented: false,
-			excludeFromExport: true
-		})
-
-		below.add(overlayGroup)
-
-		fabric.Image.fromURL("./images/ice_scratches.png", function (img) {
-			var ice = img.set({
-				left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'ice',
-				visible: true,
-				selectable: false,
-				evented: false
-			})
-			overlayGroup.addWithUpdate(ice)
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll();
-		})
-
-		fabric.Image.fromURL("./images/guides.png", function (img) {
-			var guides = img.set({
-				left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'guides',
-				visible: true,
-				selectable: false,
-				evented: false
-			})
-			overlayGroup.addWithUpdate(guides)
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll();
-		})
-
-		fabric.Image.fromURL("./images/nets.png", function (img) {
-			var nets = img.set({
-				left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'nets',
-				visible: true,
-				selectable: false,
-				evented: false
-			})
-			overlayGroup.addWithUpdate(nets)
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll()
-		})
-
-		fabric.Image.fromURL("./images/boards2.png", function (img) {
-            var boards = img.set({
-                left: 0, 
-                top: 0, 
-                scaleX: below.width / img.width,
-                scaleY: below.height / img.height,
-				id: 'boards',
-				visible: true,
-				selectable: false,
-				evented: false
-            })
-            overlayGroup.addWithUpdate(boards);
-			overlayGroup.setCoords();
-			overlayGroup.bringToFront();
-			below.renderAll()
-        })
+		initializeOverlay()
 
 		centerLineBoards = new fabric.Path("M 476.11719 24.183594 L 476.11719 39.951172 L 484.53125 39.951172 L 484.53125 24.183594 L 476.11719 24.183594 z M 476.11719 407.99023 L 476.11719 423.75781 L 484.53125 423.75781 L 484.53125 407.99023 L 476.11719 407.99023 z",{
 			fill: initialColors["centerLineColor"],
@@ -1284,22 +1304,8 @@
 			evented: false
         });
 
-		tempRect = new fabric.Rect({
-			top: 0,
-			left: 0,
-			fill: 'red',
-			height: 100,
-			width: 100
-		})
-
-		rinkElementGroup = new fabric.Group([ centerCircleStroke, centerCircle, centerLineStroke, centerLine01, centerLine02, centerLine03, centerLine04, centerLine05, centerLine06, centerLine07, centerLine08, centerLine09, centerLine10, centerLine11, centerLine12, centerLine13, centerLine14, centerLine15, centerLine16, centerLine17, centerLine18, centerLine19, centerCircleFill, centerLineBoards, blueLines, trapezoidStroke, creaseFill1, creaseStroke1, creaseFill2, creaseStroke2, creaseFill3, creaseStroke3, creaseFill4, creaseStroke4, goalLines, nzFaceOffSpots1, nzFaceOffSpots2, hashmarks1, hashmarks2, hashmarks3, hashmarks4, hashmarks5, ezDots1, ezDots2, ezCircle1, ezCircle2, ezCircle3, centerDot ], {
-			id: 'rinkElementGroup',
-			visible: true,
-			selectable: false,
-			evented: false
-		})
-
 		wordmarkTextTop = new fabric.Text('ARENA NAME',{
+			visible: false,
 			fontFamily: "Rubik One",
 			fontSize: 20,
 			originX: 'center',
@@ -1315,10 +1321,54 @@
 				evented: false,
 			}),
 			pathSide: 'left',
+			pathAlign: 'descender',
+			borderColor: 'red',
+			cornerColor: 'yellow',
+			cornerSize: 12,
+			transparentCorners: false,
+			lockScalingFlip: true,
+			lockScalingX: true,
+			lockScalingY: true,
+			lockMovementX: true,
+			lockMovementY: true,
+			snapAngle: 5,
+		})
+
+		wordmarkTextTopStroke = new fabric.Text('ARENA NAME',{
+			visible: false,
+			fontFamily: "Rubik One",
+			fontSize: 20,
+			originX: 'center',
+			originY: 'center',
+			textAlign: 'center',
+			id: 'wordmarkTextTopStroke',
+			fill: initialColors['rinkColor'],
+			stroke: initialColors['rinkColor'],
+			strokeWidth: 4,
+			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
+				visible: false,
+				selectable:false,
+				evented: false,
+			}),
+			pathSide: 'left',
 			pathAlign: 'descender'
 		})
 
+		wordmarkTextTop.setControlsVisibility({
+			mt: false,
+			mb: false,
+			ml: false,
+			mr: false,
+			tr: false,
+			tl: false,
+			br: false,
+			bl: false,
+			mtr: true
+		})
+
 		wordmarkTextBottom = new fabric.Text('ARENA NAME',{
+			visible: false,
+			selectable: false,
 			fontFamily: 'Rubik One',
 			fontSize: 20,
 			originX: 'center',
@@ -1337,69 +1387,190 @@
 			pathAlign: 'descender'
 		})
 
-		wordmarkTextBottom.rotate(180)
-		
-		wordmark = new fabric.Group( [wordmarkTextTop, wordmarkTextBottom], {
-			originX: 'center',
-			originY:' center',
+		wordmarkTextBottomStroke = new fabric.Text('ARENA NAME',{
 			visible: false,
-			id: 'wordmark',
-			borderColor: 'red',
-			cornerColor: 'yellow',
-			cornerSize: 12,
-			transparentCorners: false,
-			lockScalingFlip: true,
-			lockScalingX: true,
-			lockScalingY: true,
-			lockMovementX: true,
-			lockMovementY: true,
-			left: wmLeft,
-			top: wmTop,
-			snapAngle: 5,
-		});
-
-		wordmark.rotate(90)
-		wordmark.setControlsVisibility({
-			mt: false,
-			mb: false,
-			ml: false,
-			mr: false,
-			tr: false,
-			tl: false,
-			br: false,
-			bl: false,
-			mtr: true //the rotating point (defaut: true)
+			selectable: false,
+			fontFamily: 'Rubik One',
+			fontSize: 20,
+			originX: 'center',
+			originY: 'center',
+			textAlign: 'center',
+			id: 'wordmarkTextBottomStroke',
+			fill: initialColors['rinkColor'],
+			stroke: initialColors['rinkColor'],
+			strokeWidth: 4,
+			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
+				visible: false,
+				selectable:false,
+				evented: false
+			}),
+			pathSide: 'left',
+			pathAlign: 'descender'
 		})
 
-		below.add(rinkElementGroup)
-		below.add(wordmark)
+		wordmarkTextTopStroke.rotate(270)
+		wordmarkTextTop.rotate(270)
+		wordmarkTextBottomStroke.rotate(90)
+		wordmarkTextBottom.rotate(90)
+
+		below.add(centerCircleStroke)
+		below.add(centerCircle)
+		below.add(centerLineStroke)
+		below.add(centerLine01)
+		below.add(centerLine02)
+		below.add(centerLine03)
+		below.add(centerLine04)
+		below.add(centerLine05)
+		below.add(centerLine06)
+		below.add(centerLine07)
+		below.add(centerLine08)
+		below.add(centerLine09)
+		below.add(centerLine10)
+		below.add(centerLine11)
+		below.add(centerLine12)
+		below.add(centerLine13)
+		below.add(centerLine14)
+		below.add(centerLine15)
+		below.add(centerLine16)
+		below.add(centerLine17)
+		below.add(centerLine18)
+		below.add(centerLine19)
+		below.add(centerCircleFill)
+		below.add(centerLineBoards)
+		below.add(blueLines)
+		below.add(trapezoidStroke)
+		below.add(creaseFill1)
+		below.add(creaseStroke1)
+		below.add(creaseFill2)
+		below.add(creaseStroke2)
+		below.add(creaseFill3)
+		below.add(creaseStroke3)
+		below.add(creaseFill4)
+		below.add(creaseStroke4)
+		below.add(goalLines)
+		below.add(nzFaceOffSpots1)
+		below.add(nzFaceOffSpots2)
+		below.add(hashmarks1)
+		below.add(hashmarks2)
+		below.add(hashmarks3)
+		below.add(hashmarks4)
+		below.add(hashmarks5)
+		below.add(ezDots1)
+		below.add(ezDots2)
+		below.add(ezCircle1)
+		below.add(ezCircle2)
+		below.add(ezCircle3)
+		below.add(centerDot)
+		below.add(wordmarkTextBottomStroke)
+		below.add(wordmarkTextTopStroke)
+		below.add(wordmarkTextBottom)
+		below.add(wordmarkTextTop)
+
+		below.centerObject(wordmarkTextTopStroke)
+		below.centerObject(wordmarkTextTop)
+		below.centerObject(wordmarkTextBottomStroke)
+		below.centerObject(wordmarkTextBottom)
+
+		fabric.Image.fromURL("./images/guides.png", function (img) {
+			var guides = img.set({
+				left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'guides',
+				visible: true,
+				selectable: false,
+				evented: false
+			})
+			below.add(guides)
+			guides.bringToFront()
+			below.renderAll();
+		})
+
+		fabric.Image.fromURL("./images/nets.png", function (img) {
+			var nets = img.set({
+				left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'nets',
+				visible: true,
+				selectable: false,
+				evented: false
+			})
+			below.add(nets)
+			nets.bringToFront()
+			below.renderAll()
+		})
+
 		below.renderAll()
     }
 
+	function initializeOverlay() {
+		overlayGroup = new fabric.Group([], {
+			id: 'overlayGroup',
+			visible: true,
+			selectable: false,
+			evented: false
+		})
+
+		below.add(overlayGroup)
+
+		fabric.Image.fromURL("./images/ice_scratches.png", function (img) {
+			var ice = img.set({
+				left: 0, 
+                top: 0, 
+                scaleX: below.width / img.width,
+                scaleY: below.height / img.height,
+				id: 'ice',
+				visible: true,
+				selectable: false,
+				evented: false
+			})
+			overlayGroup.addWithUpdate(ice)
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll();
+		})
+
+		fabric.Image.fromURL("./images/boards2.png", function (img) {
+            var boards = img.set({
+                left: 0, 
+                top: 0,
+				id: 'boards',
+				visible: true,
+				selectable: false,
+				evented: false
+            })
+			boards.scaleToHeight(448)
+            overlayGroup.addWithUpdate(boards);
+			overlayGroup.setCoords();
+			overlayGroup.bringToFront();
+			below.renderAll()
+        })
+	}
+	
 	$("#wordmarkTextBox").on("change",function(e) {
-		objects = wordmark.getObjects();
+		objects = below.getObjects('text');
 		for (x in objects) {
 			objects[x].text = $(this).val();
 		}
-		wordmark.addWithUpdate()
 		below.renderAll();
 	})
 
 	$("#fontSize").on("change", function(e) {
-		objects = wordmark.getObjects();
+		objects = below.getObjects('text');
 		for (x in objects) {
 			objects[x].fontSize = $(this).val();
 		}
-		wordmark.addWithUpdate()
 		below.renderAll();
 	})
 
 	$("#fontSpacing").on("change", function(e) {
-		objects = wordmark.getObjects();
+		objects = below.getObjects('text');
 		for (x in objects) {
 			objects[x].charSpacing = ($(this).val() * 10);
 		}
-		wordmark.addWithUpdate()
 		below.renderAll();
 	})
 
@@ -1407,6 +1578,7 @@
 		e.preventDefault;
 		$("#uploadTheFont").click();
 	})
+
 
 	$("#uploadTheFont").on("click", function(e) {
 		//$("#fontTypeCombo").removeClass().addClass('alegreya');
@@ -1417,10 +1589,9 @@
 				//console.log(data)
 				$("head").prepend("<style>@font-face {\n   font-family: '"+data.familyName+"';\n   src: url('"+data.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+data.familyName+"'; font-size: 1.1em;}\n</style>");
 				fontSources[data.familyName] = data.fontData;
-				console.log(fontSources)
 				var style = data.familyName;
 				var font_family = $("."+style).css("font-family");
-				var objects = wordmark.getObjects();
+				var objects = below.getObjects('text');
 				var myfont = new FontFaceObserver(data.familyName)
 				myfont.load()
 					.then(function() {
@@ -1428,7 +1599,6 @@
 						for (x in objects) {
 							objects[x].fontFamily = data.familyName;
 						}
-						wordmark.addWithUpdate()
 						below.renderAll();
 						var optgroup = $("<optgroup class='"+data.familyName+"'>");
 						optgroup.append("<option value='"+data.familyName+"'>"+data.fontName+"</option>")
@@ -1483,15 +1653,11 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var id = $(this).data('element');
-				objects = wordmark.getObjects();
-				for (x in objects) {
-					objects[x].fill = colorX;
-					//objects[x].stroke = colorX;
-				}
-				wordmark.addWithUpdate()
+				objects = below.getObjects('text').forEach(function(o){
+					o.fill = colorX
+				});
+				
 				below.renderAll();
-				//initializeWarp();
 			},
 			change: function(color) {
 				change = true;
@@ -1501,15 +1667,10 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var id = $(this).data('element');
-				objects = wordmark.getObjects();
-				for (x in objects) {
-					objects[x].fill = colorX;
-					//objects[x].stroke = colorX;
-				}
-				wordmark.addWithUpdate()
+				objects = below.getObjects('text').forEach(function(o){
+					o.fill = colorX
+				});
 				below.renderAll();
-				//initializeWarp();
 			},
 			hide: function(color) {
 				change = true;
@@ -1519,15 +1680,10 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var id = $(this).data('element');
-				objects = wordmark.getObjects();
-				for (x in objects) {
-					objects[x].fill = colorX;
-					//objects[x].stroke = colorX;
-				}
-				wordmark.addWithUpdate()
+				objects = below.getObjects('text').forEach(function(o){
+					o.fill = colorX
+				});
 				below.renderAll();
-				//initializeWarp();
 			}
 		})
 	})
@@ -1549,49 +1705,60 @@
 		move: function(color) {
 			$(this).data('changed', true);
             below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
-            var objects = rinkElementGroup.getObjects();
+            var objects = below.getObjects();
 			for (x in objects) {
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
 					objects[x].set('fill', color.toHexString())
-					//objects[x].fill = color.toHexString();
-					rinkElementGroup.addWithUpdate()
                     below.renderAll()
+				}
+				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
+					objects[x].set('stroke', color.toHexString())
+					below.renderAll()
 				}
 			}
 		},
 		change: function(color) {
 			$(this).data('changed', true);
 			below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
-            var objects = rinkElementGroup.getObjects();
+            var objects = below.getObjects();
 			for (x in objects) {
-				console.log(objects[x].id)
+				//console.log(objects[x].id)
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-                    objects[x].set('fill', color.toHexString())
-					rinkElementGroup.addWithUpdate()
+					objects[x].set('fill', color.toHexString())
                     below.renderAll()
+				}
+				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
+					objects[x].set('stroke', color.toHexString())
+					below.renderAll()
 				}
 			}
 		},
 		hide: function(color) {
 			if ($(this).data('changed')) {
 				below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
                 for (x in objects) {
                     if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-                        objects[x].set('fill', color.toHexString())
-					    rinkElementGroup.addWithUpdate()
-                        below.renderAll()
-                    }
+					objects[x].set('fill', color.toHexString())
+                    below.renderAll()
+				}
+				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
+					objects[x].set('stroke', color.toHexString())
+					below.renderAll()
+				}
                 }
 			} else {
                 below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
                 for (x in objects) {
                     if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-                        objects[x].set('fill', original_color.toHexString())
-					    rinkElementGroup.addWithUpdate()
-                        below.renderAll()
-                    }
+						objects[x].set('fill', color.toHexString())
+                    	below.renderAll()
+					}
+					if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
+						objects[x].set('stroke', color.toHexString())
+						below.renderAll()
+					}
                 }
 			}
 		}
@@ -1626,13 +1793,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id == id) {
                         objects[x].set('fill', colorX);
                     } 						
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1643,14 +1810,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id == id) {
-						console.log("found it!")
-                        objects[x].set('fill', colorX);
+						objects[x].set('fill', colorX);
                     } 						
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1661,13 +1827,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id == id) {
                         objects[x].set('fill', colorX);
                     } 						
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -1701,13 +1867,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id == "centerLineBoards" || objects[x].id.substring(0,10) == "centerLine") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1718,13 +1884,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id == "centerLineBoards" || objects[x].id.substring(0,10) == "centerLine") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1735,13 +1901,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id == "centerLineBoards" || objects[x].id.substring(0,10) == "centerLine") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -1775,13 +1941,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "hashmark") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1792,13 +1958,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "hashmark") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1809,13 +1975,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "hashmark") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -1849,13 +2015,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "ezDots") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1866,13 +2032,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "ezDots") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1883,13 +2049,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "ezDots") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -1923,13 +2089,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "nzFace") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1940,13 +2106,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "nzFace") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1957,13 +2123,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,6) == "nzFace") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -1997,13 +2163,13 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "ezCircle") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			change: function(color) {
@@ -2014,13 +2180,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "ezCircle") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -2031,13 +2197,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-				var objects = rinkElementGroup.getObjects();
+				var objects = below.getObjects();
 				for (x in objects) {
 					if (objects[x].id.substring(0,8) == "ezCircle") {
 						objects[x].set('fill', colorX)
 					}
 				}
-				rinkElementGroup.addWithUpdate();
+				//below.addWithUpdate();
 				below.renderAll();
 			}
 		})
@@ -2073,13 +2239,13 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id.substring(0, elLength) == id) {
                         objects[x].set('fill', colorX);
                     } 						
 				}
-				rinkElementGroup.addWithUpdate()
+				//below.addWithUpdate()
 				below.renderAll();
 			},
 			change: function(color) {
@@ -2091,7 +2257,7 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id.substring(0, elLength) == id) {
                         objects[x].set('fill', colorX);
@@ -2108,7 +2274,7 @@
 				}
 				$(this).data('changed', true);
 				var id = $(this).data('element');
-                var objects = rinkElementGroup.getObjects();
+                var objects = below.getObjects();
 				for (x in objects) {
                     if (objects[x].id.substring(0, elLength) == id) {
                         objects[x].set('fill', colorX);
@@ -2121,10 +2287,9 @@
 
     $("#creaseStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
 			if (objects[x].id.substring(0,6) == "crease") {
-				console.log('found a crease')
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					if (objects[x].id.substring(0,7) == "creaseF") {
 						$("#creaseFillColor").spectrum("set", objects[x].fill)
@@ -2135,15 +2300,15 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
 	$("#centerLineStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
-			console.log(objects[x].id)
+			//console.log(objects[x].id)
 			if (objects[x].id.substring(0,10) == "centerLine" && objects[x].id != "centerLineBoards") {
 				if (objects[x].id.slice(-2) == id) {
 					objects[x].visible = true;
@@ -2152,15 +2317,15 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
 	$("#circleStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
-			console.log(objects[x].id)
+			//console.log(objects[x].id)
 			if (objects[x].id.substring(0,8) == "ezCircle") {
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					objects[x].visible = true;
@@ -2169,15 +2334,15 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
 	$("#dotStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
-			console.log(objects[x].id)
+			//console.log(objects[x].id)
 			if (objects[x].id.substring(0,6) == "ezDots" || objects[x].id.substring(0,6) == "nzFace") {
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					objects[x].visible = true;
@@ -2186,15 +2351,15 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
 	$("#hashmarkStyle").on("change", function() {
 		var id = $(this).val();
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
-			console.log(objects[x].id)
+			//console.log(objects[x].id)
 			if (objects[x].id.substring(0,8) == "hashmark") {
 				if (objects[x].id.charAt(objects[x].id.length -1) == id) {
 					objects[x].visible = true;
@@ -2203,7 +2368,7 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate()
+		//below.addWithUpdate()
 		below.renderAll()
 	})
 
@@ -2227,18 +2392,24 @@
 				$(this).spectrum('disable');
 			}
 		})
-		var objects = below.getObjects()
-		for (x in objects) {
-			if (objects[x].id == "wordmark") {
-				if (state == true) {
-					objects[x].visible = true;
-				} else {
-					objects[x].visible = false;
-				}
-			wordmark.addWithUpdate();
+		var objects = below.getObjects('text').forEach(function (o) {
+			o.visible = state
 			below.renderAll()
+		})
+	})
+
+	$("#textStrokeCheck").on("click",function() {
+		state = ($(this).is(':checked')) ? true : false;
+		below.getObjects('text').forEach(function(o) {
+			if (o.id == "wordmarkTextTopStroke" || o.id == "wordmarkTextBottomStroke") {
+				if (state == true) {
+					o.visible = true;
+				} else {
+					o.visible = false;
+				}
 			}
-		}
+			below.renderAll()
+		})
 	})
 	
 	$(".belowTextureToggle").on("click",function() {
@@ -2248,7 +2419,7 @@
 			state = false;
 		}
 		var id = $(this).data("id");
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
 			if (objects[x].id == id) {
 				if (state == true) {
@@ -2257,7 +2428,7 @@
 					objects[x].visible = false;
 				}
 			}
-			rinkElementGroup.addWithUpdate();
+			//below.addWithUpdate();
 		}
 		var objects = overlayGroup.getObjects();
 		for (x in objects) {
@@ -2280,7 +2451,6 @@
 			state = false;
 		}
 		var id = $(this).data("id");
-		console.log(id)
 		var objects = above.getObjects();
 		for (x in objects) {
 			if (objects[x].id == id) {
@@ -2302,7 +2472,7 @@
 		}
         var elLength = $(this).data("id").length
 		var id = $(this).data("id");
-		var objects = rinkElementGroup.getObjects();
+		var objects = below.getObjects();
 		for (x in objects) {
 			if (objects[x].id.substring(0,elLength) == id) {
 				if (state == true) {
@@ -2312,21 +2482,19 @@
 				}
 			}
 		}
-		rinkElementGroup.addWithUpdate();
+		//below.addWithUpdate();
 		below.renderAll();
 	})
 
 	$("#fontTypeCombo").on("change",function() {
 		var style = $(this).val();
 		var font_family = $("."+style).css("font-family");
-		var objects = wordmark.getObjects();
+		var objects = below.getObjects('text');
 		for (x in objects) {
 			objects[x].fontFamily = font_family;
 		}
-		wordmark.addWithUpdate()
 		below.renderAll();
 		$(this).removeClass().addClass(style);
-		//initializeWarp();
 	})
 
     $("#fakeImageButton").on("click",function() {
@@ -2334,7 +2502,6 @@
 			type: "GET",
 			url: "http://127.0.0.1:"+port+"/uploadImage",
 			success: function(data) {
-				console.log(data)
 				var imgObj = new Image();
 				imgObj.src = data.image;
 				$("#fileName").html(data.filename);
@@ -2383,6 +2550,13 @@
 
 	$("#save").on("click",function(e) {
 		e.preventDefault()
+		below.set("team", $("#teamName").val())
+		below.set("start", $("#startYear").val())
+		below.set("end", $("#endYear").val())
+		below.set("selectedFont", $("#fontTypeCombo").val())
+
+		const json = JSON.stringify(below.toJSON(['team','start','end','selectedFont','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners','snapAngle']),null,2);
+
 		var startYear = parseInt($("#startYear").val());
 		var endYear = parseInt($("#endYear").val())
 		var yearRange = "";
@@ -2414,7 +2588,7 @@
 		teamName = teamName.split(' ').join('_');
 		var fileName = "rink_"+teamName+yearRange;
 
-		$("#overlay").css("display","inline-block");	
+		$("#overlay").css("display","inline-block");
 
 		belowFull.loadFromJSON(below.toJSON(['id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners']), belowFull.renderAll.bind(belowFull), function(o, object) {
 			if (object.id == 'rinkElementGroup' || object.id == "wordmark") {
@@ -2429,11 +2603,12 @@
 		});
 
 		belowFull.setBackgroundColor(null, belowFull.renderAll.bind(belowFull))
-		var objects = belowFull.getObjects()
 
 		var objects = below.getObjects()
 		for (x in objects) {
-			if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup' || objects[x].id == "wordmark") {
+			//console.log(objects.id)
+			//console.log(objects.visible)
+			if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup' || objects[x].id == "guides") {
 				objects[x].set({
 					visible: false
 				})
@@ -2443,10 +2618,12 @@
 		var lines = belowFull.toDataURL();
 		var img = below.toDataURL()
 
+		//var json = JSON.stringify(below.toJSON());
+
 		$.ajax({
 			type: "POST",
 			url: "http://127.0.0.1:"+port+"/saveRink",
-			data: {rinkLines:lines,imgdata:img,name:fileName},
+			data: {rinkLines:lines,imgdata:img,name:fileName,canvas:json},
 			success: function(result) {
 				var objects = below.getObjects()
 				for (x in objects) {
@@ -2455,6 +2632,13 @@
 							visible: true
 						})
 					}
+					if (objects[x].id == 'guides') {
+						if ($("#guidesToggle").is(':checked')) {
+							objects[x].set({
+								visible: true
+							})
+						}
+					}
 				}
 				below.renderAll()
 				$("#overlay").css("display","none");
@@ -2462,16 +2646,140 @@
 		})
 	})
 
+	$("#load").on("click",function(e) {
+		$("#uploadedJSON").click()
+	})
+
+	$("#uploadedJSON").on("change",function(e) {
+		var fileReader = new FileReader();
+		fileReader.onload = function () {
+			below.clear()
+      		var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
+			const tmp = JSON.parse(data)
+			const newBG = tmp.background;
+			const selectedFont = tmp.selectedFont;
+			$("#teamName").val(tmp.team)
+			$("#startYear").val(tmp.start)
+			$("#endYear").val(tmp.end)
+			var wordmarkVisible = null;
+			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
+				below.add(object)
+				if (object.id == "wordmarkTextTop") {
+					$("#wordmarkTextBox").val(object.text)
+					$("#textColor").spectrum("set", object.fill)
+					$("#fontSpacing").val(object.charSpacing)
+					$("#fontSize").val(object.fontSize)
+					$("#fontTypeCombo").val(selectedFont).trigger('change')
+					$("#fontTypeCombo").removeClass().addClass(object.fontFamily);
+					$("#fontTypeCombo").addClass("textOption")
+					$("#textLogoCheck").attr("checked", object.visible)
+					$(".textOption").each(function() {
+						if (object.visible) {
+							$(this).prop( "disabled", false );
+						} else {
+							$(this).prop( "disabled", true );
+						}
+					})
+					$(".textColorSelector").each(function() {
+						if (object.visible) {
+							$(this).spectrum('enable');
+						} else {
+							$(this).spectrum('disable');
+						}
+					})
+				}
+				if (object.id == "wordmarkTextTopStroke") {
+					$("#textStrokeColor").spectrum("set", object.fill)
+				}
+				if (object.id.substring(0,10) == "centerLine" && object.id.slice(-6) != "Boards" && object.visible == true) {
+					$("#centerLineStyle").val(object.id.slice(-2))
+				}
+				if (object.id.substring(0,8) == "ezCircle" && object.visible == true) {
+					$("#circleStyle").val(object.id.slice(-1))
+				}
+				if (object.id.substring(0,9) == "hashmarks" && object.visible == true) {
+					$("#hashmarkStyle").val(object.id.slice(-1))
+				}
+				if (object.id.substring(0,6) == "ezDots" && object.visible == true) {
+					$("#dotStyle").val(object.id.slice(-1))
+				}
+				if (object.id == "strokeCenterCircle") {
+					$("#strokeCenterCircle").attr('checked', object.visible);
+				}
+				if (object.id == "strokeCenterLine") {
+					$("#strokeCenterLine").attr('checked', object.visible);
+				}
+				if (object.id == "trapezoidStroke") {
+					$("#trapezoidStroke").attr('checked', object.visible);
+				}
+				if (object.id == "nets") {
+					$("#nets").attr("checked", object.visible)
+				}
+				if (object.id == "guides") {
+					$("#guides").attr("checked", object.visible)
+				}
+				
+				switch (object.id) {
+					case "blueLines":
+						$("#blueLineColor").spectrum("set", object.fill)
+						break;
+					case "centerCircleFill":
+						$("#centerCircleFillColor").spectrum("set", object.fill)
+						break;
+					case "centerCircle":
+						$("#centerCircleColor").spectrum("set", object.fill)
+						break;
+						$("#centerDotColor").spectrum("set", object.fill)
+						break;
+					case "centerLine01":
+						$("#centerLineColor").spectrum("set", object.fill)
+						break;
+					case "nzFaceOffSpots1":
+						$("#nzFaceOffSpotsColor").spectrum("set", object.fill)
+						break;
+					case "ezCircle1":
+						$("#ezCircle1Color").spectrum("set", object.fill)
+						break;
+					case "ezDots1":
+						$("#ezDots1Color").spectrum("set", object.fill)
+						break;
+					case "hashmarks1":
+						$("#hasmkarks1Color").spectrum("set", object.fill)
+						break;
+					case "goalLines":
+						$("#goalLinesColor").spectrum("set", object.fill)
+						break;
+					case "creaseFill1":
+						$("#creaseFillColor").spectrum("set", object.fill)
+						break;
+					case "creaseStroke1":
+						$("#creaseStrokeColor").spectrum("set", object.fill)
+						break;
+					case "trapezoidStroke":
+						$("#trapezoidStrokeColor").spectrum("set", object.fill)
+						break;
+					default:
+						break;
+				}
+			});
+
+			$("#rinkColor").spectrum("set", newBG)
+			initializeOverlay()
+			below.renderAll.bind(below)
+		}	
+    	fileReader.readAsText($(this).prop('files')[0]);
+		
+	})
+
 	$("#flipBottomtext").on("click",function(e) {
-		var objects = wordmark.getObjects()
-		if (objects[1].pathSide == 'right') {
-			objects[1].pathSide = 'left'
-			objects[1].pathAlign = 'descender'
+		var objects = below.getObjects('text')
+		if (objects[0].pathSide == 'right') {
+			objects[0].pathSide = 'left'
+			objects[0].pathAlign = 'descender'
 		} else {
-			objects[1].pathSide = 'right'
-			objects[1].pathAlign = 'ascender'
+			objects[0].pathSide = 'right'
+			objects[0].pathAlign = 'ascender'
 		}
-		wordmark.addWithUpdate()
 		below.renderAll()	
 	})
 
@@ -2481,7 +2789,7 @@
 		if (object.get('type') == "image") {
 			var imageHeight = object.height
 			var imageWidth = object.width
-			console.log($(this).data("adloc"))
+			//console.log($(this).data("adloc"))
 			switch ($(this).data("adloc")) {
 				case 1:
 					if (imageHeight > imageWidth && imageHeight > 42) {
@@ -2614,7 +2922,7 @@
 			below.centerObject(object);
 			object.setCoords();
 			const objHeight = object.scaleY ? object.height * object.scaleY : object.height;
-			console.log(objHeight)
+			//console.log(objHeight)
 		}
 		below.renderAll();
 		$("#overlay").css("display","none");
@@ -3030,6 +3338,20 @@
 			B: parseInt(b, 16)
 		};
 	}
+
+	fabric.Canvas.prototype.getItem = function(canvas, id) {
+    var object = null,
+        objects = canvas.getObjects();
+
+    for (var i = 0, len = this.size(); i < len; i++) {
+        if (objects[i].id && objects[i].id === id) {
+            object = objects[i];
+            break;
+        }
+    }
+
+    return object;
+};
 </script>
 </head>    
 </html>
