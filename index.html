@@ -2660,7 +2660,6 @@
 			const tmp = JSON.parse(data)
 			const newBG = tmp.background;
 			const selectedFont = (validFonts.includes(tmp.selectedFont)) ? tmp.selectedFont : "Rubik_One";
-			console.log(selectedFont)
 			$("#teamName").val(tmp.team)
 			$("#startYear").val(tmp.start)
 			$("#endYear").val(tmp.end)
@@ -2668,7 +2667,6 @@
 			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
 				below.add(object)
 				if (object.id == "text") {
-					//var displayFont = (validFonts.includes(tmp.selectedFont)) ? object.fontFamily : "Rubik One";
 					object.set({
 						"fontFamily": validFonts.includes(tmp.selectedFont) ? object.fontFamily : "Rubik One"
 					})
