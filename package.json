@@ -38,6 +38,9 @@
         "dmg"
       ]
     },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
     "portable": {
       "artifactName": "${productName}_${version}_portable.${ext}"
     },
