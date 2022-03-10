@@ -1,3 +1,5 @@
+![Rink Factory Screenshot](https://i.imgur.com/OFFUMVN.jpg)
+
 # FHM Rink Factory
 
 An Electron-based dekstop app allowing users to make custom rinks for [Franchise Hockey  Manager](https://www.ootpdevelopments.com/franchise-hockey-manager-home/).

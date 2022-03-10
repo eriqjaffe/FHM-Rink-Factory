@@ -88,6 +88,8 @@
 			Yellowtail: "Yellowtail-Regular.ttf"
 		};
 
+		var validFonts = ['Acme','AthleticGothic','AthleticGothicShadow','BeavertonScript','Berkshire_Swash','Cantora_One','CaxtonRoman','Chela_One','Circus','Condiment','Cookie','Courgette','Croissant_One','Damion','Engagement','RawlingsFancyBlock','Germania_One','Graduate','Grand_Hotel','Jockey_One','Kansas','Kaushan_Script','Leckerli_One','Lily_Script_One','Lobster','Lobster_Two','Metal_Mania','Miniver','Molle','New_Rocker','Norican','OldEnglish','Oleo_Script','Oleo_Script_Swash_Caps','Pacifico','Pirata_One','Playball','ProFullBlock','RichardsonFancyBlock','Rubik_One','Rum_Raisin','Satisfy','Seymour_One','spl28','TiffanyRegular','Trade_Winds','Tuscan','UnifrakturCook','UnifrakturMaguntia','Vibur','Viga','Wellfleet','Wendy_One','Yellowtail']
+
 		var fontFamilies = {
 			Acme: "Acme",
 			athletic_gothicregular: "AthleticGothic",
@@ -628,7 +630,7 @@
 </div>
 </body>
 <script>
-    var spinnerOptions = {lines: 13, length: 28, width: 14, radius: 42, scale: 2, corners: 1, color: '#C8102E', opacity: 0.25, rotate: 0, direction: 1, speed: 1, trail: 60, fps: 20, zIndex: 2e9, className: 'spinner', top: '50%', left: '50%', shadow: false, hwaccel: false, position: 'absolute'}
+	var spinnerOptions = {lines: 13, length: 28, width: 14, radius: 42, scale: 2, corners: 1, color: '#C8102E', opacity: 0.25, rotate: 0, direction: 1, speed: 1, trail: 60, fps: 20, zIndex: 2e9, className: 'spinner', top: '50%', left: '50%', shadow: false, hwaccel: false, position: 'absolute'}
     var target = document.getElementById('overlay');
     var spinner = new Spinner(spinnerOptions).spin(target);
 
@@ -2657,20 +2659,25 @@
       		var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
 			const tmp = JSON.parse(data)
 			const newBG = tmp.background;
-			const selectedFont = tmp.selectedFont;
+			const selectedFont = (validFonts.includes(tmp.selectedFont)) ? tmp.selectedFont : "Rubik_One";
 			$("#teamName").val(tmp.team)
 			$("#startYear").val(tmp.start)
 			$("#endYear").val(tmp.end)
 			var wordmarkVisible = null;
 			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
 				below.add(object)
-				if (object.id == "wordmarkTextTop") {
+				if (object.id == "text") {
+					object.set({
+						"fontFamily": validFonts.includes(tmp.selectedFont) ? object.fontFamily : "Rubik One"
+					})
+				}
+				if (object.id == "wordmarkTextTop") { 
 					$("#wordmarkTextBox").val(object.text)
 					$("#textColor").spectrum("set", object.fill)
 					$("#fontSpacing").val(object.charSpacing)
 					$("#fontSize").val(object.fontSize)
 					$("#fontTypeCombo").val(selectedFont).trigger('change')
-					$("#fontTypeCombo").removeClass().addClass(object.fontFamily);
+					$("#fontTypeCombo").removeClass().addClass(selectedFont);
 					$("#fontTypeCombo").addClass("textOption")
 					$("#textLogoCheck").attr("checked", object.visible)
 					$(".textOption").each(function() {
