@@ -146,7 +146,9 @@
 			'Wendy One': "Wendy_One",
 			Yellowtail: "Yellowtail"
 		};
-    </script>
+  
+		var customFonts = [];
+  </script>
 <body>
 <div class="title">
     <span class="header">Welcome To The FHM Rink Factory!</span>
@@ -648,7 +650,8 @@
 		team: "",
 		start: "",
 		end: "",
-		selectedFont: ""
+		selectedFont: "",
+		customFonts: ""
 	});
 
 	fabric.Object.NUM_FRACTION_DIGITS = 17;
@@ -1588,7 +1591,7 @@
 			type: "GET",
 			url: "http://127.0.0.1:"+port+"/customFont",
 			success: function(data) {
-				//console.log(data)
+				customFonts.push(data)
 				$("head").prepend("<style>@font-face {\n   font-family: '"+data.familyName+"';\n   src: url('"+data.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+data.familyName+"'; font-size: 1.1em;}\n</style>");
 				fontSources[data.familyName] = data.fontData;
 				var style = data.familyName;
@@ -2556,8 +2559,9 @@
 		below.set("start", $("#startYear").val())
 		below.set("end", $("#endYear").val())
 		below.set("selectedFont", $("#fontTypeCombo").val())
+		below.set("customFonts", customFonts)
 
-		const json = JSON.stringify(below.toJSON(['team','start','end','selectedFont','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners','snapAngle']),null,2);
+		const json = JSON.stringify(below.toJSON(['team','start','end','selectedFont','customFonts','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners','snapAngle']),null,2);
 
 		var startYear = parseInt($("#startYear").val());
 		var endYear = parseInt($("#endYear").val())
@@ -2655,21 +2659,48 @@
 	$("#uploadedJSON").on("change",function(e) {
 		var fileReader = new FileReader();
 		fileReader.onload = function () {
+			customFonts.splice(0, customFonts.length)
 			below.clear()
-      		var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
+			var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
 			const tmp = JSON.parse(data)
 			const newBG = tmp.background;
+			if (tmp.customFonts.length > 0) {
+				for (x in tmp.customFonts) {
+					const loadedFont = tmp.customFonts[x]
+					validFonts.push(loadedFont.familyName)
+					$("head").prepend("<style>@font-face {\n   font-family: '"+loadedFont.familyName+"';\n   src: url('"+loadedFont.fontData+"') format('truetype');\n}\n."+loadedFont.familyName+" { font-family: '"+loadedFont.familyName+"'; font-size: 1.1em;}\n</style>");
+					fontSources[loadedFont.familyName] = loadedFont.fontData;
+					var style = loadedFont.familyName;
+					var font_family = $("."+style).css("font-family");
+					var optgroup = $("<optgroup class='"+loadedFont.familyName+"'>");
+					optgroup.append("<option value='"+loadedFont.familyName+"'>"+loadedFont.fontName+"</option>")
+					$("#fontTypeCombo").append(optgroup)
+					customFonts.push(loadedFont)
+				}	
+			}
 			const selectedFont = (validFonts.includes(tmp.selectedFont)) ? tmp.selectedFont : "Rubik_One";
 			$("#teamName").val(tmp.team)
 			$("#startYear").val(tmp.start)
 			$("#endYear").val(tmp.end)
 			var wordmarkVisible = null;
 			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
+				
 				below.add(object)
-				if (object.id == "text") {
-					object.set({
-						"fontFamily": validFonts.includes(tmp.selectedFont) ? object.fontFamily : "Rubik One"
-					})
+				if (object.type == "text") {
+					var myfont = new FontFaceObserver(tmp.selectedFont)
+					myfont.load()
+						.then(function() {
+						// when font is loaded, use it.
+							object.set({
+								"fontFamily": validFonts.includes(tmp.selectedFont) ? object.fontFamily : "Rubik One"
+							})
+							below.renderAll();
+						}).catch(function(e) {
+							console.log(e)
+							//alert('font loading failed ' + data.familyName);
+						});
+					below.renderAll()
+					//
 				}
 				if (object.id == "wordmarkTextTop") { 
 					$("#wordmarkTextBox").val(object.text)
@@ -2768,6 +2799,7 @@
 					default:
 						break;
 				}
+				
 			});
 
 			$("#rinkColor").spectrum("set", newBG)
@@ -2779,13 +2811,31 @@
 	})
 
 	$("#flipBottomtext").on("click",function(e) {
-		var objects = below.getObjects('text')
+		below.getObjects('text').forEach(function(o) {
+			if (o.id == 'wordmarkTextBottom' || o.id == 'wordmarkTextBottomStroke') {
+				if (o.pathSide == 'left') {
+					o.set({
+						pathSide: 'right',
+						pathAlign: 'ascender'
+					})
+				} else {
+					o.set({
+						pathSide: 'left',
+						pathAlign: 'descender'
+					})
+				}
+				below.renderAll()
+			}
+		})
+
 		if (objects[0].pathSide == 'right') {
 			objects[0].pathSide = 'left'
 			objects[0].pathAlign = 'descender'
 		} else {
 			objects[0].pathSide = 'right'
 			objects[0].pathAlign = 'ascender'
+		} 
+    
 		}
 		if (objects[2].pathSide == 'right') {
 			objects[2].pathSide = 'left'
@@ -2794,6 +2844,7 @@
 			objects[2].pathSide = 'right'
 			objects[2].pathAlign = 'ascender'
 		}
+
 		below.renderAll()	
 	})
 
