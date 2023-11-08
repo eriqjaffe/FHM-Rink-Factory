@@ -4,6 +4,7 @@
 <head>
     <title>FHM Rink Factory</title>
     <script type="text/javascript" src="./scripts/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="./scripts/dd.min.js"></script>
 	<script type="text/javascript" src="./scripts/spectrum.js"></script>
     <script type="text/javascript" src="./scripts/fabric.min.js"></script>
 	<script type="text/javascript" src="./scripts/context_blender.js"></script>
@@ -19,6 +20,7 @@
 	<link href='./scripts/spectrum.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/menu.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
+	<link href='./scripts/dd.css' rel='stylesheet' type='text/css'>
     <script>	
 		const params = new URLSearchParams(window.location.search)
 		const port = params.get('port')
@@ -425,9 +427,64 @@
 						</table>	
 						<table style="width:100%;">
 							<tr>
-								<td colspan="3">
-									<select id="fontTypeCombo" class='textOption Rubik_One' style="width:100%;" disabled>
-										<optgroup class='Acme'>
+								<td colspan="3" id="fontRow">
+									<select id="fontTypeCombo" class='textOption msdd' style="width:100%;" disabled>
+										<option data-image="./images/Acme.png" value='Acme'>Acme</option>
+										<option data-image="./images/Athletic Gothic.png" value='AthleticGothic'>Athletic Gothic</option>
+										<option data-image="./images/Athletic Gothic Shadow.png" value='AthleticGothicShadow'>Athletic Gothic Shadow</option>
+										<option data-image="./images/Beaverton Script.png" value='BeavertonScript'>Fancy Block</option>
+										<option data-image="./images/Berkshire Swash.png" value='Berkshire_Swash'>Berkshire Swash</option>
+										<option data-image="./images/CantoraOne.png" value='Cantora_One'>Cantora</option>
+										<option data-image="./images/Caxton Roman.png" value='CaxtonRoman'>Caxton Roman</option>
+										<option data-image="./images/Chela One.png" value='Chela_One'>Chela</option>
+										<option data-image="./images/Russell Circus.png" value='Circus'>Circus</option>
+										<option data-image="./images/Condiment.png" value='Condiment'>Condiment</option>
+										<option data-image="./images/Cookie.png" value='Cookie'>Cookie</option>
+										<option data-image="./images/Courgette.png" value='Courgette'>Courgette</option>
+										<option data-image="./images/Croissant One.png" value='Croissant_One'>Croissant</option>
+										<option data-image="./images/Damion.png" value='Damion'>Damion</option>
+										<option data-image="./images/Engagement.png" value='Engagement'>Engagement</option>
+										<option data-image="./images/Rawlings Fancy Block.png" value='RawlingsFancyBlock'>Fancy Block</option>
+										<option data-image="./images/Germania One.png" value='Germania_One'>Germania</option>
+										<option data-image="./images/Graduate.png" value='Graduate'>Graduate</option>
+										<option data-image="./images/Grand Hotel.png" value='Grand_Hotel'>Grand Hotel</option>
+										<option data-image="./images/Jockey One.png" value='Jockey_One'>Jockey</option>
+										<option data-image="./images/Kansas.png" value='Kansas'>Kansas Tuscan</option>
+										<option data-image="./images/Kaushan Script.png" value='Kaushan_Script'>Kaushan Script</option>
+										<option data-image="./images/Leckerli One.png" value='Leckerli_One'>Leckerli</option>
+										<option data-image="./images/Lily Script One.png" value='Lily_Script_One'>Lily Script</option>
+										<option data-image="./images/Lobster.png" value='Lobster'>Lobster</option>
+										<option data-image="./images/Lobster Two.png" value='Lobster_Two'>Lobster Two</option>
+										<option data-image="./images/Metal Mania.png" value='Metal_Mania'>Metal Mania</option>
+										<option data-image="./images/Miniver.png" value='Miniver'>Miniver</option>
+										<option data-image="./images/Molle.png" value='Molle'>Molle</option>
+										<option data-image="./images/New Rocker.png" value='New_Rocker'>New Rocker</option>
+										<option data-image="./images/Norican.png" value='Norican'>Norican</option>
+										<option data-image="./images/foo.png" value='OldEnglish'>Old English</option>
+										<option data-image="./images/Oleo Script.png" value='Oleo_Script'>Oleo Script</option>
+										<option data-image="./images/foo.png" value='Oleo_Script_Swash_Caps'>Oleo Script Swash Caps</option>
+										<option data-image="./images/Pacifico.png" value='Pacifico'>Pacifico</option>
+										<option data-image="./images/Pirata One.png" value='Pirata_One'>Pirata</option>
+										<option data-image="./images/Playball.png" value='Playball'>Playball</option>
+										<option data-image="./images/Pro Full Block.png" value='ProFullBlock'>Pro Full Block</option>
+										<option data-image="./images/Quicksand.png" value='Quicksand'>Quicksand</option>
+										<option data-image="./images/Richardson Fancy Block.png" value='RichardsonFancyBlock'>Richardson Block</option>
+										<option data-image="./images/Rubik One.png" value='Rubik_One' selected>Rubik</option>
+										<option data-image="./images/Rum Raisin.png" value='Rum_Raisin'>Rum Raisin</option>
+										<option data-image="./images/Satisfy.png" value='Satisfy'>Satisfy</option>
+										<option data-image="./images/Seymour.png" value='Seymour_One'>Seymour</option>
+										<option data-image="./images/SPL28Script.png" value='spl28'>SPL28 Script</option>
+										<option data-image="./images/UA Tiffany.png" value='TiffanyRegular'>Tiffany Regular</option>
+										<option data-image="./images/Trade Winds.png" value='Trade_Winds'>Trade Winds</option>
+										<option data-image="./images/foo.png" value='Tuscan'>Tuscan</option>
+										<option data-image="./images/UnifrakturCook.png" value='UnifrakturCook'>Unifraktur Cook</option>
+										<option data-image="./images/UnifrakturMaguntia.png" value='UnifrakturMaguntia'>Unifraktur Maguntia</option>
+										<option data-image="./images/Vibur.png" value='Vibur'>Vibur</option>
+										<option data-image="./images/Viga.png" value='Viga'>Viga</option>
+										<option data-image="./images/Wellfleet.png" value='Wellfleet'>Wellfleet</option>
+										<option data-image="./images/Wendy One.png" value='Wendy_One'>Wendy</option>
+										<option data-image="./images/Yellowtail.png" value='Yellowtail'>Yellowtail</option>
+										<!--<optgroup class='Acme'>
 										<option value='Acme'>Acme</option>
 										</optgroup>
 										<optgroup class='AthleticGothic'>
@@ -541,9 +598,9 @@
 										<optgroup class='ProFullBlock'>
 										<option value='ProFullBlock'>Pro Full Block</option>
 										</optgroup>
-										<!--<optgroup class='Quicksand'>
+										<optgroup class='Quicksand'>
 										<option value='Quicksand'>Quicksand</option>
-										</optgroup>-->
+										</optgroup>
 										<optgroup class='RichardsonFancyBlock'>
 										<option value='RichardsonFancyBlock'>Richardson Block</option>
 										</optgroup>
@@ -591,7 +648,7 @@
 										</optgroup>
 										<optgroup class='Yellowtail'>
 										<option value='Yellowtail'>Yellowtail</option>
-										</optgroup>
+										</optgroup>-->
 									</select>
 								</td>
 							</tr>
@@ -812,6 +869,7 @@
 				$(this).removeClass("inactive-header").addClass("active-header");
 			}
 		});
+
 		$(":checkbox").each(function(e) {
 			if ($(this).is(':checked')) {
 				state = true;
@@ -833,6 +891,8 @@
 				}
 			})
 		})
+
+		let textDropdown = new MsDropdown(document.getElementById("fontTypeCombo"), {visibleRows: 6})
         //$(".msDropDown").msDropDown();
     })
 
@@ -2380,8 +2440,10 @@
 	$("#textLogoCheck").on("click",function(e) {
 		if ($(this).is(':checked')) {
 			state = true;
+			$("#fontRow").find(".ms-dd").removeClass("disabled")
 		} else {
 			state = false;
+			$("#fontRow").find(".ms-dd").addClass("disabled")
 		}
 		$(".textOption").each(function() {
 			if (state == true) {
@@ -2397,6 +2459,7 @@
 				$(this).spectrum('disable');
 			}
 		})
+		
 		var objects = below.getObjects('text').forEach(function (o) {
 			o.visible = state
 			below.renderAll()
