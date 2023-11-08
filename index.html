@@ -460,23 +460,23 @@
 										<option data-image="./images/Molle.png" value='Molle'>Molle</option>
 										<option data-image="./images/New Rocker.png" value='New_Rocker'>New Rocker</option>
 										<option data-image="./images/Norican.png" value='Norican'>Norican</option>
-										<option data-image="./images/foo.png" value='OldEnglish'>Old English</option>
+										<option data-image="./images/Rawlings Old English.png" value='OldEnglish'>Old English</option>
 										<option data-image="./images/Oleo Script.png" value='Oleo_Script'>Oleo Script</option>
-										<option data-image="./images/foo.png" value='Oleo_Script_Swash_Caps'>Oleo Script Swash Caps</option>
+										<option data-image="./images/Oleo Script Swash Caps.png" value='Oleo_Script_Swash_Caps'>Oleo Script Swash Caps</option>
 										<option data-image="./images/Pacifico.png" value='Pacifico'>Pacifico</option>
 										<option data-image="./images/Pirata One.png" value='Pirata_One'>Pirata</option>
 										<option data-image="./images/Playball.png" value='Playball'>Playball</option>
 										<option data-image="./images/Pro Full Block.png" value='ProFullBlock'>Pro Full Block</option>
 										<option data-image="./images/Quicksand.png" value='Quicksand'>Quicksand</option>
 										<option data-image="./images/Richardson Fancy Block.png" value='RichardsonFancyBlock'>Richardson Block</option>
-										<option data-image="./images/Rubik One.png" value='Rubik_One' selected>Rubik</option>
+										<option data-image="./images/Rubik One.png" value='Rubik One' selected>Rubik</option>
 										<option data-image="./images/Rum Raisin.png" value='Rum_Raisin'>Rum Raisin</option>
 										<option data-image="./images/Satisfy.png" value='Satisfy'>Satisfy</option>
-										<option data-image="./images/Seymour.png" value='Seymour_One'>Seymour</option>
+										<option data-image="./images/Seymour One.png" value='Seymour_One'>Seymour</option>
 										<option data-image="./images/SPL28Script.png" value='spl28'>SPL28 Script</option>
 										<option data-image="./images/UA Tiffany.png" value='TiffanyRegular'>Tiffany Regular</option>
 										<option data-image="./images/Trade Winds.png" value='Trade_Winds'>Trade Winds</option>
-										<option data-image="./images/foo.png" value='Tuscan'>Tuscan</option>
+										<option data-image="./images/MLB_Tuscan_New.png" value='Tuscan'>Tuscan</option>
 										<option data-image="./images/UnifrakturCook.png" value='UnifrakturCook'>Unifraktur Cook</option>
 										<option data-image="./images/UnifrakturMaguntia.png" value='UnifrakturMaguntia'>Unifraktur Maguntia</option>
 										<option data-image="./images/Vibur.png" value='Vibur'>Vibur</option>
@@ -1369,7 +1369,7 @@
 			evented: false
         });
 
-		wordmarkTextTop = new fabric.Text('ARENA NAME',{
+		/* wordmarkTextTop = new fabric.IText('ARENA NAME',{
 			visible: false,
 			fontFamily: "Rubik One",
 			fontSize: 20,
@@ -1399,7 +1399,7 @@
 			snapAngle: 5,
 		})
 
-		wordmarkTextTopStroke = new fabric.Text('ARENA NAME',{
+		wordmarkTextTopStroke = new fabric.IText('ARENA NAME',{
 			visible: false,
 			fontFamily: "Rubik One",
 			fontSize: 20,
@@ -1431,7 +1431,7 @@
 			mtr: true
 		})
 
-		wordmarkTextBottom = new fabric.Text('ARENA NAME',{
+		wordmarkTextBottom = new fabric.IText('ARENA NAME',{
 			visible: false,
 			selectable: false,
 			fontFamily: 'Rubik One',
@@ -1452,7 +1452,7 @@
 			pathAlign: 'descender'
 		})
 
-		wordmarkTextBottomStroke = new fabric.Text('ARENA NAME',{
+		wordmarkTextBottomStroke = new fabric.IText('ARENA NAME',{
 			visible: false,
 			selectable: false,
 			fontFamily: 'Rubik One',
@@ -1477,6 +1477,8 @@
 		wordmarkTextTop.rotate(270)
 		wordmarkTextBottomStroke.rotate(90)
 		wordmarkTextBottom.rotate(90)
+
+		 */
 
 		below.add(centerCircleStroke)
 		below.add(centerCircle)
@@ -1526,15 +1528,76 @@
 		below.add(ezCircle2)
 		below.add(ezCircle3)
 		below.add(centerDot)
-		below.add(wordmarkTextBottomStroke)
-		below.add(wordmarkTextTopStroke)
-		below.add(wordmarkTextBottom)
-		below.add(wordmarkTextTop)
 
-		below.centerObject(wordmarkTextTopStroke)
-		below.centerObject(wordmarkTextTop)
-		below.centerObject(wordmarkTextBottomStroke)
-		below.centerObject(wordmarkTextBottom)
+		centerIcePath = new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z", {
+            visible: false,
+            selectable:false,
+            evented: false,
+            originX: 'center',
+            originY: 'center',
+            id: 'centerIcePath'
+        })
+
+		var circleFont = new FontFaceObserver($("#fontTypeCombo").val())
+		circleFont.load()
+		.then(function() {
+			wordmarkTextTop = new fabric.IText('ARENA NAME',{
+				visible: true,
+                fontFamily: $("#fontTypeCombo").val(),
+                fontSize: 20,
+                originX: 'center',
+                originY: 'center',
+                textAlign: 'center',
+                id: 'roundelTextTop',
+                fill: 'black',
+                stroke: initialColors['rinkColor'],
+                paintFirst: "stroke",
+                strokeWidth: 4,
+                path: centerIcePath,
+                pathAlign: 'descender',
+                snapAngle: 5,
+                angle: 270,
+                charSpacing: 0
+			})
+
+			wordmarkTextBottom = new fabric.IText('ARENA NAME',{
+				visible: true,
+                fontFamily: $("#fontTypeCombo").val(),
+                fontSize: 20,
+                originX: 'center',
+                originY: 'center',
+                textAlign: 'center',
+                id: 'roundelTextTop',
+                fill: 'black',
+                stroke: initialColors['rinkColor'],
+                paintFirst: "stroke",
+                strokeWidth: 4,
+                path: centerIcePath,
+                pathAlign: 'descender',
+                angle: 90,
+                charSpacing: 0
+			})
+
+			wordmarkGroup = new fabric.Group([wordmarkTextTop, wordmarkTextBottom], {
+				id: 'wordmarkGroup',
+				borderColor: 'red',
+                cornerColor: 'yellow',
+                cornerSize: 12,
+                transparentCorners: false,
+                lockScalingFlip: true,
+                lockScalingX: true,
+                lockScalingY: true,
+                lockMovementX: true,
+                lockMovementY: true,
+				snapAngle: 5
+			})
+
+			below.add(wordmarkGroup)
+			//below.add(wordmarkTextBottom)
+		
+			below.centerObject(wordmarkGroup)
+			//below.centerObject(wordmarkTextBottom)
+		})
 
 		fabric.Image.fromURL("./images/guides.png", function (img) {
 			var guides = img.set({
@@ -2557,12 +2620,13 @@
 	$("#fontTypeCombo").on("change",function() {
 		var style = $(this).val();
 		var font_family = $("."+style).css("font-family");
+		console.log(font_family)
 		var objects = below.getObjects('text');
-		for (x in objects) {
-			objects[x].fontFamily = font_family;
+ 		for (x in objects) {
+			objects[x].fontFamily = style;
 		}
 		below.renderAll();
-		$(this).removeClass().addClass(style);
+		//$(this).removeClass().addClass(style);
 	})
 
     $("#fakeImageButton").on("click",function() {
@@ -2899,7 +2963,6 @@
 			objects[0].pathAlign = 'ascender'
 		} 
     
-		}
 		if (objects[2].pathSide == 'right') {
 			objects[2].pathSide = 'left'
 			objects[2].pathAlign = 'descender'
