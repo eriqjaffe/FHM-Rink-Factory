@@ -43,54 +43,6 @@ const server = app2.listen(0, () => {
 
 app2.use(express.urlencoded({limit: '50mb', extended: true, parameterLimit: 50000}));
 
-app2.get("/uploadImage", (req, res) => {
-	dialog.showOpenDialog(null, {
-		properties: ['openFile'],
-		filters: [
-			{ name: 'Images', extensions: ['jpg', 'png'] }
-		]
-	  }).then(result => {
-		  if(!result.canceled) {
-			var uploadedImg = null;
-			console.log(path.extname(result.filePaths[0]))
-			if (path.extname(result.filePaths[0]).toLowerCase() == ".gif") {
-				imagemagickCli.exec('magick convert '+result.filePaths[0]+' '+tempDir+'/temp.png').then(({ stdout, stderr }) => {
-					Jimp.read(tempDir+'/temp.png', (err, image) => {
-						if (err) {
-							console.log(err);
-						} else {
-							image.getBase64(Jimp.AUTO, (err, ret) => {
-								res.json({
-									"filename": path.basename(result.filePaths[0]),
-									"image": ret
-								  });
-								res.end();
-							})
-						}
-					});
-				})
-			} else {
-				Jimp.read(result.filePaths[0], (err, image) => {
-					if (err) {
-						console.log(err);
-					} else {
-						image.getBase64(Jimp.AUTO, (err, ret) => {
-							res.json({
-								"filename": path.basename(result.filePaths[0]),
-								"image": ret
-							  });
-							res.end();
-						})
-					}
-				});
-			}
-			
-		  }
-	  }).catch(err => {
-		console.log(err)
-	  })
-})
-
 ipcMain.on('upload-font', (event, arg) => {
     let json = {}
     const options = {
@@ -144,6 +96,42 @@ ipcMain.on('upload-font', (event, arg) => {
 	})
 })
 
+ipcMain.on('upload-image', (event, arg) => {
+    let json = {}
+    const options = {
+		defaultPath: store.get("uploadImagePath", app.getPath('pictures')),
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff'] }
+		]
+	}
+    dialog.showOpenDialog(null, options).then(result => {
+        if (!result.canceled) {
+			store.set("uploadImagePath", path.dirname(result.filePaths[0]))
+            Jimp.read(result.filePaths[0], (err, image) => {
+				if (err) {
+					json.filename = "error not an image"
+					json.image = "error not an image"
+					event.sender.send('add-image-response', json)
+				} else {
+					image.getBase64(Jimp.AUTO, (err, ret) => {
+						json.path = result.filePaths[0]
+						json.filename = path.basename(result.filePaths[0])
+						json.image = ret
+						event.sender.send('add-image-response', json)
+					})
+				}
+			})
+            .catch(err => { json.filename = "error not an image"
+                json.image = "error not an image"
+                event.sender.send('add-image-response', err) 
+            })
+        } else {
+            res.end()
+			  console.log("cancelled")
+        }
+    })
+})
 
 ipcMain.on('open-folder', (event, arg) => {
 	switch (arg) {
@@ -193,41 +181,6 @@ ipcMain.on('local-font-folder', (event, arg) => {
 	jsonObj.result = "success"
 	jsonObj.fonts = jsonArr
 	event.sender.send('local-font-folder-response', jsonObj)
-})
-
-app2.get("/customFont", (req, res) => {
-	dialog.showOpenDialog(null, {
-		properties: ['openFile'],
-		filters: [
-			{ name: 'Fonts', extensions: ['ttf', 'otf'] }
-		]
-	}).then(result => {
-		if(!result.canceled) {
-			ttfInfo(result.filePaths[0], function(err, info) {
-			var ext = getExtension(result.filePaths[0])
-				const dataUrl = font2base64.encodeToDataUrlSync(result.filePaths[0])
-				var fontPath = url.pathToFileURL(tempDir + '/'+path.basename(result.filePaths[0]))
-				fs.copyFile(result.filePaths[0], tempDir + '/'+path.basename(result.filePaths[0]), (err) => {
-					if (err) {
-						console.log(err)
-					} else {
-						res.json({
-							"fontName": info.tables.name[1],
-							"fontStyle": info.tables.name[2],
-							"familyName": info.tables.name[6],
-							"fontFormat": ext,
-							"fontMimetype": 'font/' + ext,
-							"fontData": fontPath.href,
-							'fontBase64': dataUrl
-						});
-						res.end()
-					}
-				})
-			});
-		}
-	}).catch(err => {
-		console.log(err)
-	})
 })
 
 app2.post("/removeBorder", (req, res) => {

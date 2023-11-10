@@ -2658,55 +2658,57 @@
 	})
 
     $("#fakeImageButton").on("click",function() {
-		$.ajax({
-			type: "GET",
-			url: "http://127.0.0.1:"+port+"/uploadImage",
-			success: function(data) {
-				var imgObj = new Image();
-				imgObj.src = data.image;
-				$("#fileName").html(data.filename);
-				imgObj.onload = function () {
-					// start fabricJS stuff
-					var image = new fabric.Image(imgObj);
-					image.set({
-						originX: 'center',
-						originY: 'center',
-						left: imLeft,
-						top: imTop,
-						perPixelTargetFind: true,
-						centeredScaling: true,
-						centeredRotation: true,
-						name: data.filename,
-						borderColor: 'red',
-						cornerColor: 'yellow',
-						cornerSize: 12,
-						transparentCorners: false,
-						id: data.filename
-					});
-					image.filters.push(new fabric.Image.filters.Resize({
-						resizeType: 'lanczos', // typo fixed
-						lanczosLobes: 2 // typo fixed
-					}));
-					image.on('object:modified',function() {
-						imLeft = image.get('left')
-						imTop = image.get('top');
-					})
-					var h = image.height;
-					var w = image.width;
-					//if ((h > 300) || (w > 300)) {
-					//	image.scale(0.5);
-					//}
-					below.add(image);
-					below.centerObject(image)
-					image.sendToBack();
-					below.renderAll();
-					//image.bringForward();
-					
-					// end fabricJS stuff
-				}
-			}
-		});
+		ipcRenderer.send('upload-image', null)
 	})
+
+	ipcRenderer.on('add-image-response', (event, data) => {
+        addImage(data)
+    })
+
+	function addImage(data) {
+		var imgObj = new Image();
+		imgObj.src = data.image;
+		$("#fileName").html(data.filename);
+		imgObj.onload = function () {
+			// start fabricJS stuff
+			var image = new fabric.Image(imgObj);
+			image.set({
+				originX: 'center',
+				originY: 'center',
+				left: imLeft,
+				top: imTop,
+				perPixelTargetFind: true,
+				centeredScaling: true,
+				centeredRotation: true,
+				name: data.filename,
+				borderColor: 'red',
+				cornerColor: 'yellow',
+				cornerSize: 12,
+				transparentCorners: false,
+				id: data.filename
+			});
+			image.filters.push(new fabric.Image.filters.Resize({
+				resizeType: 'lanczos', // typo fixed
+				lanczosLobes: 2 // typo fixed
+			}));
+			image.on('object:modified',function() {
+				imLeft = image.get('left')
+				imTop = image.get('top');
+			})
+			var h = image.height;
+			var w = image.width;
+			//if ((h > 300) || (w > 300)) {
+			//	image.scale(0.5);
+			//}
+			below.add(image);
+			below.centerObject(image)
+			image.sendToBack();
+			below.renderAll();
+			//image.bringForward();
+			
+			// end fabricJS stuff
+		}
+	}
 
 	$("#save").on("click",function(e) {
 		e.preventDefault()
