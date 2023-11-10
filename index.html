@@ -409,22 +409,56 @@
 						<table style="width:100%;">
 							<tr>
 								<td class="checkCell"><input type="checkbox" id="textLogoCheck" class="wordmarkToggle" data-id="wordmark"></td>
-								<td><label>Text: </label><input class="textOption" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:79%; text-align:center;"/></td>
-								<td style="text-align:right;"><input type="checkbox" class="textOption" id="textStrokeCheck" checked disabled>&nbsp;Text Border</td>
+								<td style="width: 70%;">
+									<label>Text 1: </label><input class="textOption" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:65%; text-align:center;"/ disabled>
+									&nbsp;<input class="textOption textColorSelector" type="text" id="textColor" data-element="wordmarkText" disabled>
+								</td>
+								<td style="text-align:right;">
+									<input type="checkbox" class="textOption" id="textStrokeCheck" checked disabled>&nbsp;Text Border
+								</td>
 							</tr>
 						</table>
 						<table style="width:100%;">
 							<tr>
+								<td class="checkCell"><input type="checkbox" class="wordmarkToggle" data-id="wordmark" style="visibility: hidden;"></td>
 								<td style="text-align:center;">
-									<input class="textOption textColorSelector" type="text" id="textColor" data-element="wordmarkText" disabled>
-								</td>	
-								<td style="text-align:center;">
-									Text Size: <input type="number" id="fontSize" value="20" min="1" class="textOption scaling" style="width:50px;" disabled>&nbsp;&nbsp;&nbsp;
-									Text Spacing: <input type="number" id="fontSpacing" value="0" class="textOption spacing" style="width:50px;" disabled>
+									Text Size: <input type="number" id="fontSizeTop" value="20" min="1" class="textOption scaling" style="width:50px;" disabled>&nbsp;&nbsp;&nbsp;
+									Text Spacing: <input type="number" id="fontSpacingTop" value="0" class="textOption spacing" style="width:50px;" disabled>
+									&nbsp;&nbsp;
+									Baseline: <input type="number" id="fontBaselineTop" value="0" class="textOption baseline" style="width:50px;" disabled>
+									&nbsp;&nbsp;<input type="button" class="textOption button" id="flipTopText" value="Flip Text" disabled>
 								</td>
-								<td><input type="button" class="textOption button" id="flipBottomtext" value="Flip Bottom Text" disabled></td>
 							<tr>
-						</table>	
+						</table>
+						<hr style="color:#ff0000;">
+						<table style="width:100%;">
+							<tr>
+								<td class="checkCell"><input type="checkbox" class="wordmarkToggle" data-id="wordmark" style="visibility: hidden;"></td>
+								<td style="width: 70%;">
+									<label>Text 2: </label><input class="textOption" type="text" id="wordmarkTextBox2" value="ARENA NAME" style="width:65%; text-align:center;"/ disabled>
+									&nbsp;<input class="textOption textColorSelector" type="text" id="textColor2" data-element="wordmarkText" disabled>
+								</td>
+								<td style="text-align:right;">
+									<input type="checkbox" class="textOption" id="textMatchCheck" checked disabled>&nbsp;Same Text
+								</td>
+							</tr>
+						</table>
+						<table style="width:100%;">
+							<tr>
+								<td class="checkCell"><input type="checkbox" class="wordmarkToggle" data-id="wordmark" style="visibility: hidden;"></td>
+								<td style="text-align:center;">
+									Text Size: <input type="number" id="fontSizeBottom" value="20" min="1" class="textOption scaling" style="width:50px;" disabled>&nbsp;&nbsp;&nbsp;
+									Text Spacing: <input type="number" id="fontSpacingBottom" value="0" class="textOption spacing" style="width:50px;" disabled>
+									&nbsp;&nbsp;
+									Baseline: <input type="number" id="fontBaselineBottom" value="0" class="textOption baseline" style="width:50px;" disabled>
+									&nbsp;&nbsp;<input type="button" class="textOption button" id="flipBottomText" value="Flip Text" disabled>
+								</td>
+							</tr>
+							<tr>
+								<td style="text-align:center;"></td>
+							</tr>
+						</table>
+						<hr>
 						<table style="width:100%;">
 							<tr>
 								<td colspan="3" id="fontRow">
@@ -1517,28 +1551,95 @@
 	}
 	
 	$("#wordmarkTextBox").on("input",function(e) {
-		let o = below.getObjects('group').find(o => o.id == "wordmarkGroup")
-		g.getObjects().forEach(function(o) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		if ($("#textMatchCheck").is(":checked")) {
+			$("#wordmarkTextBox2").val($("#wordmarkTextBox").val())
+			g.getObjects().forEach(function(o) {
+				o.set("text",$("#wordmarkTextBox").val())
+			})
+			topDeltaY()
+			bottomDeltaY()
+		} else {
+			let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
 			o.set("text",$("#wordmarkTextBox").val())
-		})
+			topDeltaY()
+		}
+		//below.renderAll();
+	})
+
+	$("#wordmarkTextBox2").on("input",function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		o.set("text",$("#wordmarkTextBox2").val())
+		bottomDeltaY()
+		//below.renderAll()
+	})
+
+	$("#fontSizeTop").on("input", function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+		o.set("fontSize",$(this).val())
 		below.renderAll();
 	})
 
-	$("#fontSize").on("input", function(e) {
+	$("#fontSpacingTop").on("input", function(e) {
 		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
-		g.getObjects().forEach(function(o) {
-			o.set("fontSize",$("#fontSize").val())
-		})
+		let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+		o.set('charSpacing', parseInt(($(this).val() * 10)))
 		below.renderAll();
 	})
 
-	$("#fontSpacing").on("input", function(e) {
+	$("#fontBaselineTop").on("input", function(e) {
+		topDeltaY()
+	})
+
+	function topDeltaY() {
 		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
-		g.getObjects().forEach(function(o) {
-			o.set('charSpacing', parseInt(($("#fontSpacing").val() * 10)))
-		})
+		let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+		let amt = parseInt($("#fontBaselineTop").val())
+		let len = $("#wordmarkTextBox").val().length
+		let style = {}
+        let chars = {}
+        for (i=0; i<len; i++) {
+            chars[i] = {deltaY: (amt*-1)}
+        }
+		style[0] = chars
+		o.set("styles", style)
+		below.renderAll()
+	}
+
+	$("#fontSizeBottom").on("input", function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		o.set("fontSize",$(this).val())
 		below.renderAll();
 	})
+
+	$("#fontSpacingBottom").on("input", function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		o.set('charSpacing', parseInt(($(this).val() * 10)))
+		below.renderAll();
+	})
+
+	$("#fontBaselineBottom").on("input", function(e) {
+		bottomDeltaY()
+	})
+
+	function bottomDeltaY() {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		let amt = parseInt($("#fontBaselineBottom").val())
+		let len = $("#wordmarkTextBox2").val().length
+		let style = {}
+        let chars = {}
+        for (i=0; i<len; i++) {
+            chars[i] = {deltaY: (amt*-1)}
+        }
+		style[0] = chars
+		o.set("styles", style)
+		below.renderAll()
+	}
 
 	$("#fakeFontButton").on("click", function(e) {
 		e.preventDefault;
@@ -1590,7 +1691,7 @@
 		})
 	})
 
-	$(".textColorSelector").each(function() {
+	$("#textColor").each(function() {
 		var color = $(this).attr('id');
 		var change = false;
 		if (color == 'transparent') {
@@ -1606,7 +1707,7 @@
 			showSelectionPalette: true,
 			localStorageKey: "spectrum.rinkfactory",
 			palette: [ ],
-			color: initialColors[$(this).attr('id')],
+			color: initialColors['textColor'],
 			show: function(color) {
 				var original_color = color;
 				$(this).data('changed', false);
@@ -1620,10 +1721,8 @@
 				}
 				$(this).data('changed', true);
 				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
-				g.getObjects().forEach(function(o) {
-					o.set("fill",colorX)
-				})
-				
+				let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+				o.set("fill",colorX)
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1635,9 +1734,8 @@
 				}
 				$(this).data('changed', true);
 				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
-				g.getObjects().forEach(function(o) {
-					o.set("fill",colorX)
-				})
+				let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+				o.set("fill",colorX)
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1649,9 +1747,71 @@
 				}
 				$(this).data('changed', true);
 				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
-				g.getObjects().forEach(function(o) {
-					o.set("fill",colorX)
-				})
+				let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+				o.set("fill",colorX)
+				below.renderAll();
+			}
+		})
+	})
+
+	$("#textColor2").each(function() {
+		var color = $(this).attr('id');
+		var change = false;
+		if (color == 'transparent') {
+			color = null;
+		}
+		$(this).spectrum({
+			showInput: true,
+			preferredFormat: prefColorFormat,
+			showInitial: true,
+			showPalette: true,
+			showButtons: true,
+			allowEmpty: true,
+			showSelectionPalette: true,
+			localStorageKey: "spectrum.rinkfactory",
+			palette: [ ],
+			color: initialColors['textColor'],
+			show: function(color) {
+				var original_color = color;
+				$(this).data('changed', false);
+			},
+			move: function(color) {
+				change = true;
+				if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+				o.set("fill",colorX)
+				below.renderAll();
+			},
+			change: function(color) {
+				change = true;
+				if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+				o.set("fill",colorX)
+				below.renderAll();
+			},
+			hide: function(color) {
+				change = true;
+				if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+				o.set("fill",colorX)
 				below.renderAll();
 			}
 		})
@@ -2340,6 +2500,10 @@
 				$(this).prop( "disabled", true );
 			}
 		})
+		if ($("#textMatchCheck").is(":checked")) {
+			$("#wordmarkTextBox2").val($("#wordmarkTextBox").val())
+			$("#wordmarkTextBox2").prop( "disabled", true );
+		}
 		$(".textColorSelector").each(function() {
 			if (state == true) {
 				$(this).spectrum('enable');
@@ -2352,6 +2516,24 @@
 			o.visible = state
 			below.renderAll()
 		})
+	})
+
+	$("#textMatchCheck").on("click", function() {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		if ($(this).is(':checked')) {
+			$("#wordmarkTextBox2").val($("#wordmarkTextBox").val())
+			$("#wordmarkTextBox2").prop( "disabled", true );
+			g.getObjects().forEach(function(o) {
+				o.set("text",$("#wordmarkTextBox").val())
+			})
+		} else {
+			$("#wordmarkTextBox2").prop( "disabled", false );
+			let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+			let p = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+			o.set("text",$("#wordmarkTextBox").val())
+			p.set("text",$("#wordmarkTextBox2").val())
+		}
+		below.renderAll()
 	})
 
 	$("#textStrokeCheck").on("click",function() {
@@ -2443,7 +2625,6 @@
 
 	$("#fontTypeCombo").on("change",function() {
 		let style = $(this).val();
-		console.log(style)
 		let font_family = $("."+style).css("font-family");
 		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
 		
@@ -2770,10 +2951,9 @@
 		
 	})
 
-	$("#flipBottomtext").on("click",function(e) {
+	$("#flipTopText").on("click",function(e) {
 		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
-		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
-		console.log(o.pathSide)
+		let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
 		if (o.pathSide == 'left') {
 			o.set({
 				pathSide: 'right',
@@ -2785,43 +2965,23 @@
 				pathAlign: 'descender'
 			})
 		}
-		below.renderAll()
-/* 		g.getObjects().forEach(function(o) {
-			o.set("text",$("#wordmarkTextBox").val())
-		}) */
-		/* below.getObjects('text').forEach(function(o) {
-			if (o.id == 'wordmarkTextBottom' || o.id == 'wordmarkTextBottomStroke') {
-				if (o.pathSide == 'left') {
-					o.set({
-						pathSide: 'right',
-						pathAlign: 'ascender'
-					})
-				} else {
-					o.set({
-						pathSide: 'left',
-						pathAlign: 'descender'
-					})
-				}
-				below.renderAll()
-			}
-		})
+		below.renderAll()	
+	})
 
-		if (objects[0].pathSide == 'right') {
-			objects[0].pathSide = 'left'
-			objects[0].pathAlign = 'descender'
+	$("#flipBottomText").on("click",function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		if (o.pathSide == 'left') {
+			o.set({
+				pathSide: 'right',
+				pathAlign: 'ascender'
+			})
 		} else {
-			objects[0].pathSide = 'right'
-			objects[0].pathAlign = 'ascender'
-		} 
-    
-		if (objects[2].pathSide == 'right') {
-			objects[2].pathSide = 'left'
-			objects[2].pathAlign = 'descender'
-		} else {
-			objects[2].pathSide = 'right'
-			objects[2].pathAlign = 'ascender'
-		} */
-
+			o.set({
+				pathSide: 'left',
+				pathAlign: 'descender'
+			})
+		}
 		below.renderAll()	
 	})
 
