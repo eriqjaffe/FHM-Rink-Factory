@@ -1383,7 +1383,7 @@
                 originX: 'center',
                 originY: 'center',
                 textAlign: 'center',
-                id: 'roundelTextTop',
+                id: 'wordmarkTextTop',
                 fill: 'black',
                 stroke: initialColors['rinkColor'],
                 paintFirst: "stroke",
@@ -1402,7 +1402,7 @@
                 originX: 'center',
                 originY: 'center',
                 textAlign: 'center',
-                id: 'roundelTextTop',
+                id: 'wordmarkTextBottom',
                 fill: 'black',
                 stroke: initialColors['rinkColor'],
                 paintFirst: "stroke",
@@ -1516,27 +1516,27 @@
         })
 	}
 	
-	$("#wordmarkTextBox").on("change",function(e) {
-		objects = below.getObjects('text');
-		for (x in objects) {
-			objects[x].text = $(this).val();
-		}
+	$("#wordmarkTextBox").on("input",function(e) {
+		let o = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		g.getObjects().forEach(function(o) {
+			o.set("text",$("#wordmarkTextBox").val())
+		})
 		below.renderAll();
 	})
 
-	$("#fontSize").on("change", function(e) {
-		objects = below.getObjects('text');
-		for (x in objects) {
-			objects[x].fontSize = $(this).val();
-		}
+	$("#fontSize").on("input", function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		g.getObjects().forEach(function(o) {
+			o.set("fontSize",$("#fontSize").val())
+		})
 		below.renderAll();
 	})
 
-	$("#fontSpacing").on("change", function(e) {
-		objects = below.getObjects('text');
-		for (x in objects) {
-			objects[x].charSpacing = ($(this).val() * 10);
-		}
+	$("#fontSpacing").on("input", function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		g.getObjects().forEach(function(o) {
+			o.set('charSpacing', parseInt(($("#fontSpacing").val() * 10)))
+		})
 		below.renderAll();
 	})
 
@@ -1619,9 +1619,10 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				objects = below.getObjects('text').forEach(function(o){
-					o.fill = colorX
-				});
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				g.getObjects().forEach(function(o) {
+					o.set("fill",colorX)
+				})
 				
 				below.renderAll();
 			},
@@ -1633,9 +1634,10 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				objects = below.getObjects('text').forEach(function(o){
-					o.fill = colorX
-				});
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				g.getObjects().forEach(function(o) {
+					o.set("fill",colorX)
+				})
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1646,9 +1648,10 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				objects = below.getObjects('text').forEach(function(o){
-					o.fill = colorX
-				});
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				g.getObjects().forEach(function(o) {
+					o.set("fill",colorX)
+				})
 				below.renderAll();
 			}
 		})
@@ -1674,59 +1677,43 @@
             var objects = below.getObjects();
 			for (x in objects) {
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-					objects[x].set('fill', color.toHexString())
-                    below.renderAll()
+					objects[x].set('fill', color.toHexString())                   
 				}
-				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
-					objects[x].set('stroke', color.toHexString())
-					below.renderAll()
-				}
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				g.getObjects().forEach(function(o) {
+					o.set("stroke", color.toHexString())
+				})
 			}
+			below.renderAll()
 		},
 		change: function(color) {
 			$(this).data('changed', true);
 			below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
             var objects = below.getObjects();
 			for (x in objects) {
-				//console.log(objects[x].id)
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-					objects[x].set('fill', color.toHexString())
-                    below.renderAll()
+					objects[x].set('fill', color.toHexString())                   
 				}
-				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
-					objects[x].set('stroke', color.toHexString())
-					below.renderAll()
-				}
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				g.getObjects().forEach(function(o) {
+					o.set("stroke", color.toHexString())
+				})
 			}
+			below.renderAll()
 		},
 		hide: function(color) {
-			if ($(this).data('changed')) {
-				below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
-                var objects = below.getObjects();
-                for (x in objects) {
-                    if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-					objects[x].set('fill', color.toHexString())
-                    below.renderAll()
+			below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+            var objects = below.getObjects();
+			for (x in objects) {
+				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
+					objects[x].set('fill', color.toHexString())                   
 				}
-				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
-					objects[x].set('stroke', color.toHexString())
-					below.renderAll()
-				}
-                }
-			} else {
-                below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
-                var objects = below.getObjects();
-                for (x in objects) {
-                    if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-						objects[x].set('fill', color.toHexString())
-                    	below.renderAll()
-					}
-					if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
-						objects[x].set('stroke', color.toHexString())
-						below.renderAll()
-					}
-                }
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				g.getObjects().forEach(function(o) {
+					o.set("stroke", color.toHexString())
+				})
 			}
+			below.renderAll()
 		}
 	})
 
@@ -2369,16 +2356,15 @@
 
 	$("#textStrokeCheck").on("click",function() {
 		state = ($(this).is(':checked')) ? true : false;
-		below.getObjects('text').forEach(function(o) {
-			if (o.id == "wordmarkTextTopStroke" || o.id == "wordmarkTextBottomStroke") {
-				if (state == true) {
-					o.visible = true;
-				} else {
-					o.visible = false;
-				}
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		g.getObjects().forEach(function(o) {
+			if (state == true) {
+				o.set("stroke",$("#rinkColor").spectrum("get").toHexString())
+			} else {
+				o.set("stroke","transparent")
 			}
-			below.renderAll()
 		})
+		below.renderAll()
 	})
 	
 	$(".belowTextureToggle").on("click",function() {
@@ -2785,7 +2771,25 @@
 	})
 
 	$("#flipBottomtext").on("click",function(e) {
-		below.getObjects('text').forEach(function(o) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		console.log(o.pathSide)
+		if (o.pathSide == 'left') {
+			o.set({
+				pathSide: 'right',
+				pathAlign: 'ascender'
+			})
+		} else {
+			o.set({
+				pathSide: 'left',
+				pathAlign: 'descender'
+			})
+		}
+		below.renderAll()
+/* 		g.getObjects().forEach(function(o) {
+			o.set("text",$("#wordmarkTextBox").val())
+		}) */
+		/* below.getObjects('text').forEach(function(o) {
 			if (o.id == 'wordmarkTextBottom' || o.id == 'wordmarkTextBottomStroke') {
 				if (o.pathSide == 'left') {
 					o.set({
@@ -2816,7 +2820,7 @@
 		} else {
 			objects[2].pathSide = 'right'
 			objects[2].pathAlign = 'ascender'
-		}
+		} */
 
 		below.renderAll()	
 	})
