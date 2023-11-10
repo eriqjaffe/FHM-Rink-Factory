@@ -3,6 +3,7 @@
 <html>
 <head>
     <title>FHM Rink Factory</title>
+	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script type="text/javascript" src="./scripts/jquery-1.11.3.min.js"></script>
 	<script type="text/javascript" src="./scripts/dd.min.js"></script>
 	<script type="text/javascript" src="./scripts/spectrum.js"></script>
@@ -16,14 +17,18 @@
 	<script type="text/javascript" src="./scripts/jquery.html5storage.min.js"></script>
 	<script type="text/javascript" src="./scripts/spin.min.js"></script>
 	<script type="text/javascript" src="./scripts/fontfaceobserver.js"></script>
+	<script type="text/javascript" src="./scripts/opentype.js"></script>
     <link href='./scripts/rinkfactory.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/spectrum.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/menu.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/dd.css' rel='stylesheet' type='text/css'>
     <script>	
+		const { ipcRenderer } = require('electron');
 		const params = new URLSearchParams(window.location.search)
 		const port = params.get('port')
+		
+		require('./renderer.js')
 
         var initialColors = {centerLineColor:"#C8102E",creaseLineColor:"#C8102E",faceOffCircleColor:"#C8102E",faceOffDotColor:"#C8102E",faceOffTargetColor:"#C8102E",blueLineColor:"#0032a0",creaseFillColor:"#41b6e6",creaseStrokeColor:"#C8102E",rinkColor:"#eef0f2",trapezoidFillColor:"rgba(0,0,0,0)",trapezoidStrokeColor:"#C8102E",goalLinesColor:"#C8102E",centerCircleColor:"#0032a0",centerDotColor:"#0032a0",nzFaceOffSpotsColor:"#C8102E",ezCircle1Color:"#C8102E",hashmarks1Color:"#C8102E",ezCircle1Color:"#C8102E",ezDots1Color:"#C8102E",textColor:"#000000"};
         var defaultTexture = "ice_scratches.png";
@@ -150,6 +155,8 @@
 		};
   
 		var customFonts = [];
+
+		var fontList = ['Acme','AthleticGothic','AthleticGothicShadow','BeavertonScript','Berkshire_Swash','Cantora_One','CaxtonRoman','Chela_One','Circus','Condiment','Cookie','Courgette','Croissant_One','Damion','Engagement','RawlingsFancyBlock','Germania_One','Graduate','Grand_Hotel','Jockey_One','Kansas','Kaushan_Script','Leckerli_One','Lily_Script_One','Lobster','Lobster_Two','Metal_Mania','Miniver','Molle','New_Rocker','Norican','OldEnglish','Oleo_Script','Oleo_Script_Swash_Caps','Pacifico','Pirata_One','Playball','ProFullBlock','RichardsonFancyBlock','Rubik_One','Rum_Raisin','Satisfy','Seymour_One','spl28','TiffanyRegular','Trade_Winds','Tuscan','UnifrakturCook','UnifrakturMaguntia','Vibur','Viga','Wellfleet','Wendy_One','Yellowtail']
   </script>
 <body>
 <div class="title">
@@ -523,7 +530,8 @@
 							</tr>
 							<tr><td colspan="3" align="center">
 								<input id="customFont" type="file" name="customFont" accept=".ttf,.otf,.woff,.woff2" style="display:none;" />
-								<input type="button" class="button textOption" id="fakeFontButton" value="Choose a Local Font..." disabled/>
+								<input type="button" class="button textOption" id="fakeFontButton" value="Choose a Local Font" disabled/>
+								<input type="button" class="button textOption" id="localFontFolder" value="Refresh User Fonts" disabled/>
 								<input type="button" class="button textOption" id="uploadTheFont" value="Upload Font" style="display:none;" />
 							</td></tr>
 						</table>
@@ -533,6 +541,7 @@
 					<input type="button" class="button" id="straightenObject" value="Reset Object Rotation" style="display:none;">
 					<input type="button" class="button" id="save" value="Save Rink">
 					<input type="button" class="button" id="load" value="Load Rink">
+					<input type="button" class="button" id="openFontFolder" value="Open Local Font Folder">
 					<input type="file" id="uploadedJSON" accept=".rink" style="display:none;"/>
 					<input type="button" class="button" id="aboutRinkFactory" value="About Rink Factory">
 				</div>
@@ -762,6 +771,10 @@
 		})
 
 		let textDropdown = new MsDropdown(document.getElementById("fontTypeCombo"), {visibleRows: 6})
+
+		$("#localFontFolder").trigger("click")
+
+		sortFontDropdown()
         //$(".msDropDown").msDropDown();
     })
 
@@ -1238,117 +1251,6 @@
 			evented: false
         });
 
-		/* wordmarkTextTop = new fabric.IText('ARENA NAME',{
-			visible: false,
-			fontFamily: "Rubik One",
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextTop',
-			fill: 'black',
-			stroke: 'transparent',
-			strokeWidth: 35,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false,
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender',
-			borderColor: 'red',
-			cornerColor: 'yellow',
-			cornerSize: 12,
-			transparentCorners: false,
-			lockScalingFlip: true,
-			lockScalingX: true,
-			lockScalingY: true,
-			lockMovementX: true,
-			lockMovementY: true,
-			snapAngle: 5,
-		})
-
-		wordmarkTextTopStroke = new fabric.IText('ARENA NAME',{
-			visible: false,
-			fontFamily: "Rubik One",
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextTopStroke',
-			fill: initialColors['rinkColor'],
-			stroke: initialColors['rinkColor'],
-			strokeWidth: 4,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false,
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender'
-		})
-
-		wordmarkTextTop.setControlsVisibility({
-			mt: false,
-			mb: false,
-			ml: false,
-			mr: false,
-			tr: false,
-			tl: false,
-			br: false,
-			bl: false,
-			mtr: true
-		})
-
-		wordmarkTextBottom = new fabric.IText('ARENA NAME',{
-			visible: false,
-			selectable: false,
-			fontFamily: 'Rubik One',
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextBottom',
-			fill: 'black',
-			stroke: 'transparent',
-			strokeWidth: 35,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender'
-		})
-
-		wordmarkTextBottomStroke = new fabric.IText('ARENA NAME',{
-			visible: false,
-			selectable: false,
-			fontFamily: 'Rubik One',
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextBottomStroke',
-			fill: initialColors['rinkColor'],
-			stroke: initialColors['rinkColor'],
-			strokeWidth: 4,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender'
-		})
-
-		wordmarkTextTopStroke.rotate(270)
-		wordmarkTextTop.rotate(270)
-		wordmarkTextBottomStroke.rotate(90)
-		wordmarkTextBottom.rotate(90)
-
-		 */
-
 		below.add(centerCircleStroke)
 		below.add(centerCircle)
 		below.add(centerLineStroke)
@@ -1421,7 +1323,7 @@
                 fill: 'black',
                 stroke: initialColors['rinkColor'],
                 paintFirst: "stroke",
-                strokeWidth: 4,
+                strokeWidth: 6,
                 path: centerIcePath,
                 pathAlign: 'descender',
                 snapAngle: 5,
@@ -1440,7 +1342,7 @@
                 fill: 'black',
                 stroke: initialColors['rinkColor'],
                 paintFirst: "stroke",
-                strokeWidth: 4,
+                strokeWidth: 6,
                 path: centerIcePath,
                 pathAlign: 'descender',
                 angle: 90,
@@ -1448,6 +1350,7 @@
 			})
 
 			wordmarkGroup = new fabric.Group([], {
+				visible: false,
 				id: 'wordmarkGroup',
 				borderColor: 'red',
                 cornerColor: 'yellow',
@@ -1648,48 +1551,160 @@
 
 
 	$("#uploadTheFont").on("click", function(e) {
-		//$("#fontTypeCombo").removeClass().addClass('alegreya');
-		$.ajax({
-			type: "GET",
-			url: "http://127.0.0.1:"+port+"/customFont",
-			success: function(data) {
-				customFonts.push(data)
-				$("head").prepend("<style>@font-face {\n   font-family: '"+data.familyName+"';\n   src: url('"+data.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+data.familyName+"'; font-size: 1.1em;}\n</style>");
-				fontSources[data.familyName] = data.fontData;
-				var style = data.familyName;
-				var font_family = $("."+style).css("font-family");
-				var objects = below.getObjects('text');
-				var myfont = new FontFaceObserver(data.familyName)
-				myfont.load()
-					.then(function() {
-					// when font is loaded, use it.
-						for (x in objects) {
-							objects[x].fontFamily = data.familyName;
-						}
-						below.renderAll();
-						var optgroup = $("<optgroup class='"+data.familyName+"'>");
-						optgroup.append("<option value='"+data.familyName+"'>"+data.fontName+"</option>")
-						$("#fontTypeCombo").append(optgroup)
-						$("#fontTypeCombo").children().remove("optgroup[class='alegreya']");
-						//optgroup = $("<optgroup class='alegreya'>");
-						//optgroup.append("<option value='custom'>Custom Font</option>")
-						//$("#fontTypeCombo").append(optgroup)
-						$("#fontTypeCombo").val(data.familyName)
-						$("#fontTypeCombo").removeClass().addClass(data.familyName);
-						$("#fontTypeCombo").change()
-					}).catch(function(e) {
-						console.log(e)
-						alert('font loading failed ' + data.familyName);
-					});
-				
-				//wordmarkText.fontFamily = font_family;
-				//wordmarkTextStroke1.fontFamily = font_family;
-				//wordmarkTextStroke2.fontFamily = font_family;
-				//logoCanvas.renderAll();
-				//$(this).removeClass().addClass(style);
-			}
-		})
+		ipcRenderer.send("upload-font", null)
 	})
+
+	ipcRenderer.on('add-font-response', (event, response) => {
+		addFont(response)
+	})
+
+	$("#openFontFolder").on("click",function(e) {
+		ipcRenderer.send('open-folder', "fonts")
+	})
+
+	$("#localFontFolder").on("click",function() {
+        //showOverlay("Loading User Fonts...")
+		ipcRenderer.send('local-font-folder', null)
+	})
+
+	ipcRenderer.on('local-font-folder-response', (event, data) => {
+        let fontErrors = []
+		if (data.result == 'success') {
+            let fontDropdown = document.getElementById("fontTypeCombo").msDropdown;
+
+			for (result of data.fonts) {
+                if (result.status == "ok") {
+                    $("head").prepend("<style>@font-face {\n   font-family: '"+result.familyName+"';\n   src: url('"+result.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+result.familyName+"';}\n</style>");
+					fontList.push(result.fontName)
+					var thumb = null;
+					const name = result.fontName
+					const value = result.familyName
+					opentype.load(result.fontPath, (err,font) => {
+						if (err || !font) {
+							console.log(err)
+							return;
+						}
+						
+						var thumbText = font.getPath("ABC 123", 0, 0, 96)
+						var outPath = thumbText.toPathData(5)
+
+						thumbText = new fabric.Path(outPath, {
+							left: 0,
+							originX: 'center',
+							originY: 'center',
+							centeredScaling: true,
+							centeredRotation: true,
+							fill: 'black',
+							height: '80px'
+						})
+
+						thumb = thumbText.toDataURL()
+
+						if (findIndexByText(fontDropdown, name) == -1) {
+							fontDropdown.add({text:name, value:value, image:thumb},0)
+						}
+
+						sortFontDropdown()
+					})
+				} else {
+					fontErrors.push(result.fontName)
+				}
+			}
+            //fontDropdown.selectedIndex = 0
+		}
+		//hideOverlay()
+		if (fontErrors.length > 0) {
+			var message = "The following fonts failed to import, and have been removed from your user fonts folder:\r\n\r\n"
+			for (font of fontErrors) {
+				message += font+"\r\n"
+			}
+			alert(message)
+		}
+	})
+
+	function addFont(data) {
+        if (data.result == "error") {
+            alert("An error occurred:\r\n\r\n"+data.message)
+            return false;
+        } else if (data.status == "error") {
+            alert("The font '"+data.fontName+"' could not be loaded.")
+            return false;
+        } else {
+            if (fontList.includes(data.fontName)) {
+                // switch to the already known font
+                const fontDropdown= document.getElementById("fontTypeCombo").msDropdown;
+                var foo = findIndexByText(fontDropdown, data.fontName)
+                fontDropdown.selectedIndex = foo
+                fontDropdown.refresh()
+            } else {
+                // add the font to the app
+                $("head").prepend("<style>@font-face {\n   font-family: '"+data.familyName+"';\n   src: url('"+data.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+data.familyName+"';}\n</style>");
+                fontList.push(data.fontName)
+                // switch to the font
+                var topfont = new FontFaceObserver(data.familyName)
+                topfont.load()
+                .then(function() {
+					let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+					g.getObjects().forEach(function(o) {
+						o.set('fontFamily',data.familyName)
+					})
+                    below.renderAll()
+
+                    var tmpTxt = new fabric.IText("ABC 123",{
+                        fontFamily: data.familyName,
+                        fontSize: 96,
+                        originX: 'center',
+                        originY: 'center',
+                        textAlign: 'center',
+                        fill: 'black',
+                        stroke: 'black',
+                        originX: 'center',
+                        originY: 'center',
+                    })
+
+                    refreshDropdown(data,tmpTxt)
+                })
+            }
+        }
+    }
+
+	function refreshDropdown(data,thumb) {
+		data.thumb = thumb.toDataURL()
+		customFonts.push(data)
+
+		const fontDropdown= document.getElementById("fontTypeCombo").msDropdown;
+    
+		const displayName = (data.fontStyle == "Regular") ? data.fontName : data.fontName +" "+data.fontStyle
+
+		const idx = findIndexByText(fontDropdown, displayName)
+
+		if (idx == -1) {
+			fontDropdown.add({text:displayName, value:data.fontName, image:data.thumb},0)
+			fontDropdown.selectedIndex = 0;
+		} else {
+            fontDropdown.selectedIndex = idx;
+		}
+
+		sortFontDropdown()
+	}
+
+    function sortFontDropdown() {
+        const selectedFont = $("#fontTypeCombo").val()
+
+		$("#fontTypeCombo").html($('#fontTypeCombo option').sort(function(x, y) {
+         	return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+		}))
+		$("#fontTypeCombo").val(selectedFont)
+    }
+
+	function findIndexByText(dropdown, text) {
+		for (child of dropdown.children) {
+			if (child.text == text) {
+				return child.index
+			}
+		}
+		return -1
+	}
 
 	$("#textColor").each(function() {
 		var color = $(this).attr('id');
@@ -2512,10 +2527,9 @@
 			}
 		})
 		
-		var objects = below.getObjects('text').forEach(function (o) {
-			o.visible = state
-			below.renderAll()
-		})
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		g.visible = state
+		below.renderAll()
 	})
 
 	$("#textMatchCheck").on("click", function() {
