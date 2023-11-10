@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, Menu, shell } = require('electron')
+const { app, BrowserWindow, dialog, Menu, shell, ipcMain } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
@@ -10,98 +10,32 @@ const ttfInfo = require('ttfinfo')
 const url = require('url');
 const archiver = require('archiver');
 const font2base64 = require("node-font2base64")
+const fontname = require("fontname")
+const Store = require("electron-store")
+const chokidar = require("chokidar")
 
 const app2 = express()
 const tempDir = os.tmpdir()
 const isMac = process.platform === 'darwin'
+const store = new Store();
+const userFontsFolder = path.join(app.getPath('userData'),"fonts")
 
-const template = [
-// { role: 'appMenu' }
-...(isMac ? [{
-	label: app.name,
-	submenu: [
-	{ role: 'about' },
-	{ type: 'separator' },
-	{ role: 'services' },
-	{ type: 'separator' },
-	{ role: 'hide' },
-	{ role: 'hideOthers' },
-	{ role: 'unhide' },
-	{ type: 'separator' },
-	{ role: 'quit' }
-	]
-}] : []),
-// { role: 'fileMenu' }
-{
-	label: 'File',
-	submenu: [
-	isMac ? { role: 'close' } : { role: 'quit' }
-	]
-},
-// { role: 'viewMenu' }
-{
-	label: 'View',
-	submenu: [
-	{ role: 'reload' },
-	{ role: 'forceReload' },
-	{ role: 'toggleDevTools' },
-	{ type: 'separator' },
-	{ role: 'resetZoom' },
-	{ role: 'zoomIn' },
-	{ role: 'zoomOut' },
-	{ type: 'separator' },
-	{ role: 'togglefullscreen' }
-	]
-},
-// { role: 'windowMenu' }
-{
-	label: 'Window',
-	submenu: [
-	{ role: 'minimize' },
-	{ role: 'zoom' },
-	...(isMac ? [
-		{ type: 'separator' },
-		{ role: 'front' },
-		{ type: 'separator' },
-		{ role: 'window' }
-	] : [
-		{ role: 'close' }
-	])
-	]
-},
-{
-	role: 'help',
-	submenu: [
-	{
-		label: 'About Franchise Hockey Manager',
-		click: async () => {    
-		await shell.openExternal('https://www.ootpdevelopments.com/franchise-hockey-manager-home/')
-		}
-	},
-	{
-		label: 'About Node.js',
-		click: async () => {    
-		await shell.openExternal('https://nodejs.org/en/about/')
-		}
-	},
-	{
-		label: 'About Electron',
-		click: async () => {
-		await shell.openExternal('https://electronjs.org')
-		}
-	},
-	{
-		label: 'View project on GitHub',
-		click: async () => {
-		await shell.openExternal('https://github.com/eriqjaffe/FHM-Rink-Factory')
-		}
-	}
-	]
+if (!fs.existsSync(userFontsFolder)) {
+    fs.mkdirSync(userFontsFolder);
 }
-]
 
-const menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu)
+if (!fs.existsSync(userFontsFolder+"/README.txt")) {
+	var writeStream = fs.createWriteStream(userFontsFolder+"/README.txt");
+	writeStream.write("TTF and OTF fonts dropped into this folder will automatically be imported into the Rink Factory!\r\n\r\nFonts removed from this folder will still be available in the Rink Factory until you quit the app, and they will not reload after that.")
+	writeStream.end()
+}
+
+const watcher = chokidar.watch(userFontsFolder, {
+	ignored: /(^|[\/\\])\../, // ignore dotfiles
+	persistent: true
+});
+
+watcher.on('ready', () => {})
 
 const server = app2.listen(0, () => {
 	console.log(`Server running on port ${server.address().port}`);
@@ -155,6 +89,110 @@ app2.get("/uploadImage", (req, res) => {
 	  }).catch(err => {
 		console.log(err)
 	  })
+})
+
+ipcMain.on('upload-font', (event, arg) => {
+    let json = {}
+    const options = {
+		defaultPath: store.get("uploadFontPath", app.getPath('desktop')),
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Fonts', extensions: ['ttf', 'otf'] }
+		]
+	}
+	dialog.showOpenDialog(null, options).then(result => {
+		if(!result.canceled) {
+			store.set("uploadFontPath", path.dirname(result.filePaths[0]))
+			const filePath = path.join(userFontsFolder,path.basename(result.filePaths[0]))
+			try {
+				const fontMeta = fontname.parse(fs.readFileSync(result.filePaths[0]))[0];
+				var ext = getExtension(result.filePaths[0])
+				var fontPath = url.pathToFileURL(result.filePaths[0])
+				json = {
+					"status": "ok",
+					"fontName": fontMeta.fullName,
+					"fontStyle": fontMeta.fontSubfamily,
+					"familyName": fontMeta.fontFamily,
+					"fontFormat": ext,
+					"fontMimetype": 'font/' + ext,
+					"fontData": fontPath.href,
+					"fontPath": filePath
+				};
+				fs.copyFileSync(result.filePaths[0], filePath)
+				event.sender.send('add-font-response', json)
+			} catch (err) {
+				json = {
+					"status": "error",
+					"fontName": path.basename(result.filePaths[0]),
+					"fontPath": result.filePaths[0],
+					"message": err
+				}
+				event.sender.send('add-font-response', json)
+				//fs.unlinkSync(result.filePaths[0])
+			}
+		} else {
+            json.status = "cancelled"
+			event.sender.send('add-font-response', json)
+		}
+	}).catch(err => {
+		console.log(err)
+		res.json({
+			"status":"error",
+			"message": err
+		})
+		res.end()
+	})
+})
+
+
+ipcMain.on('open-folder', (event, arg) => {
+	switch (arg) {
+		case "fonts":
+			shell.openPath(userFontsFolder)
+			break;
+	}
+})
+
+ipcMain.on('local-font-folder', (event, arg) => {
+	const jsonObj = {}
+	const jsonArr = []
+
+	filenames = fs.readdirSync(userFontsFolder);
+	for (i=0; i<filenames.length; i++) {
+        if (path.extname(filenames[i]).toLowerCase() == ".ttf" || path.extname(filenames[i]).toLowerCase() == ".otf") {
+			const filePath = path.join(userFontsFolder,filenames[i])
+			try {
+				const fontMeta = fontname.parse(fs.readFileSync(filePath))[0];
+				var ext = getExtension(filePath)
+				const dataUrl = font2base64.encodeToDataUrlSync(filePath)
+				var fontPath = url.pathToFileURL(filePath)
+				var json = {
+					"status": "ok",
+					"fontName": fontMeta.fullName,
+					"fontStyle": fontMeta.fontSubfamily,
+					"familyName": fontMeta.fontFamily,
+					"fontFormat": ext,
+					"fontMimetype": 'font/' + ext,
+					"fontData": fontPath.href,
+					"fontBase64": dataUrl,
+					"fontPath": filePath,
+				};
+				jsonArr.push(json)
+			} catch (err) {
+				const json = {
+					"status": "error",
+					"fontName": path.basename(filePath),
+					"fontPath": filePath,
+					"message": err
+				}
+				jsonArr.push(json)
+				//fs.unlinkSync(filePath)
+			}
+		}
+	}
+	jsonObj.result = "success"
+	jsonObj.fonts = jsonArr
+	event.sender.send('local-font-folder-response', jsonObj)
 })
 
 app2.get("/customFont", (req, res) => {
@@ -443,9 +481,107 @@ function createWindow () {
       height: 760,
       icon: (__dirname + '/images/zamboni.png'),
       webPreferences: {
+	      nodeIntegration: true,
+          contextIsolation: false
         //preload: path.join(__dirname, 'preload.js')
       }
     })
+
+	watcher.on('add', (path, stats) => {
+		mainWindow.webContents.send('updateFonts','click')
+	})
+
+	const template = [
+		// { role: 'appMenu' }
+		...(isMac ? [{
+			label: app.name,
+			submenu: [
+			{ role: 'about' },
+			{ type: 'separator' },
+			{ role: 'services' },
+			{ type: 'separator' },
+			{ role: 'hide' },
+			{ role: 'hideOthers' },
+			{ role: 'unhide' },
+			{ type: 'separator' },
+			{ role: 'quit' }
+			]
+		}] : []),
+		// { role: 'fileMenu' }
+		{
+			label: 'File',
+			submenu: [
+			isMac ? { role: 'close' } : { role: 'quit' }
+			]
+		},
+		// { role: 'viewMenu' }
+		{
+			label: 'View',
+			submenu: [
+			{ role: 'reload' },
+			{ role: 'forceReload' },
+			{ role: 'toggleDevTools' },
+			{ type: 'separator' },
+			{ role: 'resetZoom' },
+			{ role: 'zoomIn' },
+			{ role: 'zoomOut' },
+			{ type: 'separator' },
+			{ role: 'togglefullscreen' }
+			]
+		},
+		// { role: 'windowMenu' }
+		{
+			label: 'Window',
+			submenu: [
+			{ role: 'minimize' },
+			{ role: 'zoom' },
+			...(isMac ? [
+				{ type: 'separator' },
+				{ role: 'front' },
+				{ type: 'separator' },
+				{ role: 'window' }
+			] : [
+				{ role: 'close' }
+			])
+			]
+		},
+		{
+			role: 'help',
+			submenu: [
+				{
+					click: () => mainWindow.webContents.send('about','click'),
+						label: 'About the FHM Rink Factory',
+				},
+				{
+					label: 'About Franchise Hockey Manager',
+					click: async () => {    
+					await shell.openExternal('https://www.ootpdevelopments.com/franchise-hockey-manager-home/')
+					}
+				},
+				{
+					label: 'About Node.js',
+					click: async () => {    
+					await shell.openExternal('https://nodejs.org/en/about/')
+					}
+				},
+				{
+					label: 'About Electron',
+					click: async () => {
+					await shell.openExternal('https://electronjs.org')
+					}
+				},
+				{
+					label: 'View project on GitHub',
+					click: async () => {
+					await shell.openExternal('https://github.com/eriqjaffe/FHM-Rink-Factory')
+					}
+				}
+			]
+		}
+	]
+		
+	const menu = Menu.buildFromTemplate(template)
+	Menu.setApplicationMenu(menu)
   
     mainWindow.loadURL(`file://${__dirname}/index.html?port=${server.address().port}`);
 
