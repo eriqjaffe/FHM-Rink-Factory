@@ -2,19 +2,16 @@ const { app, BrowserWindow, dialog, Menu, shell, ipcMain } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
-const express = require('express')
 const Jimp = require('jimp')
-const openExplorer = require('open-file-explorer');
 const imagemagickCli = require('imagemagick-cli');
-const ttfInfo = require('ttfinfo')
 const url = require('url');
 const archiver = require('archiver');
 const font2base64 = require("node-font2base64")
 const fontname = require("fontname")
 const Store = require("electron-store")
 const chokidar = require("chokidar")
+const increment = require('add-filename-increment');
 
-const app2 = express()
 const tempDir = os.tmpdir()
 const isMac = process.platform === 'darwin'
 const store = new Store();
@@ -36,12 +33,6 @@ const watcher = chokidar.watch(userFontsFolder, {
 });
 
 watcher.on('ready', () => {})
-
-const server = app2.listen(0, () => {
-	console.log(`Server running on port ${server.address().port}`);
-});
-
-app2.use(express.urlencoded({limit: '50mb', extended: true, parameterLimit: 50000}));
 
 ipcMain.on('upload-font', (event, arg) => {
     let json = {}
@@ -118,6 +109,7 @@ ipcMain.on('upload-image', (event, arg) => {
 						json.path = result.filePaths[0]
 						json.filename = path.basename(result.filePaths[0])
 						json.image = ret
+						json.path = result.filePaths[0]
 						event.sender.send('add-image-response', json)
 					})
 				}
@@ -183,122 +175,241 @@ ipcMain.on('local-font-folder', (event, arg) => {
 	event.sender.send('local-font-folder-response', jsonObj)
 })
 
-app2.post("/removeBorder", (req, res) => {
-	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
-	var fuzz = parseInt(req.body.fuzz);
+ipcMain.on('remove-border', (event, arg) => {
+	let imgdata = arg.imgdata
+	let fuzz = parseInt(arg.fuzz)
+	let pictureName = arg.pictureName
+	let canvas = arg.canvas
+	let imgLeft = arg.imgLeft
+	let imgTop = arg.imgTop
+	let path = arg.path
+	let scaleX = arg.scaleX
+	let scaleY = arg.scaleY
+	let json = {}
+	let buffer = Buffer.from(imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	
 	Jimp.read(buffer, (err, image) => {
 		if (err) {
 			console.log(err);
 		} else {
-			image.write(tempDir+"/temp.png");
-			imagemagickCli.exec('magick convert -trim -fuzz '+fuzz+'% '+tempDir+'/temp.png '+tempDir+'/temp.png').then(({ stdout, stderr }) => {
-				Jimp.read(tempDir+"/temp.png", (err, image) => {
-					if (err) {
-						console.log(err);
-					} else {
-						image.getBase64(Jimp.AUTO, (err, ret) => {
-							res.end(ret);
-						})
-					}
-				})
-			})
-		}
-	})
-})
-
-app2.post("/replaceColor", (req, res) => {
-	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
-	var x = parseInt(req.body.x);
-	var y = parseInt(req.body.y);
-	var color = req.body.color;
-	var newcolor = req.body.newcolor;
-	var action = req.body.action;
-	var fuzz = parseInt(req.body.fuzz);
-	var cmdString;
-	Jimp.read(buffer, (err, image) => {
-		if (err) {
-			console.log(err);
-		} else {
-			image.write(tempDir+"/temp.png");
-			if (action == "replaceColorRange") {
-				cmdString = 'magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -fill '+newcolor+' -draw "color '+x+','+y+' floodfill" '+tempDir+'/temp.png';		
-			} else {
-				cmdString = 'magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -fill '+newcolor+' -opaque '+color+' '+tempDir+'/temp.png';	
-			}
-			imagemagickCli.exec(cmdString).then(({ stdout, stderr }) => {
-				Jimp.read(tempDir+"/temp.png", (err, image) => {
-					if (err) {
-						console.log(err);
-					} else {
-						image.getBase64(Jimp.AUTO, (err, ret) => {
-							res.end(ret);
-						})
-					}
-				})
-			})
-		}
-	})
-})
-
-app2.post("/removeColorRange", (req, res) => {
-	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
-	var x = parseInt(req.body.x);
-	var y = parseInt(req.body.y);
-	var fuzz = parseInt(req.body.fuzz);
-	Jimp.read(buffer, (err, image) => {
-		if (err) {
-			console.log(err);
-		} else {
-			image.write(tempDir+"/temp.png", (err) => {
-				imagemagickCli.exec('magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -fill none -draw "color '+x+','+y+' floodfill" '+tempDir+'/temp.png')
-				.then(({ stdout, stderr }) => {
+			try {
+				image.write(tempDir+"/temp.png");
+				imagemagickCli.exec('magick convert -trim -fuzz '+fuzz+'% '+tempDir+'/temp.png '+tempDir+'/temp.png').then(({ stdout, stderr }) => {
 					Jimp.read(tempDir+"/temp.png", (err, image) => {
 						if (err) {
+							json.status = 'error'
+							json.message = err
 							console.log(err);
+							event.sender.send('imagemagick-response', json)
 						} else {
 							image.getBase64(Jimp.AUTO, (err, ret) => {
-								res.end(ret);
+								json.status = 'success'
+								json.data = ret
+								json.canvas = canvas
+								json.pTop = imgTop
+								json.pLeft = imgLeft
+								json.pictureName = pictureName
+								json.path = path
+								json.scaleX = scaleX
+								json.scaleY = scaleY
+								event.sender.send('imagemagick-response', json)
 							})
 						}
 					})
 				})
+			} catch (error) {
+				json.status = 'error'
+				json.message = "An error occurred - please make sure ImageMagick is installed"
+				console.log(error);
+				event.sender.send('imagemagick-response', json)
+			}
+		}
+	})
+})
+
+ipcMain.on('remove-color-range', (event, arg) => {
+	let buffer = Buffer.from(arg.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	let x = parseInt(arg.x);
+	let y = parseInt(arg.y);
+	let imgTop = arg.pTop
+	let imgLeft = arg.pLeft
+	let pScaleX = arg.pScaleX
+	let pScaleY = arg.pScaleY
+	let pictureName = arg.pictureName
+	let fuzz = parseInt(arg.fuzz);
+	let path = arg.path
+	let json = {}
+	Jimp.read(buffer, (err, image) => {
+		if (err) {
+			json.status = 'error'
+			json.message = "An error occurred - please make sure ImageMagick is installed"
+			console.log(err);
+			event.sender.send('imagemagick-response', json)
+		} else {
+			image.write(tempDir+"/temp.png", (err) => {
+				try {
+					imagemagickCli.exec('magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -fill none -draw "color '+x+','+y+' floodfill" '+tempDir+'/temp.png')
+					.then(({ stdout, stderr }) => {
+						Jimp.read(tempDir+"/temp.png", (err, image) => {
+							if (err) {
+								json.status = 'error'
+								json.message = "An error occurred - please make sure ImageMagick is installed"
+								console.log(err);
+								event.sender.send('imagemagick-response', json)
+							} else {
+								image.getBase64(Jimp.AUTO, (err, ret) => {
+									json.status = 'success'
+									json.data = ret
+									json.x = x
+									json.y = y
+									json.pTop = imgTop
+									json.pLeft = imgLeft
+									json.scaleX = pScaleX
+									json.scaleY = pScaleY
+									json.pictureName = pictureName
+									json.path = path
+									event.sender.send('imagemagick-response', json)
+								})
+							}
+						})
+					})
+				} catch (error) {
+					json.status = 'error'
+					json.message = "An error occurred - please make sure ImageMagick is installed"
+					console.log(err);
+					event.sender.send('imagemagick-response', json)
+				}
+				
 			})
 		}
  	})
 })
 
-app2.post('/removeAllColor', (req, res) => {
-	var buffer = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
-	var x = parseInt(req.body.x);
-	var y = parseInt(req.body.y);
-	var color = req.body.color;
-	var fuzz = parseInt(req.body.fuzz);
+ipcMain.on('remove-all-color', (event, arg) => {
+	let buffer = Buffer.from(arg.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	let x = parseInt(arg.x);
+	let y = parseInt(arg.y);
+	let pTop = arg.pTop
+	let pLeft = arg.pLeft
+	let pScaleX = arg.pScaleX
+	let pScaleY = arg.pScaleY
+	let pictureName = arg.pictureName
+	let fuzz = parseInt(arg.fuzz);
+	let color = arg.color
+	let path = arg.path
+	let json = {}
 	Jimp.read(buffer, (err, image) => {
 		if (err) {
-			console.log(err);		
+			json.status = 'error'
+			json.message = err
+			console.log(err);
+			event.sender.send('imagemagick-response', json)
 		} else {
 			image.write(tempDir+"/temp.png", (err) => {
-				var cmdString = 'magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -transparent '+color+' '+tempDir+'/temp.png';
+				try {
+					imagemagickCli.exec('magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -transparent '+color+' '+tempDir+'/temp.png')
+					.then(({ stdout, stderr }) => {
+						Jimp.read(tempDir+"/temp.png", (err, image) => {
+							if (err) {
+								json.status = 'error'
+								json.message = err
+								console.log(err);
+								event.sender.send('imagemagick-response', json)
+							} else {
+								image.getBase64(Jimp.AUTO, (err, ret) => {
+									json.status = 'success'
+									json.data = ret
+									json.x = x
+									json.y = y
+									json.pTop = pTop
+									json.pLeft = pLeft
+									json.scaleX = pScaleX
+									json.scaleY = pScaleY
+									json.pictureName = pictureName
+									json.path = path
+									event.sender.send('imagemagick-response', json)
+								})
+							}
+						})
+					})
+				} catch (error) {
+					json.status = 'error'
+					json.message = "An error occurred - please make sure ImageMagick is installed"
+					console.log(err);
+					event.sender.send('imagemagick-response', json)
+				}
+				
+			})
+		}
+ 	})
+})
+
+ipcMain.on('replace-color', (event, arg) => {
+	let imgdata = arg.imgdata
+	let pLeft = arg.pLeft
+	let pTop = arg.pTop
+	let pScaleX = arg.pScaleX
+	let pScaleY = arg.pScaleY
+	let action = arg.action
+	let color = arg.color
+	let newcolor = arg.newcolor
+	let fuzz = arg.fuzz
+	let pictureName = arg.pictureName
+	let x = arg.x
+	let y = arg.y
+	let path = arg.path
+	let json = {}
+	var buffer = Buffer.from(imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	Jimp.read(buffer, (err, image) => {
+		if (err) {
+			json.status = "error"
+			json.message = err
+			event.sender.send('imagemagick-response', json)
+		} else {
+			image.write(tempDir+"/temp.png");
+      if (action == "replaceColorRange") {
+				cmdString = 'magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -fill '+newcolor+' -draw "color '+x+','+y+' floodfill" '+tempDir+'/temp.png';		
+			} else {
+				cmdString = 'magick convert '+tempDir+'/temp.png -fuzz '+fuzz+'% -fill '+newcolor+' -opaque '+color+' '+tempDir+'/temp.png';	
+			}
+			try {
 				imagemagickCli.exec(cmdString).then(({ stdout, stderr }) => {
 					Jimp.read(tempDir+"/temp.png", (err, image) => {
 						if (err) {
-							console.log(err);
+							json.status = "error"
+							json.message = err
+							event.sender.send('imagemagick-response', json)
 						} else {
 							image.getBase64(Jimp.AUTO, (err, ret) => {
-								res.end(ret);
+								json.status = "success"
+								json.data = ret
+								json.pTop = pTop
+								json.pLeft = pLeft
+								json.x = pScaleX
+								json.y = pScaleY
+								json.pictureName = pictureName
+								json.scaleX = pScaleX
+								json.scaleY = pScaleY
+								json.path = path
+								event.sender.send('imagemagick-response', json)
 							})
 						}
 					})
 				})
-			})
+			} catch (error) {
+				json.status = 'error'
+				json.message = "An error occurred - please make sure ImageMagick is installed"
+				console.log(err);
+				event.sender.send('remove-border-response', json)
+			}
 		}
 	})
-});
+})
 
-app2.post('/saveRink', (req, res) => {
-  	const images = Buffer.from(req.body.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
-  	const staticLines = Buffer.from(req.body.rinkLines.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
-	const json = Buffer.from(req.body.canvas, 'utf-8')
+ipcMain.on('save-rink', (event, arg) => {
+	const images = Buffer.from(arg.imgdata.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+  	const staticLines = Buffer.from(arg.rinkLines.replace(/^data:image\/(png|gif|jpeg);base64,/,''), 'base64');
+	const json = Buffer.from(arg.canvas, 'utf-8')
 
 	var scratches0 = fs.readFileSync(__dirname + "/images/boards2.png", {encoding: 'base64'});
 	var scratchLayer0 = Buffer.from(scratches0, 'base64');
@@ -309,43 +420,44 @@ app2.post('/saveRink', (req, res) => {
 	var scratches3 = fs.readFileSync(__dirname + "/images/overlay_3.png", {encoding: 'base64'});
 	var scratchLayer3 = Buffer.from(scratches3, 'base64');
 
-	const output = fs.createWriteStream(tempDir + '/'+req.body.name+'.zip');
+	const output = fs.createWriteStream(tempDir + '/'+arg.name+'.zip');
 
 	output.on('close', function() {
-		var data = fs.readFileSync(tempDir + '/'+req.body.name+'.zip');
+		var data = fs.readFileSync(tempDir + '/'+arg.name+'.zip');
 		var saveOptions = {
-		  defaultPath: app.getPath('downloads') + '/' + req.body.name+'.zip',
+			defaultPath: increment(store.get("downloadPath", app.getPath('downloads')) + '/' + arg.name+'.zip',{fs: true})
 		}
 		dialog.showSaveDialog(null, saveOptions).then((result) => { 
 		  if (!result.canceled) {
+			store.set("downloadPath", path.dirname(result.filePath))
 			fs.writeFile(result.filePath, data, function(err) {
 			  if (err) {
-				res.end("success")
-				fs.unlink(tempDir + '/'+req.body.name+'.zip', (err) => {
+				event.sender.send('save-rink-response', arg)
+				fs.unlink(tempDir + '/'+arg.name+'.zip', (err) => {
 				  if (err) {
-					console.error(err)
+					event.sender.send('save-rink-response', arg)
 					return
 				  }
 				})
 				res.end("success")
 			  } else {
-				fs.unlink(tempDir + '/'+req.body.name+'.zip', (err) => {
+				fs.unlink(tempDir + '/'+arg.name+'.zip', (err) => {
 				  if (err) {
-					console.error(err)
+					event.sender.send('save-rink-response', arg)
 					return
 				  }
 				})
-				res.end("success")
+				event.sender.send('save-rink-response', arg)
 			  };
 			})
 		  } else {
-			fs.unlink(tempDir + '/'+req.body.name+'.zip', (err) => {
+			fs.unlink(tempDir + '/'+arg.name+'.zip', (err) => {
 			  if (err) {
 				console.error(err)
 				return
 			  }
 			})
-			res.end("success");
+			event.sender.send('save-rink-response', arg)
 		  }
 		})
 	});
@@ -373,29 +485,16 @@ app2.post('/saveRink', (req, res) => {
 				createFile (scratchLayer3)
 				.then(function(response) {
 					const buff3 = response;
-					archive.append(buff0, {name: req.body.name+"_0.png"})
-					archive.append(buff1, {name: req.body.name+"_1.png"})
-					archive.append(buff2, {name: req.body.name+"_2.png"})
-					archive.append(buff3, {name: req.body.name+"_3.png"})
-					archive.append(json, {name: req.body.name+".rink"})
+					archive.append(buff0, {name: arg.name+"_0.png"})
+					archive.append(buff1, {name: arg.name+"_1.png"})
+					archive.append(buff2, {name: arg.name+"_2.png"})
+					archive.append(buff3, {name: arg.name+"_3.png"})
+					archive.append(json, {name: arg.name+".rink"})
 					archive.finalize()
 				}) 
 			}) 
 		}) 
 	})
-
- 	
-
-	
-
-	
-
-	//archive.append(buff1, {name: req.body.name+"_0png"})
-	
-
-	//createFile (scratchLayer1, req.body.name+"_1.png")
-	//createFile (scratchLayer2, req.body.name+"_2.png")
-	//createFile (scratchLayer3, req.body.name+"_3.png")
 
 	async function createFile(overlay) {
 		let base = await Jimp.read(images)
@@ -407,20 +506,7 @@ app2.post('/saveRink', (req, res) => {
 		let buffer = await base.getBufferAsync(Jimp.MIME_PNG)
 		return buffer
 	}
-	/* async function createFile(overlay, filename) {
-		const base = await Jimp.read(images)
-		const lines = await Jimp.read(staticLines)
-		const ice = await Jimp.read(overlay)
-		await base.resize(2880, 1344, Jimp.RESIZE_BEZIER).quality(100)
-		await base.composite(lines, 0, 0)
-		await base.composite(ice, 0, 0)
-		await base.writeAsync(result.filePaths[0] +"/"  +filename)
-		if (filename.substr(filename.length - 5) == "3.png") {
-		  openExplorer(result.filePaths[0])
-		  res.end("success")
-		}
-	} */
-});
+})
 
 function getExtension(filename) {
 	var ext = path.extname(filename||'').split('.');
@@ -536,7 +622,7 @@ function createWindow () {
 	const menu = Menu.buildFromTemplate(template)
 	Menu.setApplicationMenu(menu)
   
-    mainWindow.loadURL(`file://${__dirname}/index.html?port=${server.address().port}`);
+    mainWindow.loadURL(`file://${__dirname}/index.html`);
 
 	mainWindow.webContents.on('new-window', function(e, url) {
 		e.preventDefault();
