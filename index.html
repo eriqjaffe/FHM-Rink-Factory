@@ -542,7 +542,6 @@
 					<input type="button" class="button" id="save" value="Save Rink">
 					<input type="button" class="button" id="load" value="Load Rink">
 					<input type="button" class="button" id="openFontFolder" value="Open Local Font Folder">
-					<input type="file" id="uploadedJSON" accept=".rink" style="display:none;"/>
 					<input type="button" class="button" id="aboutRinkFactory" value="About Rink Factory">
 				</div>
             </div>
@@ -2855,17 +2854,18 @@
 	})
 
 	$("#load").on("click",function(e) {
-		$("#uploadedJSON").click()
+		$("#overlay").css("display","inline-block");	
+		ipcRenderer.send('load-rink', null)
 	})
 
-	$("#uploadedJSON").on("change",function(e) {
-		var fileReader = new FileReader();
-		fileReader.onload = function () {
+	ipcRenderer.on('load-rink-response', (event, data) => {
+		console.log(data.result)
+		if (data.result == "success") {
+			customFonts.splice(0, customFonts.length)
+			const tmp = JSON.parse(data.json)
 			customFonts.splice(0, customFonts.length)
 			below.clear()
-			var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
-			const tmp = JSON.parse(data)
-			console.log(tmp)
+			//var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
 			const newBG = tmp.background;
 			if (tmp.customFonts.length > 0) {
 				for (x in tmp.customFonts) {
@@ -2886,7 +2886,7 @@
 			$("#startYear").val(tmp.start)
 			$("#endYear").val(tmp.end)
 			var wordmarkVisible = null;
-			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
+			below.loadFromJSON(tmp, below.renderAll.bind(below), function(o, object) {
 				
 				below.add(object)
 				if (object.type == "text") {
@@ -3005,14 +3005,15 @@
 				
 			});
 
-			console.log(newBG)
-
 			$("#rinkColor").spectrum("set", newBG)
 			initializeOverlay()
 			below.renderAll.bind(below)
-		}	
-    	fileReader.readAsText($(this).prop('files')[0]);
-		
+		}
+		$("#overlay").css("display","none");	
+	})
+
+	ipcRenderer.on('hide-overlay', (event, arg) => {
+		$("#overlay").css("display","none");
 	})
 
 	$("#flipTopText").on("click",function(e) {

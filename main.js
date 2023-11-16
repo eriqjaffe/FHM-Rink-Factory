@@ -11,6 +11,7 @@ const fontname = require("fontname")
 const Store = require("electron-store")
 const chokidar = require("chokidar")
 const increment = require('add-filename-increment');
+const admzip = require('adm-zip');
 
 const tempDir = os.tmpdir()
 const isMac = process.platform === 'darwin'
@@ -506,6 +507,60 @@ ipcMain.on('save-rink', (event, arg) => {
 		let buffer = await base.getBufferAsync(Jimp.MIME_PNG)
 		return buffer
 	}
+})
+
+ipcMain.on('load-rink', (event, arg) => {
+	let json = {}
+	const options = {
+		defaultPath: store.get("uploadRinkPath", app.getPath('downloads')),
+		properties: ['openFile'],
+		filters: [
+			{ name: 'Rink Files', extensions: ['rink', 'zip'] }
+		]
+	}
+	dialog.showOpenDialog(null, options).then(result => {
+		if(!result.canceled) {
+			store.set("uploadRinkPath", path.dirname(result.filePaths[0]))
+			switch (getExtension(result.filePaths[0])) {
+				case "uni":
+					json.result = "success",
+					json.json = JSON.stringify(JSON.parse(fs.readFileSync(result.filePaths[0]).toString()))
+					event.sender.send('load-rink-response', json)
+					break;
+				case "zip":
+					var uniFile = null;
+					var zip = new admzip(result.filePaths[0]);
+					var zipEntries = zip.getEntries()
+					zipEntries.forEach(function (zipEntry) {
+						if (zipEntry.entryName.slice(-5).toLowerCase() == '.rink') {
+							uniFile = zipEntry
+						}
+					});
+					if (uniFile != null) {
+						json.result = "success"
+						json.json = JSON.stringify(JSON.parse(uniFile.getData().toString("utf8")))
+						event.sender.send('load-rink-response', json)
+					} else {
+						json.result = "error",
+						json.message = "No valid uniform file was found in "+path.basename(result.filePaths[0])
+						event.sender.send('load-rink-response', json)
+					}
+					break;
+				default:
+					json.result = "error",
+					json.message = "Invalid file type: "+path.basename(result.filePaths[0])
+					event.sender.send('load-rink-response', json)
+			}
+			event.sender.send('hide-overlay', null)
+		} else {
+			event.sender.send('hide-overlay', null)
+		}
+	}).catch(err => {
+		json.result = "error",
+		json.message = err
+		event.sender.send('load-rink-response', json)
+		console.log(err)
+	})
 })
 
 function getExtension(filename) {
