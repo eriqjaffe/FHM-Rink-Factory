@@ -157,6 +157,9 @@
 		var customFonts = [];
 
 		var fontList = ['Acme','AthleticGothic','AthleticGothicShadow','BeavertonScript','Berkshire_Swash','Cantora_One','CaxtonRoman','Chela_One','Circus','Condiment','Cookie','Courgette','Croissant_One','Damion','Engagement','RawlingsFancyBlock','Germania_One','Graduate','Grand_Hotel','Jockey_One','Kansas','Kaushan_Script','Leckerli_One','Lily_Script_One','Lobster','Lobster_Two','Metal_Mania','Miniver','Molle','New_Rocker','Norican','OldEnglish','Oleo_Script','Oleo_Script_Swash_Caps','Pacifico','Pirata_One','Playball','ProFullBlock','RichardsonFancyBlock','Rubik_One','Rum_Raisin','Satisfy','Seymour_One','spl28','TiffanyRegular','Trade_Winds','Tuscan','UnifrakturCook','UnifrakturMaguntia','Vibur','Viga','Wellfleet','Wendy_One','Yellowtail']
+
+		const validFontTypes = ["ttf", "otf"]
+		const validImageTypes = ["png","jpg","jpeg","bmp","gif","tiff"]
   </script>
 <body>
 <div class="title">
@@ -170,8 +173,10 @@
 					<canvas id="belowFull" width="2880" height="1344"></canvas>
 				</div>
                 <div id="canvasContainer" style="width:960px; height:515px;">
+					<div id="dropContainer">
                     <div id="overlay" class="sample" style="width:960px; height:448px;"></div>
                     <canvas id="below" width="960" height="448" style="position:absolute; top:10; left:10;"></canvas>
+					</div>
                     <div id="tipContainer" style="height:60px; padding-top:5px; font-weight:bold;"></div>
 					<br>
 					<div id="donateContainer" style="width:512px; height: 50px; text-align:right; padding-top:10px">
@@ -385,6 +390,12 @@
 								</tr>
 								<tr>
 									<td><center>
+										<input type="button" class="button" id="straightenImage" value="Reset Image Rotation">
+										<input type="button" class="button" id="resetImage" value="Reset Image" data-x="0" data-y="0">
+									</center></td>
+								</tr>
+								<tr>
+									<td><center>
 										<input type="button" id="colorSquare" class="colorSquare" value="Select Color" style="margin-right:10px;"><span id="chosenCoordinates" style="margin-right:5px;"></span>
 										Fuzz %:
 										<input type="range" class="range" id="colorFuzz" value="40" min="1" max="100" style="margin-left:5px; margin-right:5px;"> 
@@ -538,7 +549,6 @@
 					</div>
                 </div>
 				<div style="text-align:center; margin-top:5px;">
-					<input type="button" class="button" id="straightenObject" value="Reset Object Rotation" style="display:none;">
 					<input type="button" class="button" id="save" value="Save Rink">
 					<input type="button" class="button" id="load" value="Load Rink">
 					<input type="button" class="button" id="openFontFolder" value="Open Local Font Folder">
@@ -602,7 +612,7 @@
 	});
 
 	below.on('selection:created', function(e) {
-		$("#straightenObject").css("display","inline-block");
+		//$("#straightenObject").css("display","inline-block");
 		var obj = e.selected[0];
 		if (obj.id == 'wordmark') {
 			$("#tipContainer").html("If you're trying to select an image instead of the text, you have to hide the text first.");
@@ -661,7 +671,7 @@
 	}) */
 	
 	below.on('selection:cleared', function(e) {
-		$("#straightenObject").css("display","none");
+		//$("#straightenObject").css("display","none");
 		if ($("#replaceColorDiv").css("display") == "block") {
 			$("#replaceColorDiv").slideToggle();
 		}
@@ -717,6 +727,38 @@
 			})
 		}
 	})
+
+	$("#dropContainer").on('dragover', function() {
+		$("#dropContainer").addClass('hover')
+		return false;
+	});
+
+	$("#dropContainer").on('dragleave', function() {
+		$("#dropContainer").removeClass('hover');
+		return false;
+	});
+
+	$("#dropContainer").on('drop', function(e) {
+		$("#dropContainer").removeClass('hover');
+		e.stopPropagation();
+		e.preventDefault();
+		var files = e.originalEvent.dataTransfer.files;
+		dropFile(files[0].path)
+		return false;
+	});
+
+	function dropFile(file) {
+        if ($.inArray(getExtension(file).toLowerCase(), validFontTypes) > -1) {
+            ipcRenderer.send('drop-font', file)
+        } else {
+            if ($.inArray(getExtension(file).toLowerCase(), validImageTypes) > -1) {
+                ipcRenderer.send('drop-image', file)
+            } else {
+                console.log("it's an invalid file")
+                return false;
+            }
+        }
+    }
 
     /* var above = new fabric.Canvas('above',{
 		enableRetinaScaling:false,
@@ -1452,6 +1494,28 @@
         })
 	}
 	
+	$("#resetImage").on("click",function(e) {
+        if (below.getActiveObject()) {
+			var object = below.getActiveObject()
+			var idx = below.getObjects().indexOf(object)
+			if (object.get('type') == "image") {
+                below.remove(object)
+                dropFile(object.get('path'), 0)
+			}
+        }
+    })
+
+    $("#straightenImage").on("click",function(e) {
+        if (below.getActiveObject()) {
+            var object = below.getActiveObject()
+			var idx = below.getObjects().indexOf(object)
+			if (object.get('type') == "image") {
+                object.set("angle", 0)
+			}
+            below.renderAll()
+        }
+    })
+
 	$("#wordmarkTextBox").on("input",function(e) {
 		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
 		if ($("#textMatchCheck").is(":checked")) {
@@ -3521,6 +3585,12 @@
 
     return object;
 };
+
+function getExtension(filename) {
+	var ext = (filename||'').split('.');
+	return ext[ext.length - 1];
+}
+
 </script>
 </head>    
 </html>

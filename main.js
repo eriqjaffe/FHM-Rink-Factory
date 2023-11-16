@@ -88,6 +88,37 @@ ipcMain.on('upload-font', (event, arg) => {
 	})
 })
 
+ipcMain.on('drop-font', (event, arg) => {
+    let json = {}
+    try {
+		const filePath = path.join(userFontsFolder,path.basename(arg))
+		const fontMeta = fontname.parse(fs.readFileSync(arg))[0];
+		var ext = getExtension(arg)
+		var fontPath = url.pathToFileURL(arg)
+		json = {
+			"status": "ok",
+			"fontName": fontMeta.fullName,
+			"fontStyle": fontMeta.fontSubfamily,
+			"familyName": fontMeta.fontFamily,
+			"fontFormat": ext,
+			"fontMimetype": 'font/' + ext,
+			"fontData": fontPath.href,
+			"fontPath": filePath
+		};
+		fs.copyFileSync(arg, filePath)
+		event.sender.send('add-font-response', json)
+	} catch (err) {
+		json = {
+			"status": "error",
+			"fontName": path.basename(arg),
+			"fontPath": arg,
+			"message": err
+		}
+		event.sender.send('add-font-response', json)
+		//fs.unlinkSync(req.query.file)
+	}
+})
+
 ipcMain.on('upload-image', (event, arg) => {
     let json = {}
     const options = {
@@ -110,7 +141,7 @@ ipcMain.on('upload-image', (event, arg) => {
 						json.path = result.filePaths[0]
 						json.filename = path.basename(result.filePaths[0])
 						json.image = ret
-						json.path = result.filePaths[0]
+						//json.path = result.filePaths[0]
 						event.sender.send('add-image-response', json)
 					})
 				}
@@ -124,6 +155,33 @@ ipcMain.on('upload-image', (event, arg) => {
 			  console.log("cancelled")
         }
     })
+})
+
+ipcMain.on('drop-image', (event, arg) => {
+    let json = {}
+    //ColorThief.getPalette(arg, 8)
+    //    .then(palette => { 
+            Jimp.read(arg, (err, image) => {
+                if (err) {
+                    json.filename = "error not an image"
+                    json.image = "error not an image"
+                    event.sender.send('add-image-response', json)
+                } else {
+                    image.getBase64(Jimp.AUTO, (err, ret) => {
+						json.path = arg
+                        json.filename = path.basename(arg)
+                        json.image = ret
+                        //json.palette = palette
+                        event.sender.send('add-image-response', json)
+                    })
+                }
+            })
+        //})
+        .catch(err => { json.filename = "error not an image"
+            json.image = "error not an image"
+            event.sender.send('add-image-response', err) 
+        })
+    
 })
 
 ipcMain.on('open-folder', (event, arg) => {
@@ -605,6 +663,29 @@ function createWindow () {
 		{
 			label: 'File',
 			submenu: [
+			{
+				click: () => mainWindow.webContents.send('load-rink','click'),
+				accelerator: isMac ? 'Cmd+L' : 'Control+L',
+				label: 'Load Rink',
+			},
+			{ type: 'separator' },
+			{
+				click: () => mainWindow.webContents.send('save-rink','click'),
+				accelerator: isMac ? 'Cmd+S' : 'Control+S',
+				label: 'Save Rink',
+			},
+			{ type: 'separator' },
+			{
+				click: () => mainWindow.webContents.send('updateFonts','click'),
+				accelerator: isMac ? 'Cmd+R' : 'Control+R',
+				label: 'Refresh User Fonts',
+			},
+			{
+			  	click: () => mainWindow.webContents.send('openFontFolder','click'),
+				  accelerator: isMac ? 'Cmd+O' : 'Control+O',
+			  	label: 'Open User Fonts Folder',
+			},
+			{ type: 'separator' },
 			isMac ? { role: 'close' } : { role: 'quit' }
 			]
 		},
@@ -621,22 +702,6 @@ function createWindow () {
 			{ role: 'zoomOut' },
 			{ type: 'separator' },
 			{ role: 'togglefullscreen' }
-			]
-		},
-		// { role: 'windowMenu' }
-		{
-			label: 'Window',
-			submenu: [
-			{ role: 'minimize' },
-			{ role: 'zoom' },
-			...(isMac ? [
-				{ type: 'separator' },
-				{ role: 'front' },
-				{ type: 'separator' },
-				{ role: 'window' }
-			] : [
-				{ role: 'close' }
-			])
 			]
 		},
 		{
@@ -665,6 +730,13 @@ function createWindow () {
 					}
 				},
 				{
+					label: 'About fabric.js',
+					click: async () => {
+					await shell.openExternal('http://fabricjs.com/')
+					}
+				},
+				{ type: 'separator' },
+				{
 					label: 'View project on GitHub',
 					click: async () => {
 					await shell.openExternal('https://github.com/eriqjaffe/FHM-Rink-Factory')
@@ -685,8 +757,8 @@ function createWindow () {
 	});
   
     // Open the DevTools.
-      mainWindow.maximize()
-      mainWindow.webContents.openDevTools()
+      //mainWindow.maximize()
+      //mainWindow.webContents.openDevTools()
   }
   
   app.whenReady().then(() => {
