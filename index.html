@@ -189,7 +189,7 @@
                         <table style="width:100%;">
                             <tr>
                                 <td>
-                                    Team Name: <input type="text" id="teamName">
+                                    Team Name: <input type="text" class="textInput" id="teamName">
                                 </td>
                                 <td><label for="startYear">Start:</label>
 									<input type="number" class="year" id="startYear" name="startYear" onkeypress="return isNumberKey(event)">
@@ -204,7 +204,7 @@
 								<td>&nbsp;</td>
 								<td><label>Ice Color: </label></td>
 								<td style="text-align:right;">
-									<input class="baseSelector" type="text" id="rinkColor" data-element="rink_color" data-linkname="rink">
+									<input class="baseSelector allSelectors" type="text" id="rinkColor" data-element="rink_color" data-linkname="rink">
 								</td>
 							</tr>
 							<tr class="color_tr">
@@ -243,16 +243,16 @@
 									</select>
 								</td>
                                 <td style="text-align:right;">
-                                    <input class="centerLineSelector enabledSelector" type="text" id="centerLineColor" data-element="centerLine01">
+                                    <input class="centerLineSelector enabledSelector allSelectors" type="text" id="centerLineColor" data-element="centerLine01">
                                 </td>
                             </tr>
 							<tr class="color_tr">
                                 <td>&nbsp;</td>
                                 <td><label>Center Ice: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="selector enabledSelector" type="text" id="centerCircleColor" data-element="centerCircle">
-									<input class="selector enabledSelector" type="text" id="centerCircleFillColor" data-element="centerCircleFill">
-                                    <input class="selector enabledSelector" type="text" id="centerDotColor" data-element="centerDot">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="centerCircleColor" data-element="centerCircle">
+									<input class="selector enabledSelector allSelectors" type="text" id="centerCircleFillColor" data-element="centerCircleFill">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="centerDotColor" data-element="centerDot">
                                 </td>
                             </tr>
 							<tr class="color_tr">
@@ -264,23 +264,23 @@
                                 <td>&nbsp;</td>
                                 <td><label>Blue Lines: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="selector enabledSelector" type="text" id="blueLineColor" data-element="blueLines">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="blueLineColor" data-element="blueLines">
                                 </td>
                             </tr>
                             <tr class="color_tr">
                                 <td>&nbsp;</td>
                                 <td><label>Neutral Zone Face-Off Dots: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="dotSelector2 enabledSelector" type="text" id="nzFaceOffSpotsColor" data-element="nzFaceOffSpots">
+                                    <input class="dotSelector2 enabledSelector allSelectors" type="text" id="nzFaceOffSpotsColor" data-element="nzFaceOffSpots">
                                 </td>
                             </tr>
                             <tr class="color_tr">
                                 <td>&nbsp;</td>
                                 <td><label>Defensive Zone Circles: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="circleSelector enabledSelector" type="text" id="ezCircle1Color" data-element="ezCircle1">
-                                    <input class="hashmarkSelector enabledSelector" type="text" id="hashmarks1Color" data-element="hashmarks1">
-                                    <input class="dotSelector enabledSelector" type="text" id="ezDots1Color" data-element="ezDots1">
+                                    <input class="circleSelector enabledSelector allSelectors" type="text" id="ezCircle1Color" data-element="ezCircle1">
+                                    <input class="hashmarkSelector enabledSelector allSelectors" type="text" id="hashmarks1Color" data-element="hashmarks1">
+                                    <input class="dotSelector enabledSelector allSelectors" type="text" id="ezDots1Color" data-element="ezDots1">
                                 </td>
                             </tr>
 							<tr class="color_tr">
@@ -315,7 +315,7 @@
                                 <td>&nbsp;</td>
                                 <td><label>Goal Lines: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="selector enabledSelector" type="text" id="goalLinesColor" data-element="goalLines">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="goalLinesColor" data-element="goalLines">
                                 </td>
                             </tr>
                             <tr class="color_tr">
@@ -329,8 +329,8 @@
 									</select>
 								</td>	
                                 <td style="text-align:right;">
-                                    <input class="multiSelector" type="text" id="creaseFillColor" data-element="creaseFill">
-                                    <input class="multiSelector" type="text" id="creaseStrokeColor" data-element="creaseStroke">
+                                    <input class="multiSelector allSelectors" type="text" id="creaseFillColor" data-element="creaseFill">
+                                    <input class="multiSelector allSelectors" type="text" id="creaseStrokeColor" data-element="creaseStroke">
                                 </td>
                             </tr>
                             <tr class="color_tr">
@@ -338,7 +338,7 @@
                                 <td><label>Trapezoid: </label></td>
                                 <td style="text-align:right;">
                                     <!--<input class="selector enabledSelector" type="text" id="trapezoidFillColor" data-element="trapezoidFill">-->
-                                    <input class="selector enabledSelector" type="text" id="trapezoidStrokeColor" data-element="trapezoidStroke">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="trapezoidStrokeColor" data-element="trapezoidStroke">
                                 </td>
                             </tr>
                         </table>
@@ -417,8 +417,8 @@
 							<tr>
 								<td class="checkCell"><input type="checkbox" id="textLogoCheck" class="wordmarkToggle" data-id="wordmark"></td>
 								<td style="width: 70%;">
-									<label>Text 1: </label><input class="textOption" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:65%; text-align:center;"/ disabled>
-									&nbsp;<input class="textOption textColorSelector" type="text" id="textColor" data-element="wordmarkText" disabled>
+									<label>Text 1: </label><input class="textOption textInput" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:65%; text-align:center;"/ disabled>
+									&nbsp;<input class="textOption textColorSelector allSelectors" type="text" id="textColor" data-element="wordmarkText" disabled>
 								</td>
 								<td style="text-align:right;">
 									<input type="checkbox" class="textOption" id="textStrokeCheck" checked disabled>&nbsp;Text Border
@@ -442,8 +442,8 @@
 							<tr>
 								<td class="checkCell"><input type="checkbox" class="wordmarkToggle" data-id="wordmark" style="visibility: hidden;"></td>
 								<td style="width: 70%;">
-									<label>Text 2: </label><input class="textOption" type="text" id="wordmarkTextBox2" value="ARENA NAME" style="width:65%; text-align:center;"/ disabled>
-									&nbsp;<input class="textOption textColorSelector" type="text" id="textColor2" data-element="wordmarkText" disabled>
+									<label>Text 2: </label><input class="textOption textInput" type="text" id="wordmarkTextBox2" value="ARENA NAME" style="width:65%; text-align:center;"/ disabled>
+									&nbsp;<input class="textOption textColorSelector allSelectors" type="text" id="textColor2" data-element="wordmarkText" disabled>
 								</td>
 								<td style="text-align:right;">
 									<input type="checkbox" class="textOption" id="textMatchCheck" checked disabled>&nbsp;Same Text
@@ -2719,6 +2719,51 @@
 		below.set("selectedFont", $("#fontTypeCombo").val())
 		below.set("customFonts", customFonts)
 
+		const checkboxes = {}
+		const selects = {}
+		const numberInputs = {}
+		const selectors = {}
+		const textBoxes = {}
+		const buttons = {}
+		const exportMeta = {}
+
+		$("input[type=checkbox]").each(function() {
+			checkboxes[$(this).attr("id")] = { "checked": $(this).is(":checked"), "val": $(this).val() }
+		})
+
+		$("select").each(function() {
+			selects[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": $(this).val() }
+		})
+
+		$(".textInput").each(function() {
+			textBoxes[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": $(this).val() }
+		})
+
+		$("input[type=number]").each(function() {
+			numberInputs[$(this).attr("id")] = { "checked": $(this).is(":checked"), "val": $(this).val() }
+		})
+
+		$("input[type=button]").each(function(){
+			buttons[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": $(this).val() }
+		})
+
+		$(".allSelectors").each(function(){
+			if ($(this).spectrum("get") == null) {
+				selectors[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": 'transparent' }
+			} else {
+				selectors[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": $(this).spectrum("get").toHexString() }
+			}
+		})
+
+		exportMeta.checkboxes = checkboxes
+		exportMeta.selects = selects
+		exportMeta.numberInputs = numberInputs
+		exportMeta.selectors = selectors
+		exportMeta.textBoxes = textBoxes
+		exportMeta.buttons = buttons
+
+		below.set("exportMeta", exportMeta)
+
 		const json = JSON.stringify(below.toJSON(['team','start','end','selectedFont','customFonts','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners','snapAngle']),null,2);
 
 		var startYear = parseInt($("#startYear").val());
@@ -2784,32 +2829,9 @@
 
 		//var json = JSON.stringify(below.toJSON());
 
-		ipcRenderer.send('save-rink', {rinkLines:lines, imgdata:img, name:fileName, canvas:json})
+		exportMeta.canvas = json
 
-		/* $.ajax({
-			type: "POST",
-			url: "http://127.0.0.1:"+port+"/saveRink",
-			data: {rinkLines:lines,imgdata:img,name:fileName,canvas:json},
-			success: function(result) {
-				var objects = below.getObjects()
-				for (x in objects) {
-					if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup') {
-						objects[x].set({
-							visible: true
-						})
-					}
-					if (objects[x].id == 'guides') {
-						if ($("#guidesToggle").is(':checked')) {
-							objects[x].set({
-								visible: true
-							})
-						}
-					}
-				}
-				below.renderAll()
-				$("#overlay").css("display","none");
-			}
-		}) */
+		ipcRenderer.send('save-rink', {rinkLines:lines, imgdata:img, name:fileName, canvas:json})
 	})
 
 	ipcRenderer.on('save-rink-response', (event, response) => {
@@ -2843,6 +2865,7 @@
 			below.clear()
 			var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
 			const tmp = JSON.parse(data)
+			console.log(tmp)
 			const newBG = tmp.background;
 			if (tmp.customFonts.length > 0) {
 				for (x in tmp.customFonts) {
@@ -2981,6 +3004,8 @@
 				}
 				
 			});
+
+			console.log(newBG)
 
 			$("#rinkColor").spectrum("set", newBG)
 			initializeOverlay()
