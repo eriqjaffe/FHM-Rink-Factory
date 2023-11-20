@@ -3,7 +3,9 @@
 <html>
 <head>
     <title>FHM Rink Factory</title>
+	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
     <script type="text/javascript" src="./scripts/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="./scripts/dd.min.js"></script>
 	<script type="text/javascript" src="./scripts/spectrum.js"></script>
     <script type="text/javascript" src="./scripts/fabric.min.js"></script>
 	<script type="text/javascript" src="./scripts/context_blender.js"></script>
@@ -15,13 +17,18 @@
 	<script type="text/javascript" src="./scripts/jquery.html5storage.min.js"></script>
 	<script type="text/javascript" src="./scripts/spin.min.js"></script>
 	<script type="text/javascript" src="./scripts/fontfaceobserver.js"></script>
+	<script type="text/javascript" src="./scripts/opentype.js"></script>
     <link href='./scripts/rinkfactory.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/spectrum.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/menu.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
+	<link href='./scripts/dd.css' rel='stylesheet' type='text/css'>
     <script>	
+		const { ipcRenderer } = require('electron');
 		const params = new URLSearchParams(window.location.search)
 		const port = params.get('port')
+		
+		require('./renderer.js')
 
         var initialColors = {centerLineColor:"#C8102E",creaseLineColor:"#C8102E",faceOffCircleColor:"#C8102E",faceOffDotColor:"#C8102E",faceOffTargetColor:"#C8102E",blueLineColor:"#0032a0",creaseFillColor:"#41b6e6",creaseStrokeColor:"#C8102E",rinkColor:"#eef0f2",trapezoidFillColor:"rgba(0,0,0,0)",trapezoidStrokeColor:"#C8102E",goalLinesColor:"#C8102E",centerCircleColor:"#0032a0",centerDotColor:"#0032a0",nzFaceOffSpotsColor:"#C8102E",ezCircle1Color:"#C8102E",hashmarks1Color:"#C8102E",ezCircle1Color:"#C8102E",ezDots1Color:"#C8102E",textColor:"#000000"};
         var defaultTexture = "ice_scratches.png";
@@ -148,6 +155,11 @@
 		};
   
 		var customFonts = [];
+
+		var fontList = ['Acme','AthleticGothic','AthleticGothicShadow','BeavertonScript','Berkshire_Swash','Cantora_One','CaxtonRoman','Chela_One','Circus','Condiment','Cookie','Courgette','Croissant_One','Damion','Engagement','RawlingsFancyBlock','Germania_One','Graduate','Grand_Hotel','Jockey_One','Kansas','Kaushan_Script','Leckerli_One','Lily_Script_One','Lobster','Lobster_Two','Metal_Mania','Miniver','Molle','New_Rocker','Norican','OldEnglish','Oleo_Script','Oleo_Script_Swash_Caps','Pacifico','Pirata_One','Playball','ProFullBlock','RichardsonFancyBlock','Rubik_One','Rum_Raisin','Satisfy','Seymour_One','spl28','TiffanyRegular','Trade_Winds','Tuscan','UnifrakturCook','UnifrakturMaguntia','Vibur','Viga','Wellfleet','Wendy_One','Yellowtail']
+
+		const validFontTypes = ["ttf", "otf"]
+		const validImageTypes = ["png","jpg","jpeg","bmp","gif","tiff"]
   </script>
 <body>
 <div class="title">
@@ -161,8 +173,10 @@
 					<canvas id="belowFull" width="2880" height="1344"></canvas>
 				</div>
                 <div id="canvasContainer" style="width:960px; height:515px;">
+					<div id="dropContainer">
                     <div id="overlay" class="sample" style="width:960px; height:448px;"></div>
                     <canvas id="below" width="960" height="448" style="position:absolute; top:10; left:10;"></canvas>
+					</div>
                     <div id="tipContainer" style="height:60px; padding-top:5px; font-weight:bold;"></div>
 					<br>
 					<div id="donateContainer" style="width:512px; height: 50px; text-align:right; padding-top:10px">
@@ -180,7 +194,7 @@
                         <table style="width:100%;">
                             <tr>
                                 <td>
-                                    Team Name: <input type="text" id="teamName">
+                                    Team Name: <input type="text" class="textInput" id="teamName">
                                 </td>
                                 <td><label for="startYear">Start:</label>
 									<input type="number" class="year" id="startYear" name="startYear" onkeypress="return isNumberKey(event)">
@@ -195,7 +209,7 @@
 								<td>&nbsp;</td>
 								<td><label>Ice Color: </label></td>
 								<td style="text-align:right;">
-									<input class="baseSelector" type="text" id="rinkColor" data-element="rink_color" data-linkname="rink">
+									<input class="baseSelector allSelectors" type="text" id="rinkColor" data-element="rink_color" data-linkname="rink">
 								</td>
 							</tr>
 							<tr class="color_tr">
@@ -234,16 +248,16 @@
 									</select>
 								</td>
                                 <td style="text-align:right;">
-                                    <input class="centerLineSelector enabledSelector" type="text" id="centerLineColor" data-element="centerLine01">
+                                    <input class="centerLineSelector enabledSelector allSelectors" type="text" id="centerLineColor" data-element="centerLine01">
                                 </td>
                             </tr>
 							<tr class="color_tr">
                                 <td>&nbsp;</td>
                                 <td><label>Center Ice: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="selector enabledSelector" type="text" id="centerCircleColor" data-element="centerCircle">
-									<input class="selector enabledSelector" type="text" id="centerCircleFillColor" data-element="centerCircleFill">
-                                    <input class="selector enabledSelector" type="text" id="centerDotColor" data-element="centerDot">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="centerCircleColor" data-element="centerCircle">
+									<input class="selector enabledSelector allSelectors" type="text" id="centerCircleFillColor" data-element="centerCircleFill">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="centerDotColor" data-element="centerDot">
                                 </td>
                             </tr>
 							<tr class="color_tr">
@@ -255,23 +269,23 @@
                                 <td>&nbsp;</td>
                                 <td><label>Blue Lines: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="selector enabledSelector" type="text" id="blueLineColor" data-element="blueLines">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="blueLineColor" data-element="blueLines">
                                 </td>
                             </tr>
                             <tr class="color_tr">
                                 <td>&nbsp;</td>
                                 <td><label>Neutral Zone Face-Off Dots: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="dotSelector2 enabledSelector" type="text" id="nzFaceOffSpotsColor" data-element="nzFaceOffSpots">
+                                    <input class="dotSelector2 enabledSelector allSelectors" type="text" id="nzFaceOffSpotsColor" data-element="nzFaceOffSpots">
                                 </td>
                             </tr>
                             <tr class="color_tr">
                                 <td>&nbsp;</td>
                                 <td><label>Defensive Zone Circles: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="circleSelector enabledSelector" type="text" id="ezCircle1Color" data-element="ezCircle1">
-                                    <input class="hashmarkSelector enabledSelector" type="text" id="hashmarks1Color" data-element="hashmarks1">
-                                    <input class="dotSelector enabledSelector" type="text" id="ezDots1Color" data-element="ezDots1">
+                                    <input class="circleSelector enabledSelector allSelectors" type="text" id="ezCircle1Color" data-element="ezCircle1">
+                                    <input class="hashmarkSelector enabledSelector allSelectors" type="text" id="hashmarks1Color" data-element="hashmarks1">
+                                    <input class="dotSelector enabledSelector allSelectors" type="text" id="ezDots1Color" data-element="ezDots1">
                                 </td>
                             </tr>
 							<tr class="color_tr">
@@ -306,7 +320,7 @@
                                 <td>&nbsp;</td>
                                 <td><label>Goal Lines: </label></td>
                                 <td style="text-align:right;">
-                                    <input class="selector enabledSelector" type="text" id="goalLinesColor" data-element="goalLines">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="goalLinesColor" data-element="goalLines">
                                 </td>
                             </tr>
                             <tr class="color_tr">
@@ -320,8 +334,8 @@
 									</select>
 								</td>	
                                 <td style="text-align:right;">
-                                    <input class="multiSelector" type="text" id="creaseFillColor" data-element="creaseFill">
-                                    <input class="multiSelector" type="text" id="creaseStrokeColor" data-element="creaseStroke">
+                                    <input class="multiSelector allSelectors" type="text" id="creaseFillColor" data-element="creaseFill">
+                                    <input class="multiSelector allSelectors" type="text" id="creaseStrokeColor" data-element="creaseStroke">
                                 </td>
                             </tr>
                             <tr class="color_tr">
@@ -329,7 +343,7 @@
                                 <td><label>Trapezoid: </label></td>
                                 <td style="text-align:right;">
                                     <!--<input class="selector enabledSelector" type="text" id="trapezoidFillColor" data-element="trapezoidFill">-->
-                                    <input class="selector enabledSelector" type="text" id="trapezoidStrokeColor" data-element="trapezoidStroke">
+                                    <input class="selector enabledSelector allSelectors" type="text" id="trapezoidStrokeColor" data-element="trapezoidStroke">
                                 </td>
                             </tr>
                         </table>
@@ -376,7 +390,13 @@
 								</tr>
 								<tr>
 									<td><center>
-										<input type="button" id="colorSquare" class="colorSquare" value="Click To Choose Color" style="margin-right:10px;"><span id="chosenCoordinates" style="margin-right:5px;"></span>
+										<input type="button" class="button" id="straightenImage" value="Reset Image Rotation">
+										<input type="button" class="button" id="resetImage" value="Reset Image" data-x="0" data-y="0">
+									</center></td>
+								</tr>
+								<tr>
+									<td><center>
+										<input type="button" id="colorSquare" class="colorSquare" value="Select Color" style="margin-right:10px;"><span id="chosenCoordinates" style="margin-right:5px;"></span>
 										Fuzz %:
 										<input type="range" class="range" id="colorFuzz" value="40" min="1" max="100" style="margin-left:5px; margin-right:5px;"> 
 										<span id="fuzzAmount">40</span>%
@@ -407,207 +427,131 @@
 						<table style="width:100%;">
 							<tr>
 								<td class="checkCell"><input type="checkbox" id="textLogoCheck" class="wordmarkToggle" data-id="wordmark"></td>
-								<td><label>Text: </label><input class="textOption" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:79%; text-align:center;"/></td>
-								<td style="text-align:right;"><input type="checkbox" class="textOption" id="textStrokeCheck" checked disabled>&nbsp;Text Border</td>
+								<td style="width: 70%;">
+									<label>Text 1: </label><input class="textOption textInput" type="text" id="wordmarkTextBox" value="ARENA NAME" style="width:65%; text-align:center;"/ disabled>
+									&nbsp;<input class="textOption textColorSelector allSelectors" type="text" id="textColor" data-element="wordmarkText" disabled>
+								</td>
+								<td style="text-align:right;">
+									<input type="checkbox" class="textOption" id="textStrokeCheck" checked disabled>&nbsp;Text Border
+								</td>
 							</tr>
 						</table>
 						<table style="width:100%;">
 							<tr>
+								<td class="checkCell"><input type="checkbox" class="wordmarkToggle" data-id="wordmark" style="visibility: hidden;"></td>
 								<td style="text-align:center;">
-									<input class="textOption textColorSelector" type="text" id="textColor" data-element="wordmarkText" disabled>
-								</td>	
-								<td style="text-align:center;">
-									Text Size: <input type="number" id="fontSize" value="20" min="1" class="textOption scaling" style="width:50px;" disabled>&nbsp;&nbsp;&nbsp;
-									Text Spacing: <input type="number" id="fontSpacing" value="0" class="textOption spacing" style="width:50px;" disabled>
+									Text Size: <input type="number" id="fontSizeTop" value="20" min="1" class="textOption scaling" style="width:50px;" disabled>&nbsp;&nbsp;&nbsp;
+									Text Spacing: <input type="number" id="fontSpacingTop" value="0" class="textOption spacing" style="width:50px;" disabled>
+									&nbsp;&nbsp;
+									Baseline: <input type="number" id="fontBaselineTop" value="0" class="textOption baseline" style="width:50px;" disabled>
+									&nbsp;&nbsp;<input type="button" class="textOption button" id="flipTopText" value="Flip Text" disabled>
 								</td>
-								<td><input type="button" class="textOption button" id="flipBottomtext" value="Flip Bottom Text" disabled></td>
 							<tr>
-						</table>	
+						</table>
+						<hr style="color:#ff0000;">
 						<table style="width:100%;">
 							<tr>
-								<td colspan="3">
-									<select id="fontTypeCombo" class='textOption Rubik_One' style="width:100%;" disabled>
-										<optgroup class='Acme'>
-										<option value='Acme'>Acme</option>
-										</optgroup>
-										<optgroup class='AthleticGothic'>
-										<option value='AthleticGothic'>Athletic Gothic</option>
-										</optgroup>
-										<optgroup class='AthleticGothicShadow'>
-										<option value='AthleticGothicShadow'>Athletic Gothic Shadow</option>
-										</optgroup>
-										<optgroup class='BeavertonScript'>
-										<option value='BeavertonScript'>Fancy Block</option>
-										</optgroup>
-										<optgroup class='Berkshire_Swash'>
-										<option value='Berkshire_Swash'>Berkshire Swash</option>
-										</optgroup>
-										<optgroup class='Cantora_One'>
-										<option value='Cantora_One'>Cantora</option>
-										</optgroup>
-										<optgroup class='CaxtonRoman'>
-										<option value='CaxtonRoman'>Caxton Roman</option>
-										</optgroup>
-										<optgroup class='Chela_One'>
-										<option value='Chela_One'>Chela</option>
-										</optgroup>
-										<optgroup class='Circus'>
-										<option value='Circus'>Circus</option>
-										</optgroup>
-										<optgroup class='Condiment'>
-										<option value='Condiment'>Condiment</option>
-										</optgroup>
-										<optgroup class='Cookie'>
-										<option value='Cookie'>Cookie</option>
-										</optgroup>
-										<optgroup class='Courgette'>
-										<option value='Courgette'>Courgette</option>
-										</optgroup>
-										<optgroup class='Croissant_One'>
-										<option value='Croissant_One'>Croissant</option>
-										</optgroup>
-										<optgroup class='Damion'>
-										<option value='Damion'>Damion</option>
-										</optgroup>
-										<optgroup class='Engagement'>
-										<option value='Engagement'>Engagement</option>
-										</optgroup>
-										<optgroup class='RawlingsFancyBlock'>
-										<option value='RawlingsFancyBlock'>Fancy Block</option>
-										</optgroup>
-										<optgroup class='Germania_One'>
-										<option value='Germania_One'>Germania</option>
-										</optgroup>
-										<optgroup class='Graduate'>
-										<option value='Graduate'>Graduate</option>
-										</optgroup>
-										<optgroup class='Grand_Hotel'>
-										<option value='Grand_Hotel'>Grand Hotel</option>
-										</optgroup>
-										<optgroup class='Jockey_One'>
-										<option value='Jockey_One'>Jockey</option>
-										</optgroup>
-										<optgroup class='Kansas'>
-										<option value='Kansas'>Kansas Tuscan</option>
-										</optgroup>
-										<optgroup class='Kaushan_Script'>
-										<option value='Kaushan_Script'>Kaushan Script</option>
-										</optgroup>
-										<optgroup class='Leckerli_One'>
-										<option value='Leckerli_One'>Leckerli</option>
-										</optgroup>
-										<optgroup class='Lily_Script_One'>
-										<option value='Lily_Script_One'>Lily Script</option>
-										</optgroup>
-										<optgroup class='Lobster'>
-										<option value='Lobster'>Lobster</option>
-										</optgroup>
-										<optgroup class='Lobster_Two'>
-										<option value='Lobster_Two'>Lobster Two</option>
-										</optgroup>
-										<optgroup class='Metal_Mania'>
-										<option value='Metal_Mania'>Metal Mania</option>
-										</optgroup>
-										<optgroup class='Miniver'>
-										<option value='Miniver'>Miniver</option>
-										</optgroup>
-										<optgroup class='Molle'>
-										<option value='Molle'>Molle</option>
-										</optgroup>
-										<optgroup class='New_Rocker'>
-										<option value='New_Rocker'>New Rocker</option>
-										</optgroup>
-										<optgroup class='Norican'>
-										<option value='Norican'>Norican</option>
-										</optgroup>
-										<optgroup class='OldEnglish'>
-										<option value='OldEnglish'>Old English</option>
-										</optgroup>
-										<optgroup class='Oleo_Script'>
-										<option value='Oleo_Script'>Oleo Script</option>
-										</optgroup>
-										<optgroup class='Oleo_Script_Swash_Caps'>
-										<option value='Oleo_Script_Swash_Caps'>Oleo Script Swash Caps</option>
-										</optgroup>
-										<optgroup class='Pacifico'>
-										<option value='Pacifico'>Pacifico</option>
-										</optgroup>
-										<optgroup class='Pirata_One'>
-										<option value='Pirata_One'>Pirata</option>
-										</optgroup>
-										<optgroup class='Playball'>
-										<option value='Playball'>Playball</option>
-										</optgroup>
-										<optgroup class='ProFullBlock'>
-										<option value='ProFullBlock'>Pro Full Block</option>
-										</optgroup>
-										<!--<optgroup class='Quicksand'>
-										<option value='Quicksand'>Quicksand</option>
-										</optgroup>-->
-										<optgroup class='RichardsonFancyBlock'>
-										<option value='RichardsonFancyBlock'>Richardson Block</option>
-										</optgroup>
-										<optgroup class='Rubik_One'>
-										<option value='Rubik_One' selected>Rubik</option>
-										</optgroup>
-										<optgroup class='Rum_Raisin'>
-										<option value='Rum_Raisin'>Rum Raisin</option>
-										</optgroup>
-										<optgroup class='Satisfy'>
-										<option value='Satisfy'>Satisfy</option>
-										</optgroup>
-										<optgroup class='Seymour_One'>
-										<option value='Seymour_One'>Seymour</option>
-										</optgroup>
-										<optgroup class='spl28'>
-										<option value='spl28'>SPL28 Script</option>
-										</optgroup>
-										<optgroup class='TiffanyRegular'>
-										<option value='TiffanyRegular'>Tiffany Regular</option>
-										</optgroup>
-										<optgroup class='Trade_Winds'>
-										<option value='Trade_Winds'>Trade Winds</option>
-										</optgroup>
-										<optgroup class='Tuscan'>
-										<option value='Tuscan'>Tuscan</option>
-										</optgroup>
-										<optgroup class='UnifrakturCook'>
-										<option value='UnifrakturCook'>Unifraktur Cook</option>
-										</optgroup>
-										<optgroup class='UnifrakturMaguntia'>
-										<option value='UnifrakturMaguntia'>Unifraktur Maguntia</option>
-										</optgroup>
-										<optgroup class='Vibur'>
-										<option value='Vibur'>Vibur</option>
-										</optgroup>
-										<optgroup class='Viga'>
-										<option value='Viga'>Viga</option>
-										</optgroup>
-										<optgroup class='Wellfleet'>
-										<option value='Wellfleet'>Wellfleet</option>
-										</optgroup>
-										<optgroup class='Wendy_One'>
-										<option value='Wendy_One'>Wendy</option>
-										</optgroup>
-										<optgroup class='Yellowtail'>
-										<option value='Yellowtail'>Yellowtail</option>
-										</optgroup>
+								<td class="checkCell"><input type="checkbox" class="wordmarkToggle" data-id="wordmark" style="visibility: hidden;"></td>
+								<td style="width: 70%;">
+									<label>Text 2: </label><input class="textOption textInput" type="text" id="wordmarkTextBox2" value="ARENA NAME" style="width:65%; text-align:center;"/ disabled>
+									&nbsp;<input class="textOption textColorSelector allSelectors" type="text" id="textColor2" data-element="wordmarkText" disabled>
+								</td>
+								<td style="text-align:right;">
+									<input type="checkbox" class="textOption" id="textMatchCheck" checked disabled>&nbsp;Same Text
+								</td>
+							</tr>
+						</table>
+						<table style="width:100%;">
+							<tr>
+								<td class="checkCell"><input type="checkbox" class="wordmarkToggle" data-id="wordmark" style="visibility: hidden;"></td>
+								<td style="text-align:center;">
+									Text Size: <input type="number" id="fontSizeBottom" value="20" min="1" class="textOption scaling" style="width:50px;" disabled>&nbsp;&nbsp;&nbsp;
+									Text Spacing: <input type="number" id="fontSpacingBottom" value="0" class="textOption spacing" style="width:50px;" disabled>
+									&nbsp;&nbsp;
+									Baseline: <input type="number" id="fontBaselineBottom" value="0" class="textOption baseline" style="width:50px;" disabled>
+									&nbsp;&nbsp;<input type="button" class="textOption button" id="flipBottomText" value="Flip Text" disabled>
+								</td>
+							</tr>
+							<tr>
+								<td style="text-align:center;"></td>
+							</tr>
+						</table>
+						<hr>
+						<table style="width:100%;">
+							<tr>
+								<td colspan="3" id="fontRow">
+									<select id="fontTypeCombo" class='textOption msdd' style="width:100%;" disabled>
+										<option data-image="./images/Acme.png" value='Acme'>Acme</option>
+										<option data-image="./images/Athletic Gothic.png" value='athletic_gothicregular'>Athletic Gothic</option>
+										<option data-image="./images/Athletic Gothic Shadow.png" value='athletic_gothic_shadowregular'>Athletic Gothic Shadow</option>
+										<option data-image="./images/Beaverton Script.png" value='beaverton_scriptregular'>Fancy Block</option>
+										<option data-image="./images/Berkshire Swash.png" value='Berkshire Swash'>Berkshire Swash</option>
+										<option data-image="./images/CantoraOne.png" value='Cantora One'>Cantora</option>
+										<option data-image="./images/Caxton Roman.png" value='caxton_romanregular'>Caxton Roman</option>
+										<option data-image="./images/Chela One.png" value='Chela One'>Chela</option>
+										<option data-image="./images/Russell Circus.png" value='russell_circusregular'>Circus</option>
+										<option data-image="./images/Condiment.png" value='Condiment'>Condiment</option>
+										<option data-image="./images/Cookie.png" value='Cookie'>Cookie</option>
+										<option data-image="./images/Courgette.png" value='Courgette'>Courgette</option>
+										<option data-image="./images/Croissant One.png" value='Croissant One'>Croissant</option>
+										<option data-image="./images/Damion.png" value='Damion'>Damion</option>
+										<option data-image="./images/Engagement.png" value='Engagement'>Engagement</option>
+										<option data-image="./images/Rawlings Fancy Block.png" value='rawlings_fancy_blockregular'>Fancy Block</option>
+										<option data-image="./images/Germania One.png" value='Germania One'>Germania</option>
+										<option data-image="./images/Graduate.png" value='Graduate'>Graduate</option>
+										<option data-image="./images/Grand Hotel.png" value='Grand Hotel'>Grand Hotel</option>
+										<option data-image="./images/Jockey One.png" value='Jockey One'>Jockey</option>
+										<option data-image="./images/Kansas.png" value='kansasregular'>Kansas Tuscan</option>
+										<option data-image="./images/Kaushan Script.png" value='Kaushan Script'>Kaushan Script</option>
+										<option data-image="./images/Leckerli One.png" value='Leckerli One'>Leckerli</option>
+										<option data-image="./images/Lily Script One.png" value='Lily Script One'>Lily Script</option>
+										<option data-image="./images/Lobster.png" value='Lobster'>Lobster</option>
+										<option data-image="./images/Lobster Two.png" value='Lobster Two'>Lobster Two</option>
+										<option data-image="./images/Metal Mania.png" value='Metal Mania'>Metal Mania</option>
+										<option data-image="./images/Miniver.png" value='Miniver'>Miniver</option>
+										<option data-image="./images/Molle.png" value='Molle'>Molle</option>
+										<option data-image="./images/New Rocker.png" value='New Rocker'>New Rocker</option>
+										<option data-image="./images/Norican.png" value='Norican'>Norican</option>
+										<option data-image="./images/Rawlings Old English.png" value='rawlings_old_englishmedium'>Old English</option>
+										<option data-image="./images/Oleo Script.png" value='Oleo Script'>Oleo Script</option>
+										<option data-image="./images/Oleo Script Swash Caps.png" value='Oleo Script Swash Caps'>Oleo Script Swash Caps</option>
+										<option data-image="./images/Pacifico.png" value='Pacifico'>Pacifico</option>
+										<option data-image="./images/Pirata One.png" value='Pirata One'>Pirata</option>
+										<option data-image="./images/Playball.png" value='Playball'>Playball</option>
+										<option data-image="./images/Pro Full Block.png" value='pro_full_blockregular'>Pro Full Block</option>
+										<!--<option data-image="./images/Quicksand.png" value='Quicksand'>Quicksand</option>-->
+										<option data-image="./images/Richardson Fancy Block.png" value='richardson_fancy_blockregular'>Richardson Block</option>
+										<option data-image="./images/Rubik One.png" value='Rubik One' selected>Rubik</option>
+										<option data-image="./images/Rum Raisin.png" value='Rum Raisin'>Rum Raisin</option>
+										<option data-image="./images/Satisfy.png" value='Satisfy'>Satisfy</option>
+										<option data-image="./images/Seymour One.png" value='Seymour One'>Seymour</option>
+										<option data-image="./images/SPL28Script.png" value='spl28scriptregular'>SPL28 Script</option>
+										<option data-image="./images/UA Tiffany.png" value='ua_tiffanyregular'>Tiffany Regular</option>
+										<option data-image="./images/Trade Winds.png" value='Trade Winds'>Trade Winds</option>
+										<option data-image="./images/MLB_Tuscan_New.png" value='mlb_tuscan_newmedium'>Tuscan</option>
+										<option data-image="./images/UnifrakturCook.png" value='UnifrakturCook'>Unifraktur Cook</option>
+										<option data-image="./images/UnifrakturMaguntia.png" value='UnifrakturMaguntia'>Unifraktur Maguntia</option>
+										<option data-image="./images/Vibur.png" value='Vibur'>Vibur</option>
+										<option data-image="./images/Viga.png" value='Viga'>Viga</option>
+										<option data-image="./images/Wellfleet.png" value='Wellfleet'>Wellfleet</option>
+										<option data-image="./images/Wendy One.png" value='Wendy One'>Wendy</option>
+										<option data-image="./images/Yellowtail.png" value='Yellowtail'>Yellowtail</option>			
 									</select>
 								</td>
 							</tr>
 							<tr><td colspan="3" align="center">
 								<input id="customFont" type="file" name="customFont" accept=".ttf,.otf,.woff,.woff2" style="display:none;" />
-								<input type="button" class="button textOption" id="fakeFontButton" value="Choose a Local Font..." disabled/>
+								<input type="button" class="button textOption" id="fakeFontButton" value="Choose a Local Font" disabled/>
+								<input type="button" class="button textOption" id="localFontFolder" value="Refresh User Fonts" disabled/>
 								<input type="button" class="button textOption" id="uploadTheFont" value="Upload Font" style="display:none;" />
 							</td></tr>
 						</table>
 					</div>
                 </div>
 				<div style="text-align:center; margin-top:5px;">
-					<input type="button" class="button" id="straightenObject" value="Reset Object Rotation" style="display:none;">
 					<input type="button" class="button" id="save" value="Save Rink">
 					<input type="button" class="button" id="load" value="Load Rink">
-					<input type="file" id="uploadedJSON" accept=".rink" style="display:none;"/>
+					<input type="button" class="button" id="openFontFolder" value="Open Local Font Folder">
 					<input type="button" class="button" id="aboutRinkFactory" value="About Rink Factory">
 				</div>
             </div>
@@ -668,7 +612,7 @@
 	});
 
 	below.on('selection:created', function(e) {
-		$("#straightenObject").css("display","inline-block");
+		//$("#straightenObject").css("display","inline-block");
 		var obj = e.selected[0];
 		if (obj.id == 'wordmark') {
 			$("#tipContainer").html("If you're trying to select an image instead of the text, you have to hide the text first.");
@@ -727,7 +671,7 @@
 	}) */
 	
 	below.on('selection:cleared', function(e) {
-		$("#straightenObject").css("display","none");
+		//$("#straightenObject").css("display","none");
 		if ($("#replaceColorDiv").css("display") == "block") {
 			$("#replaceColorDiv").slideToggle();
 		}
@@ -784,6 +728,38 @@
 		}
 	})
 
+	$("#dropContainer").on('dragover', function() {
+		$("#dropContainer").addClass('hover')
+		return false;
+	});
+
+	$("#dropContainer").on('dragleave', function() {
+		$("#dropContainer").removeClass('hover');
+		return false;
+	});
+
+	$("#dropContainer").on('drop', function(e) {
+		$("#dropContainer").removeClass('hover');
+		e.stopPropagation();
+		e.preventDefault();
+		var files = e.originalEvent.dataTransfer.files;
+		dropFile(files[0].path)
+		return false;
+	});
+
+	function dropFile(file) {
+        if ($.inArray(getExtension(file).toLowerCase(), validFontTypes) > -1) {
+            ipcRenderer.send('drop-font', file)
+        } else {
+            if ($.inArray(getExtension(file).toLowerCase(), validImageTypes) > -1) {
+                ipcRenderer.send('drop-image', file)
+            } else {
+                console.log("it's an invalid file")
+                return false;
+            }
+        }
+    }
+
     /* var above = new fabric.Canvas('above',{
 		enableRetinaScaling:false,
 		evented:false
@@ -812,6 +788,7 @@
 				$(this).removeClass("inactive-header").addClass("active-header");
 			}
 		});
+
 		$(":checkbox").each(function(e) {
 			if ($(this).is(':checked')) {
 				state = true;
@@ -833,6 +810,12 @@
 				}
 			})
 		})
+
+		let textDropdown = new MsDropdown(document.getElementById("fontTypeCombo"), {visibleRows: 6})
+
+		$("#localFontFolder").trigger("click")
+
+		sortFontDropdown()
         //$(".msDropDown").msDropDown();
     })
 
@@ -1309,115 +1292,6 @@
 			evented: false
         });
 
-		wordmarkTextTop = new fabric.Text('ARENA NAME',{
-			visible: false,
-			fontFamily: "Rubik One",
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextTop',
-			fill: 'black',
-			stroke: 'transparent',
-			strokeWidth: 35,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false,
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender',
-			borderColor: 'red',
-			cornerColor: 'yellow',
-			cornerSize: 12,
-			transparentCorners: false,
-			lockScalingFlip: true,
-			lockScalingX: true,
-			lockScalingY: true,
-			lockMovementX: true,
-			lockMovementY: true,
-			snapAngle: 5,
-		})
-
-		wordmarkTextTopStroke = new fabric.Text('ARENA NAME',{
-			visible: false,
-			fontFamily: "Rubik One",
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextTopStroke',
-			fill: initialColors['rinkColor'],
-			stroke: initialColors['rinkColor'],
-			strokeWidth: 4,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false,
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender'
-		})
-
-		wordmarkTextTop.setControlsVisibility({
-			mt: false,
-			mb: false,
-			ml: false,
-			mr: false,
-			tr: false,
-			tl: false,
-			br: false,
-			bl: false,
-			mtr: true
-		})
-
-		wordmarkTextBottom = new fabric.Text('ARENA NAME',{
-			visible: false,
-			selectable: false,
-			fontFamily: 'Rubik One',
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextBottom',
-			fill: 'black',
-			stroke: 'transparent',
-			strokeWidth: 35,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender'
-		})
-
-		wordmarkTextBottomStroke = new fabric.Text('ARENA NAME',{
-			visible: false,
-			selectable: false,
-			fontFamily: 'Rubik One',
-			fontSize: 20,
-			originX: 'center',
-			originY: 'center',
-			textAlign: 'center',
-			id: 'wordmarkTextBottomStroke',
-			fill: initialColors['rinkColor'],
-			stroke: initialColors['rinkColor'],
-			strokeWidth: 4,
-			path: new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z ", {
-				visible: false,
-				selectable:false,
-				evented: false
-			}),
-			pathSide: 'left',
-			pathAlign: 'descender'
-		})
-
-		wordmarkTextTopStroke.rotate(270)
-		wordmarkTextTop.rotate(270)
-		wordmarkTextBottomStroke.rotate(90)
-		wordmarkTextBottom.rotate(90)
-
 		below.add(centerCircleStroke)
 		below.add(centerCircle)
 		below.add(centerLineStroke)
@@ -1466,15 +1340,80 @@
 		below.add(ezCircle2)
 		below.add(ezCircle3)
 		below.add(centerDot)
-		below.add(wordmarkTextBottomStroke)
-		below.add(wordmarkTextTopStroke)
-		below.add(wordmarkTextBottom)
-		below.add(wordmarkTextTop)
 
-		below.centerObject(wordmarkTextTopStroke)
-		below.centerObject(wordmarkTextTop)
-		below.centerObject(wordmarkTextBottomStroke)
-		below.centerObject(wordmarkTextBottom)
+		centerIcePath = new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z", {
+            visible: false,
+            selectable:false,
+            evented: false,
+            originX: 'center',
+            originY: 'center',
+            id: 'centerIcePath'
+        })
+
+		var circleFont = new FontFaceObserver($("#fontTypeCombo").val())
+		circleFont.load()
+		.then(function() {
+			wordmarkTextTop = new fabric.IText('ARENA NAME',{
+				visible: true,
+                fontFamily: $("#fontTypeCombo").val(),
+                fontSize: 20,
+                originX: 'center',
+                originY: 'center',
+                textAlign: 'center',
+                id: 'wordmarkTextTop',
+                fill: 'black',
+                stroke: initialColors['rinkColor'],
+                paintFirst: "stroke",
+                strokeWidth: 6,
+                path: centerIcePath,
+                pathAlign: 'descender',
+                snapAngle: 5,
+                angle: 270,
+                charSpacing: 0
+			})
+
+			wordmarkTextBottom = new fabric.IText('ARENA NAME',{
+				visible: true,
+                fontFamily: $("#fontTypeCombo").val(),
+                fontSize: 20,
+                originX: 'center',
+                originY: 'center',
+                textAlign: 'center',
+                id: 'wordmarkTextBottom',
+                fill: 'black',
+                stroke: initialColors['rinkColor'],
+                paintFirst: "stroke",
+                strokeWidth: 6,
+                path: centerIcePath,
+                pathAlign: 'descender',
+                angle: 90,
+                charSpacing: 0
+			})
+
+			wordmarkGroup = new fabric.Group([], {
+				visible: false,
+				id: 'wordmarkGroup',
+				borderColor: 'red',
+                cornerColor: 'yellow',
+                cornerSize: 12,
+                transparentCorners: false,
+                lockScalingFlip: true,
+                lockScalingX: true,
+                lockScalingY: true,
+                lockMovementX: true,
+                lockMovementY: true,
+				snapAngle: 5
+			})
+
+			wordmarkGroup.addWithUpdate(wordmarkTextTop)
+			wordmarkGroup.addWithUpdate(wordmarkTextBottom)
+
+			below.add(wordmarkGroup)
+			//below.add(wordmarkTextBottom)
+		
+			below.centerObject(wordmarkGroup)
+			//below.centerObject(wordmarkTextBottom)
+		})
 
 		fabric.Image.fromURL("./images/guides.png", function (img) {
 			var guides = img.set({
@@ -1555,29 +1494,118 @@
         })
 	}
 	
-	$("#wordmarkTextBox").on("change",function(e) {
-		objects = below.getObjects('text');
-		for (x in objects) {
-			objects[x].text = $(this).val();
+	$("#resetImage").on("click",function(e) {
+        if (below.getActiveObject()) {
+			var object = below.getActiveObject()
+			var idx = below.getObjects().indexOf(object)
+			if (object.get('type') == "image") {
+                below.remove(object)
+                dropFile(object.get('path'), 0)
+			}
+        }
+    })
+
+    $("#straightenImage").on("click",function(e) {
+        if (below.getActiveObject()) {
+            var object = below.getActiveObject()
+			var idx = below.getObjects().indexOf(object)
+			if (object.get('type') == "image") {
+                object.set("angle", 0)
+			}
+            below.renderAll()
+        }
+    })
+
+	$("#wordmarkTextBox").on("input",function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		if ($("#textMatchCheck").is(":checked")) {
+			$("#wordmarkTextBox2").val($("#wordmarkTextBox").val())
+			g.getObjects().forEach(function(o) {
+				o.set("text",$("#wordmarkTextBox").val())
+			})
+			topDeltaY()
+			bottomDeltaY()
+		} else {
+			let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+			o.set("text",$("#wordmarkTextBox").val())
+			topDeltaY()
 		}
+		//below.renderAll();
+	})
+
+	$("#wordmarkTextBox2").on("input",function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		o.set("text",$("#wordmarkTextBox2").val())
+		bottomDeltaY()
+		//below.renderAll()
+	})
+
+	$("#fontSizeTop").on("input", function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+		o.set("fontSize",$(this).val())
 		below.renderAll();
 	})
 
-	$("#fontSize").on("change", function(e) {
-		objects = below.getObjects('text');
-		for (x in objects) {
-			objects[x].fontSize = $(this).val();
-		}
+	$("#fontSpacingTop").on("input", function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+		o.set('charSpacing', parseInt(($(this).val() * 10)))
 		below.renderAll();
 	})
 
-	$("#fontSpacing").on("change", function(e) {
-		objects = below.getObjects('text');
-		for (x in objects) {
-			objects[x].charSpacing = ($(this).val() * 10);
-		}
+	$("#fontBaselineTop").on("input", function(e) {
+		topDeltaY()
+	})
+
+	function topDeltaY() {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+		let amt = parseInt($("#fontBaselineTop").val())
+		let len = $("#wordmarkTextBox").val().length
+		let style = {}
+        let chars = {}
+        for (i=0; i<len; i++) {
+            chars[i] = {deltaY: (amt*-1)}
+        }
+		style[0] = chars
+		o.set("styles", style)
+		below.renderAll()
+	}
+
+	$("#fontSizeBottom").on("input", function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		o.set("fontSize",$(this).val())
 		below.renderAll();
 	})
+
+	$("#fontSpacingBottom").on("input", function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		o.set('charSpacing', parseInt(($(this).val() * 10)))
+		below.renderAll();
+	})
+
+	$("#fontBaselineBottom").on("input", function(e) {
+		bottomDeltaY()
+	})
+
+	function bottomDeltaY() {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		let amt = parseInt($("#fontBaselineBottom").val())
+		let len = $("#wordmarkTextBox2").val().length
+		let style = {}
+        let chars = {}
+        for (i=0; i<len; i++) {
+            chars[i] = {deltaY: (amt*-1)}
+        }
+		style[0] = chars
+		o.set("styles", style)
+		below.renderAll()
+	}
 
 	$("#fakeFontButton").on("click", function(e) {
 		e.preventDefault;
@@ -1586,50 +1614,162 @@
 
 
 	$("#uploadTheFont").on("click", function(e) {
-		//$("#fontTypeCombo").removeClass().addClass('alegreya');
-		$.ajax({
-			type: "GET",
-			url: "http://127.0.0.1:"+port+"/customFont",
-			success: function(data) {
-				customFonts.push(data)
-				$("head").prepend("<style>@font-face {\n   font-family: '"+data.familyName+"';\n   src: url('"+data.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+data.familyName+"'; font-size: 1.1em;}\n</style>");
-				fontSources[data.familyName] = data.fontData;
-				var style = data.familyName;
-				var font_family = $("."+style).css("font-family");
-				var objects = below.getObjects('text');
-				var myfont = new FontFaceObserver(data.familyName)
-				myfont.load()
-					.then(function() {
-					// when font is loaded, use it.
-						for (x in objects) {
-							objects[x].fontFamily = data.familyName;
-						}
-						below.renderAll();
-						var optgroup = $("<optgroup class='"+data.familyName+"'>");
-						optgroup.append("<option value='"+data.familyName+"'>"+data.fontName+"</option>")
-						$("#fontTypeCombo").append(optgroup)
-						$("#fontTypeCombo").children().remove("optgroup[class='alegreya']");
-						//optgroup = $("<optgroup class='alegreya'>");
-						//optgroup.append("<option value='custom'>Custom Font</option>")
-						//$("#fontTypeCombo").append(optgroup)
-						$("#fontTypeCombo").val(data.familyName)
-						$("#fontTypeCombo").removeClass().addClass(data.familyName);
-						$("#fontTypeCombo").change()
-					}).catch(function(e) {
-						console.log(e)
-						alert('font loading failed ' + data.familyName);
-					});
-				
-				//wordmarkText.fontFamily = font_family;
-				//wordmarkTextStroke1.fontFamily = font_family;
-				//wordmarkTextStroke2.fontFamily = font_family;
-				//logoCanvas.renderAll();
-				//$(this).removeClass().addClass(style);
-			}
-		})
+		ipcRenderer.send("upload-font", null)
 	})
 
-	$(".textColorSelector").each(function() {
+	ipcRenderer.on('add-font-response', (event, response) => {
+		addFont(response)
+	})
+
+	$("#openFontFolder").on("click",function(e) {
+		ipcRenderer.send('open-folder', "fonts")
+	})
+
+	$("#localFontFolder").on("click",function() {
+        //showOverlay("Loading User Fonts...")
+		ipcRenderer.send('local-font-folder', null)
+	})
+
+	ipcRenderer.on('local-font-folder-response', (event, data) => {
+        let fontErrors = []
+		if (data.result == 'success') {
+            let fontDropdown = document.getElementById("fontTypeCombo").msDropdown;
+
+			for (result of data.fonts) {
+                if (result.status == "ok") {
+                    $("head").prepend("<style>@font-face {\n   font-family: '"+result.familyName+"';\n   src: url('"+result.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+result.familyName+"';}\n</style>");
+					fontList.push(result.fontName)
+					var thumb = null;
+					const name = result.fontName
+					const value = result.familyName
+					opentype.load(result.fontPath, (err,font) => {
+						if (err || !font) {
+							console.log(err)
+							return;
+						}
+						
+						var thumbText = font.getPath("ABC 123", 0, 0, 96)
+						var outPath = thumbText.toPathData(5)
+
+						thumbText = new fabric.Path(outPath, {
+							left: 0,
+							originX: 'center',
+							originY: 'center',
+							centeredScaling: true,
+							centeredRotation: true,
+							fill: 'black',
+							height: '80px'
+						})
+
+						thumb = thumbText.toDataURL()
+
+						if (findIndexByText(fontDropdown, name) == -1) {
+							fontDropdown.add({text:name, value:value, image:thumb},0)
+						}
+
+						sortFontDropdown()
+					})
+				} else {
+					fontErrors.push(result.fontName)
+				}
+			}
+            //fontDropdown.selectedIndex = 0
+		}
+		//hideOverlay()
+		if (fontErrors.length > 0) {
+			var message = "The following fonts failed to import, and have been removed from your user fonts folder:\r\n\r\n"
+			for (font of fontErrors) {
+				message += font+"\r\n"
+			}
+			alert(message)
+		}
+	})
+
+	function addFont(data) {
+        if (data.result == "error") {
+            alert("An error occurred:\r\n\r\n"+data.message)
+            return false;
+        } else if (data.status == "error") {
+            alert("The font '"+data.fontName+"' could not be loaded.")
+            return false;
+        } else {
+            if (fontList.includes(data.fontName)) {
+                // switch to the already known font
+                const fontDropdown= document.getElementById("fontTypeCombo").msDropdown;
+                var foo = findIndexByText(fontDropdown, data.fontName)
+                fontDropdown.selectedIndex = foo
+                fontDropdown.refresh()
+            } else {
+                // add the font to the app
+                $("head").prepend("<style>@font-face {\n   font-family: '"+data.familyName+"';\n   src: url('"+data.fontData+"') format('truetype');\n}\n."+data.familyName+" { font-family: '"+data.familyName+"';}\n</style>");
+                fontList.push(data.fontName)
+                // switch to the font
+                var topfont = new FontFaceObserver(data.familyName)
+                topfont.load()
+                .then(function() {
+					let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+					g.getObjects().forEach(function(o) {
+						o.set('fontFamily',data.familyName)
+					})
+                    below.renderAll()
+
+                    var tmpTxt = new fabric.IText("ABC 123",{
+                        fontFamily: data.familyName,
+                        fontSize: 96,
+                        originX: 'center',
+                        originY: 'center',
+                        textAlign: 'center',
+                        fill: 'black',
+                        stroke: 'black',
+                        originX: 'center',
+                        originY: 'center',
+                    })
+
+                    refreshDropdown(data,tmpTxt)
+                })
+            }
+        }
+    }
+
+	function refreshDropdown(data,thumb) {
+		data.thumb = thumb.toDataURL()
+		customFonts.push(data)
+
+		const fontDropdown= document.getElementById("fontTypeCombo").msDropdown;
+    
+		const displayName = (data.fontStyle == "Regular") ? data.fontName : data.fontName +" "+data.fontStyle
+
+		const idx = findIndexByText(fontDropdown, displayName)
+
+		if (idx == -1) {
+			fontDropdown.add({text:displayName, value:data.fontName, image:data.thumb},0)
+			fontDropdown.selectedIndex = 0;
+		} else {
+            fontDropdown.selectedIndex = idx;
+		}
+
+		sortFontDropdown()
+	}
+
+    function sortFontDropdown() {
+        const selectedFont = $("#fontTypeCombo").val()
+
+		$("#fontTypeCombo").html($('#fontTypeCombo option').sort(function(x, y) {
+         	return $(x).text().toLowerCase() < $(y).text().toLowerCase() ? -1 : 1;
+		}))
+		$("#fontTypeCombo").val(selectedFont)
+    }
+
+	function findIndexByText(dropdown, text) {
+		for (child of dropdown.children) {
+			if (child.text == text) {
+				return child.index
+			}
+		}
+		return -1
+	}
+
+	$("#textColor").each(function() {
 		var color = $(this).attr('id');
 		var change = false;
 		if (color == 'transparent') {
@@ -1645,7 +1785,7 @@
 			showSelectionPalette: true,
 			localStorageKey: "spectrum.rinkfactory",
 			palette: [ ],
-			color: initialColors[$(this).attr('id')],
+			color: initialColors['textColor'],
 			show: function(color) {
 				var original_color = color;
 				$(this).data('changed', false);
@@ -1658,10 +1798,9 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				objects = below.getObjects('text').forEach(function(o){
-					o.fill = colorX
-				});
-				
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+				o.set("fill",colorX)
 				below.renderAll();
 			},
 			change: function(color) {
@@ -1672,9 +1811,9 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				objects = below.getObjects('text').forEach(function(o){
-					o.fill = colorX
-				});
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+				o.set("fill",colorX)
 				below.renderAll();
 			},
 			hide: function(color) {
@@ -1685,9 +1824,72 @@
 					colorX = color.toHexString();
 				}
 				$(this).data('changed', true);
-				objects = below.getObjects('text').forEach(function(o){
-					o.fill = colorX
-				});
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+				o.set("fill",colorX)
+				below.renderAll();
+			}
+		})
+	})
+
+	$("#textColor2").each(function() {
+		var color = $(this).attr('id');
+		var change = false;
+		if (color == 'transparent') {
+			color = null;
+		}
+		$(this).spectrum({
+			showInput: true,
+			preferredFormat: prefColorFormat,
+			showInitial: true,
+			showPalette: true,
+			showButtons: true,
+			allowEmpty: true,
+			showSelectionPalette: true,
+			localStorageKey: "spectrum.rinkfactory",
+			palette: [ ],
+			color: initialColors['textColor'],
+			show: function(color) {
+				var original_color = color;
+				$(this).data('changed', false);
+			},
+			move: function(color) {
+				change = true;
+				if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+				o.set("fill",colorX)
+				below.renderAll();
+			},
+			change: function(color) {
+				change = true;
+				if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+				o.set("fill",colorX)
+				below.renderAll();
+			},
+			hide: function(color) {
+				change = true;
+				if (color == null) {
+					var colorX = "transparent";
+				} else {
+					colorX = color.toHexString();
+				}
+				$(this).data('changed', true);
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+				o.set("fill",colorX)
 				below.renderAll();
 			}
 		})
@@ -1713,59 +1915,43 @@
             var objects = below.getObjects();
 			for (x in objects) {
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-					objects[x].set('fill', color.toHexString())
-                    below.renderAll()
+					objects[x].set('fill', color.toHexString())                   
 				}
-				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
-					objects[x].set('stroke', color.toHexString())
-					below.renderAll()
-				}
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				g.getObjects().forEach(function(o) {
+					o.set("stroke", color.toHexString())
+				})
 			}
+			below.renderAll()
 		},
 		change: function(color) {
 			$(this).data('changed', true);
 			below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
             var objects = below.getObjects();
 			for (x in objects) {
-				//console.log(objects[x].id)
 				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-					objects[x].set('fill', color.toHexString())
-                    below.renderAll()
+					objects[x].set('fill', color.toHexString())                   
 				}
-				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
-					objects[x].set('stroke', color.toHexString())
-					below.renderAll()
-				}
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				g.getObjects().forEach(function(o) {
+					o.set("stroke", color.toHexString())
+				})
 			}
+			below.renderAll()
 		},
 		hide: function(color) {
-			if ($(this).data('changed')) {
-				below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
-                var objects = below.getObjects();
-                for (x in objects) {
-                    if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-					objects[x].set('fill', color.toHexString())
-                    below.renderAll()
+			below.setBackgroundColor(color.toHexString(), below.renderAll.bind(below))
+            var objects = below.getObjects();
+			for (x in objects) {
+				if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
+					objects[x].set('fill', color.toHexString())                   
 				}
-				if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
-					objects[x].set('stroke', color.toHexString())
-					below.renderAll()
-				}
-                }
-			} else {
-                below.setBackgroundColor(original_color.toHexString(), below.renderAll.bind(below))
-                var objects = below.getObjects();
-                for (x in objects) {
-                    if (objects[x].id == 'strokeCenterLine' || objects[x].id == 'strokeCenterCircle') {
-						objects[x].set('fill', color.toHexString())
-                    	below.renderAll()
-					}
-					if (objects[x].id == 'wordmarkTextTopStroke' || objects[x].id == 'wordmarkTextBottomStroke') {
-						objects[x].set('stroke', color.toHexString())
-						below.renderAll()
-					}
-                }
+				let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+				g.getObjects().forEach(function(o) {
+					o.set("stroke", color.toHexString())
+				})
 			}
+			below.renderAll()
 		}
 	})
 
@@ -2380,8 +2566,10 @@
 	$("#textLogoCheck").on("click",function(e) {
 		if ($(this).is(':checked')) {
 			state = true;
+			$("#fontRow").find(".ms-dd").removeClass("disabled")
 		} else {
 			state = false;
+			$("#fontRow").find(".ms-dd").addClass("disabled")
 		}
 		$(".textOption").each(function() {
 			if (state == true) {
@@ -2390,6 +2578,10 @@
 				$(this).prop( "disabled", true );
 			}
 		})
+		if ($("#textMatchCheck").is(":checked")) {
+			$("#wordmarkTextBox2").val($("#wordmarkTextBox").val())
+			$("#wordmarkTextBox2").prop( "disabled", true );
+		}
 		$(".textColorSelector").each(function() {
 			if (state == true) {
 				$(this).spectrum('enable');
@@ -2397,24 +2589,41 @@
 				$(this).spectrum('disable');
 			}
 		})
-		var objects = below.getObjects('text').forEach(function (o) {
-			o.visible = state
-			below.renderAll()
-		})
+		
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		g.visible = state
+		below.renderAll()
+	})
+
+	$("#textMatchCheck").on("click", function() {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		if ($(this).is(':checked')) {
+			$("#wordmarkTextBox2").val($("#wordmarkTextBox").val())
+			$("#wordmarkTextBox2").prop( "disabled", true );
+			g.getObjects().forEach(function(o) {
+				o.set("text",$("#wordmarkTextBox").val())
+			})
+		} else {
+			$("#wordmarkTextBox2").prop( "disabled", false );
+			let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+			let p = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+			o.set("text",$("#wordmarkTextBox").val())
+			p.set("text",$("#wordmarkTextBox2").val())
+		}
+		below.renderAll()
 	})
 
 	$("#textStrokeCheck").on("click",function() {
 		state = ($(this).is(':checked')) ? true : false;
-		below.getObjects('text').forEach(function(o) {
-			if (o.id == "wordmarkTextTopStroke" || o.id == "wordmarkTextBottomStroke") {
-				if (state == true) {
-					o.visible = true;
-				} else {
-					o.visible = false;
-				}
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		g.getObjects().forEach(function(o) {
+			if (state == true) {
+				o.set("stroke",$("#rinkColor").spectrum("get").toHexString())
+			} else {
+				o.set("stroke","transparent")
 			}
-			below.renderAll()
 		})
+		below.renderAll()
 	})
 	
 	$(".belowTextureToggle").on("click",function() {
@@ -2492,66 +2701,78 @@
 	})
 
 	$("#fontTypeCombo").on("change",function() {
-		var style = $(this).val();
-		var font_family = $("."+style).css("font-family");
-		var objects = below.getObjects('text');
-		for (x in objects) {
-			objects[x].fontFamily = font_family;
-		}
+		let style = $(this).val();
+		let font_family = $("."+style).css("font-family");
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		
+		let font = new FontFaceObserver(style)
+        font.load()
+        .then(function() {
+            g.getObjects().forEach(function(o) {
+				o.set('fontFamily',style)
+			})
+        })
+		/* var objects = below.getObjects('text');
+ 		for (x in objects) {
+			objects[x].fontFamily = style;
+		} */
 		below.renderAll();
-		$(this).removeClass().addClass(style);
+		//$(this).removeClass().addClass(style);
 	})
 
     $("#fakeImageButton").on("click",function() {
-		$.ajax({
-			type: "GET",
-			url: "http://127.0.0.1:"+port+"/uploadImage",
-			success: function(data) {
-				var imgObj = new Image();
-				imgObj.src = data.image;
-				$("#fileName").html(data.filename);
-				imgObj.onload = function () {
-					// start fabricJS stuff
-					var image = new fabric.Image(imgObj);
-					image.set({
-						originX: 'center',
-						originY: 'center',
-						left: imLeft,
-						top: imTop,
-						perPixelTargetFind: true,
-						centeredScaling: true,
-						centeredRotation: true,
-						name: data.filename,
-						borderColor: 'red',
-						cornerColor: 'yellow',
-						cornerSize: 12,
-						transparentCorners: false,
-						id: data.filename
-					});
-					image.filters.push(new fabric.Image.filters.Resize({
-						resizeType: 'lanczos', // typo fixed
-						lanczosLobes: 2 // typo fixed
-					}));
-					image.on('object:modified',function() {
-						imLeft = image.get('left')
-						imTop = image.get('top');
-					})
-					var h = image.height;
-					var w = image.width;
-					//if ((h > 300) || (w > 300)) {
-					//	image.scale(0.5);
-					//}
-					below.add(image);
-					below.centerObject(image)
-					image.sendToBack();
-					below.renderAll();
-					//image.bringForward();
-					
-					// end fabricJS stuff
-				}
-			}
-		});
+		ipcRenderer.send('upload-image', null)
 	})
+
+	ipcRenderer.on('add-image-response', (event, data) => {
+        addImage(data)
+    })
+
+	function addImage(data) {
+		var imgObj = new Image();
+		imgObj.src = data.image;
+		$("#fileName").html(data.filename);
+		imgObj.onload = function () {
+			// start fabricJS stuff
+			var image = new fabric.Image(imgObj);
+			image.set({
+				originX: 'center',
+				originY: 'center',
+				left: imLeft,
+				top: imTop,
+				perPixelTargetFind: true,
+				centeredScaling: true,
+				centeredRotation: true,
+				name: data.filename,
+				borderColor: 'red',
+				cornerColor: 'yellow',
+				cornerSize: 12,
+				transparentCorners: false,
+				id: data.filename,
+				path: data.path
+			});
+			image.filters.push(new fabric.Image.filters.Resize({
+				resizeType: 'lanczos', // typo fixed
+				lanczosLobes: 2 // typo fixed
+			}));
+			image.on('object:modified',function() {
+				imLeft = image.get('left')
+				imTop = image.get('top');
+			})
+			var h = image.height;
+			var w = image.width;
+			//if ((h > 300) || (w > 300)) {
+			//	image.scale(0.5);
+			//}
+			below.add(image);
+			below.centerObject(image)
+			image.sendToBack();
+			below.renderAll();
+			//image.bringForward();
+			
+			// end fabricJS stuff
+		}
+	}
 
 	$("#save").on("click",function(e) {
 		e.preventDefault()
@@ -2560,6 +2781,51 @@
 		below.set("end", $("#endYear").val())
 		below.set("selectedFont", $("#fontTypeCombo").val())
 		below.set("customFonts", customFonts)
+
+		const checkboxes = {}
+		const selects = {}
+		const numberInputs = {}
+		const selectors = {}
+		const textBoxes = {}
+		const buttons = {}
+		const exportMeta = {}
+
+		$("input[type=checkbox]").each(function() {
+			checkboxes[$(this).attr("id")] = { "checked": $(this).is(":checked"), "val": $(this).val() }
+		})
+
+		$("select").each(function() {
+			selects[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": $(this).val() }
+		})
+
+		$(".textInput").each(function() {
+			textBoxes[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": $(this).val() }
+		})
+
+		$("input[type=number]").each(function() {
+			numberInputs[$(this).attr("id")] = { "checked": $(this).is(":checked"), "val": $(this).val() }
+		})
+
+		$("input[type=button]").each(function(){
+			buttons[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": $(this).val() }
+		})
+
+		$(".allSelectors").each(function(){
+			if ($(this).spectrum("get") == null) {
+				selectors[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": 'transparent' }
+			} else {
+				selectors[$(this).attr("id")] = { "disabled": $(this).prop("disabled"), "val": $(this).spectrum("get").toHexString() }
+			}
+		})
+
+		exportMeta.checkboxes = checkboxes
+		exportMeta.selects = selects
+		exportMeta.numberInputs = numberInputs
+		exportMeta.selectors = selectors
+		exportMeta.textBoxes = textBoxes
+		exportMeta.buttons = buttons
+
+		below.set("exportMeta", exportMeta)
 
 		const json = JSON.stringify(below.toJSON(['team','start','end','selectedFont','customFonts','id','visible','selectable','perPixelTargetFind','centeredScaling','centeredRotation','borderColor','cornerColor','cornerSize','name','transparentCorners','snapAngle']),null,2);
 
@@ -2626,43 +2892,44 @@
 
 		//var json = JSON.stringify(below.toJSON());
 
-		$.ajax({
-			type: "POST",
-			url: "http://127.0.0.1:"+port+"/saveRink",
-			data: {rinkLines:lines,imgdata:img,name:fileName,canvas:json},
-			success: function(result) {
-				var objects = below.getObjects()
-				for (x in objects) {
-					if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup') {
-						objects[x].set({
-							visible: true
-						})
-					}
-					if (objects[x].id == 'guides') {
-						if ($("#guidesToggle").is(':checked')) {
-							objects[x].set({
-								visible: true
-							})
-						}
-					}
-				}
-				below.renderAll()
-				$("#overlay").css("display","none");
+		exportMeta.canvas = json
+
+		ipcRenderer.send('save-rink', {rinkLines:lines, imgdata:img, name:fileName, canvas:json})
+	})
+
+	ipcRenderer.on('save-rink-response', (event, response) => {
+		var objects = below.getObjects()
+		for (x in objects) {
+			if (objects[x].id == 'overlayGroup' || objects[x].id == 'rinkElementGroup') {
+				objects[x].set({
+					visible: true
+				})
 			}
-		})
+			if (objects[x].id == 'guides') {
+				if ($("#guidesToggle").is(':checked')) {
+					objects[x].set({
+						visible: true
+					})
+				}
+			}
+		}
+		below.renderAll()
+		$("#overlay").css("display","none");
 	})
 
 	$("#load").on("click",function(e) {
-		$("#uploadedJSON").click()
+		$("#overlay").css("display","inline-block");	
+		ipcRenderer.send('load-rink', null)
 	})
 
-	$("#uploadedJSON").on("change",function(e) {
-		var fileReader = new FileReader();
-		fileReader.onload = function () {
+	ipcRenderer.on('load-rink-response', (event, data) => {
+		console.log(data.result)
+		if (data.result == "success") {
+			customFonts.splice(0, customFonts.length)
+			const tmp = JSON.parse(data.json)
 			customFonts.splice(0, customFonts.length)
 			below.clear()
-			var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
-			const tmp = JSON.parse(data)
+			//var data = fileReader.result;  // data <-- in this var you have the file data in Base64 format
 			const newBG = tmp.background;
 			if (tmp.customFonts.length > 0) {
 				for (x in tmp.customFonts) {
@@ -2683,7 +2950,7 @@
 			$("#startYear").val(tmp.start)
 			$("#endYear").val(tmp.end)
 			var wordmarkVisible = null;
-			below.loadFromJSON(data, below.renderAll.bind(below), function(o, object) {
+			below.loadFromJSON(tmp, below.renderAll.bind(below), function(o, object) {
 				
 				below.add(object)
 				if (object.type == "text") {
@@ -2805,48 +3072,48 @@
 			$("#rinkColor").spectrum("set", newBG)
 			initializeOverlay()
 			below.renderAll.bind(below)
-		}	
-    	fileReader.readAsText($(this).prop('files')[0]);
-		
+		}
+		$("#overlay").css("display","none");	
 	})
 
-	$("#flipBottomtext").on("click",function(e) {
-		below.getObjects('text').forEach(function(o) {
-			if (o.id == 'wordmarkTextBottom' || o.id == 'wordmarkTextBottomStroke') {
-				if (o.pathSide == 'left') {
-					o.set({
-						pathSide: 'right',
-						pathAlign: 'ascender'
-					})
-				} else {
-					o.set({
-						pathSide: 'left',
-						pathAlign: 'descender'
-					})
-				}
-				below.renderAll()
-			}
-		})
+	ipcRenderer.on('hide-overlay', (event, arg) => {
+		$("#overlay").css("display","none");
+	})
 
-		if (objects[0].pathSide == 'right') {
-			objects[0].pathSide = 'left'
-			objects[0].pathAlign = 'descender'
+	$("#flipTopText").on("click",function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextTop")
+		if (o.pathSide == 'left') {
+			o.set({
+				pathSide: 'right',
+				pathAlign: 'ascender'
+			})
 		} else {
-			objects[0].pathSide = 'right'
-			objects[0].pathAlign = 'ascender'
-		} 
-		
-		if (objects[2].pathSide == 'right') {
-			objects[2].pathSide = 'left'
-			objects[2].pathAlign = 'descender'
-		} else {
-			objects[2].pathSide = 'right'
-			objects[2].pathAlign = 'ascender'
+			o.set({
+				pathSide: 'left',
+				pathAlign: 'descender'
+			})
 		}
-
 		below.renderAll()	
 	})
 
+	$("#flipBottomText").on("click",function(e) {
+		let g = below.getObjects('group').find(o => o.id == "wordmarkGroup")
+		let o = g.getObjects().find(o => o.id == "wordmarkTextBottom")
+		if (o.pathSide == 'left') {
+			o.set({
+				pathSide: 'right',
+				pathAlign: 'ascender'
+			})
+		} else {
+			o.set({
+				pathSide: 'left',
+				pathAlign: 'descender'
+			})
+		}
+		below.renderAll()	
+	})
+  
 	$(".makeAd").on("click",function(e) {
 		$("#overlay").css("display","inline-block");	
 		var object = below.getActiveObject();
@@ -3013,213 +3280,160 @@
 	})
 
 	$("#border").on("click",function(e) {
-		var action = $(this).data("action");
-		var fuzz = parseInt($("#colorFuzz").val());
-		if (below.getActiveObject()) {
+        let canvas = below
+        let canvasName = "below"
+        let fuzz = parseInt($("#colorFuzz").val())
+		let action = $(this).data("action");
+		if (canvas.getActiveObject()) {
 			$("#overlay").css("display","inline-block");
-			var object = below.getActiveObject()
-			var idx = below.getObjects().indexOf(object)
+			var object = canvas.getActiveObject()
+			console.log(object.scaleX)
+			var idx = canvas.getObjects().indexOf(object)
 			if (object.get('type') == "image") {
-				var pictureName = object.get('name');
-				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
-				var theImage = object._originalElement.currentSrc;	
-				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();
-				$.ajax({
-					type: "POST",
-					url: "http://127.0.0.1:"+port+"/removeBorder",
-					data: {imgdata: theImage, x: "1", y: "1", action: "removeBorder", color: "null", newcolor: "null", fuzz: fuzz, filename: pictureName},
-					success: function(data) {
-						$("#overlay").css("display","none");
-						//$("#testImage").attr("src","data:image/png;base64,"+data);
-						var imgObj = new Image();
-						imgObj.src = data;
-						imgObj.onload = function () {
-							var image = new fabric.Image(imgObj);
-							image.set({
-								originX: 'center',
-								originY: 'center',
-								left: imLeft,
-								top: imTop,
-								perPixelTargetFind: true,
-								centeredScaling: true,
-								centeredRotation: true,
-								borderColor: 'red',
-								cornerColor: 'yellow',
-								cornerSize: 12,
-								name: pictureName,
-								transparentCorners: false
-							});
-							
-							image.filters.push(new fabric.Image.filters.Resize({
-								resizeType: 'lanczos', // typo fixed
-								lanczosLobes: 2 // typo fixed
-							}));
-							
-							image.on('object:modified',function() {
-								imLeft = image.get('left')
-								imTop = image.get('top');
-							});
-							
-							below.remove(object);
-							below.add(image);
-							image.moveTo(idx);
-							below.renderAll();
-							imLeft = image.get('left')
-							imTop = image.get('top');
-						}
-					}
-				})
+				let imLeft = object.get("left");
+				let imTop = object.get("top");
+                let path = object.get('path')
+				let pictureName = object.get('name');
+				let scaleX = object.get('scaleX')
+				let scaleY = object.get('scaleY')
+				//$("#colorSquare").removeClass("colorSquare").removeClass("colorSquareSelected");
+				let theImage = object._originalElement.currentSrc;	
+                theImage = theImage.substr(theImage.indexOf(',') + 1).toString();
+				ipcRenderer.send('remove-border', {imgdata: theImage, fuzz: fuzz, pictureName: pictureName, canvas: canvasName, imgLeft: imLeft, imgTop: imTop, path: path, scaleX: scaleX, scaleY: scaleY})
 				return false;
 			}
 		}	
 	})
 
+	ipcRenderer.on('imagemagick-response', (event, response) => {
+		if (response.status != "success") {
+			alert(response.message)
+			//hideOverlay()
+		} else {
+			let canvas = below
+			let data = response.data
+			let imLeft = response.pLeft
+			let imTop = response.pTop
+			let pictureName = response.pictureName
+			let path = response.path
+			let scaleX = response.scaleX
+			let scaleY = response.scaleY
+		
+			var object = canvas.getActiveObject()
+			var idx = canvas.getObjects().indexOf(object)
+
+			var imgObj = new Image();
+			imgObj.src = data;
+			imgObj.onload = function () {
+				var image = new fabric.Image(imgObj);
+				image.set({
+					originX: 'center',
+					originY: 'center',
+					left: imLeft,
+					top: imTop,
+					perPixelTargetFind: true,
+					centeredScaling: true,
+					centeredRotation: true,
+					name: pictureName,
+					id: pictureName,
+					path: path,
+					scaleX: scaleX,
+					scaleY: scaleY,
+					borderColor: 'red',
+					cornerColor: 'yellow',
+					cornerSize: 12,
+					transparentCorners: false
+				});
+				
+				image.filters.push(new fabric.Image.filters.Resize({
+					resizeType: 'lanczos', // typo fixed
+					lanczosLobes: 2 // typo fixed
+				}));
+				
+				image.on('object:modified',function() {
+					imLeft = image.get('left')
+					imTop = image.get('top');
+				});
+
+				image.on('selected',function() {
+					$("#fileName").html(image.get('id'));
+					if ($("#trimImageDiv").css("display") == "none") {
+						$("#trimImageDiv").css("display","block");
+						$("#uploadImageDiv").css("display","none");
+						$("#selectedImageDiv").css("display","block");
+					}
+					$("#tipSpan").html("Use Arrow keys to move image 1 pixel.<br>Use Shift + Arrow keys to move image 10 pixels.<br>Use Delete key to remove image.");
+					$(".copypaste").each(function() {
+						$(this).css("display","inline-block")
+					})
+				})
+				
+				canvas.remove(object);
+
+				canvas.add(image);
+				image.moveTo(idx);
+				canvas.renderAll();
+				imLeft = image.get('left')
+				imTop = image.get('top');
+				$("#colorSquare").val("Select Color");
+				$("#colorSquare").css("background","#FFFFFF");
+				$("#colorSquare").css("color","#000000");
+				$("#overlay").css("display","none");
+			}
+		}
+	})
+
 	$("#removeColorRange").on("click",function(e) {
-		var x = $(this).data("x");
-		var y = $(this).data("y");
-		var action = $(this).attr("id");
-		var color = $("#colorSquare").val();
-		var fuzz = parseInt($("#colorFuzz").val());
+		let x = $(this).data("x");
+		let y = $(this).data("y");
+		let action = $(this).attr("id");
+		let color = $("#colorSquare").val();
+		let fuzz = parseInt($("#colorFuzz").val());
 		if (below.getActiveObject()) {
-			var object = below.getActiveObject()
-			var idx = below.getObjects().indexOf(object)
+			let object = below.getActiveObject()
+			let idx = below.getObjects().indexOf(object)
 			if (object.get('type') == "image") {
 				//$("#overlay").css("display","inline-block");
-				var pictureName = object.get('name');
-				var pLeft = object.get('left')
-				var pTop = object.get('top')
-				var pScaleX = object.get('scaleX')
-				var pScaleY = object.get('scaleY')
-				var pX = x / pScaleX
-				var pY = y / pScaleY
+				let pictureName = object.get('name');
+				let pLeft = object.get('left')
+				let pTop = object.get('top')
+				let pScaleX = object.get('scaleX')
+				let pScaleY = object.get('scaleY')
+				let pX = x / pScaleX
+				let pY = y / pScaleY
+				let path = object.get('path')
 				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
 				var theImage = object._originalElement.currentSrc;
-				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();			
-				$.ajax({
-					type: "POST",
-					url: "http://127.0.0.1:"+port+"/removeColorRange",
-					data: {imgdata: theImage, x: pX, y: pY, color: color, action: action, fuzz: fuzz, filename: pictureName},
-					success: function(data) {
-						var imgObj = new Image();
-						imgObj.src = data;
-						imgObj.onload = function () {
-							var image = new fabric.Image(imgObj);
-							image.set({
-								originX: 'center',
-								originY: 'center',
-								left: pLeft,
-								top: pTop,
-								scaleX: pScaleX,
-								scaleY: pScaleY,
-								perPixelTargetFind: true,
-								centeredScaling: true,
-								centeredRotation: true,
-								borderColor: 'red',
-								cornerColor: 'yellow',
-								cornerSize: 12,
-								name: pictureName,
-								transparentCorners: false
-							});
-							
-							image.filters.push(new fabric.Image.filters.Resize({
-								resizeType: 'lanczos', // typo fixed
-								lanczosLobes: 2 // typo fixed
-							}));	
-							
-							image.on('object:modified',function() {
-								imLeft = image.get('left');
-								imTop = image.get('top');
-							});
-							
-							below.remove(object);
-							below.add(image);
-							image.moveTo(idx);
-							below.renderAll();
-							imLeft = image.get('left');
-							imTop = image.get('top');
-							$("#colorSquare").val("Select Color");
-							$("#colorSquare").css("background","#FFFFFF");
-							$("#colorSquare").css("color","#000000");
-							$("#overlay").css("display","none");
-						}
-					}
-				})
+				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();	
+				ipcRenderer.send('remove-color-range', {imgdata: theImage, x: pX, y: pY, color: color, action: action, fuzz: fuzz, filename: pictureName, pLeft: pLeft, pTop: pTop, pScaleX: pScaleX, pScaleY: pScaleY, pictureName: pictureName, path: path})		
 				return false;
 			}
 		}
 	})
 
 	$("#removeAllColor").on("click",function(e) {
-		var x = $(this).data("x");
-		var y = $(this).data("y");
-		var action = $(this).attr("id");
-		var color = $("#colorSquare").val();
-		var fuzz = parseInt($("#colorFuzz").val());
+		let x = $(this).data("x");
+		let y = $(this).data("y");
+		let action = $(this).attr("id");
+		let color = $("#colorSquare").val();
+		let fuzz = parseInt($("#colorFuzz").val());
 		if (below.getActiveObject()) {
-			var object = below.getActiveObject()
-			var idx = below.getObjects().indexOf(object)
+			let object = below.getActiveObject()
+			let idx = below.getObjects().indexOf(object)
 			if (object.get('type') == "image") {
 				$("#overlay").css("display","inline-block");
-				var pictureName = object.get('name');
-				var pLeft = object.get('left')
-				var pTop = object.get('top')
-				var pScaleX = object.get('scaleX')
-				var pScaleY = object.get('scaleY')
-				var pX = x / pScaleX
-				var pY = y / pScaleY
+				let pictureName = object.get('name');
+				let pLeft = object.get('left')
+				let pTop = object.get('top')
+				let pScaleX = object.get('scaleX')
+				let pScaleY = object.get('scaleY')
+				let pX = x / pScaleX
+				let pY = y / pScaleY
+				let path = object.get('path')
 				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
-				var theImage = object._originalElement.currentSrc;
-				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();			
-				$.ajax({
-					type: "POST",
-					//url: "./scripts/changecolor.php",
-					url: "http://127.0.0.1:"+port+"/removeAllColor",
-					data: {imgdata: theImage, x: pX, y: pY, color: color, action: action, fuzz: fuzz, filename: pictureName},
-					success: function(data) {
-						var imgObj = new Image();
-						imgObj.src = data;
-						imgObj.onload = function () {
-							var image = new fabric.Image(imgObj);
-							image.set({
-								originX: 'center',
-								originY: 'center',
-								left: pLeft,
-								top: pTop,
-								scaleX: pScaleX,
-								scaleY: pScaleY,
-								perPixelTargetFind: true,
-								centeredScaling: true,
-								centeredRotation: true,
-								borderColor: 'red',
-								cornerColor: 'yellow',
-								cornerSize: 12,
-								name: pictureName,
-								transparentCorners: false
-							});
-							
-							image.filters.push(new fabric.Image.filters.Resize({
-								resizeType: 'lanczos',
-								lanczosLobes: 2
-							}));
-							
-							image.on('object:modified',function() {
-								imLeft = image.get('left');
-								imTop = image.get('top');
-							});
-							
-							below.remove(object);
-							below.add(image);
-							image.moveTo(idx);
-							below.renderAll();
-							imLeft = image.get('left');
-							imTop = image.get('top');
-							$("#colorSquare").val("Select Color");
-							$("#colorSquare").css("background","#FFFFFF");
-							$("#colorSquare").css("color","#000000");
-							$("#overlay").css("display","none");
-						}
-					}
-				})
+				let theImage = object._originalElement.currentSrc;
+				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();
+				ipcRenderer.send('remove-all-color', {imgdata: theImage, x: pX, y: pY, color: color, action: action, fuzz: fuzz, filename: pictureName,  pLeft: pLeft, pTop: pTop, pScaleX: pScaleX, pScaleY: pScaleY, pictureName: pictureName, color: color, path: path})			
 				return false;
 			}
 		}
@@ -3236,78 +3450,33 @@
 	})
 	
 	$("#replaceColorSubmit").on("click",function(e) {
-		var action = $(this).data("action");
-		var x = $(this).data("x");
-		var y = $(this).data("y");
-		var color = $("#colorSquare").val();
-		var newcolor = $("#replacementColor").spectrum("get").toHexString();
-		var fuzz = parseInt($("#colorFuzz").val());
+		let action = $(this).data("action");
+		let x = $(this).data("x");
+		let y = $(this).data("y");
+		let color = $("#colorSquare").val();
+		let newcolor = $("#replacementColor").spectrum("get").toHexString();
+		let fuzz = parseInt($("#colorFuzz").val());
 		if (below.getActiveObject()) {
-			var object = below.getActiveObject()
-			var idx = below.getObjects().indexOf(object)
+			let object = below.getActiveObject()
+			let idx = below.getObjects().indexOf(object)
 			if (object.get('type') == "image") {
-				var pictureName = object.get('name');
+				let pictureName = object.get('name');
 				$("#colorSquare").removeClass("colorSquareActive").removeClass("colorSquareSelected");
 				
-				var theImage = object._originalElement.currentSrc;
+				let theImage = object._originalElement.currentSrc;
 
-				var pLeft = object.get('left')
-				var pTop = object.get('top')
-				var pScaleX = object.get('scaleX')
-				var pScaleY = object.get('scaleY')
-				var pX = x / pScaleX
-				var pY = y / pScaleY
+				let pLeft = object.get('left')
+				let pTop = object.get('top')
+				let pScaleX = object.get('scaleX')
+				let pScaleY = object.get('scaleY')
+				let pX = x / pScaleX
+				let pY = y / pScaleY
+				let path = object.get('path')
 
 				theImage = theImage.substr(theImage.indexOf(',') + 1).toString();
+
+				ipcRenderer.send('replace-color', {imgdata: theImage, pLeft: pLeft, pTop: pTop, pScaleX: pScaleX, pScaleY: pScaleY, action: action, color: color, newcolor: newcolor, fuzz: fuzz, pictureName: pictureName, x: x, y: y, path: path})
 				
-				$.ajax({
-					type: "POST",
-					url: "http://127.0.0.1:"+port+"/replaceColor",
-					data: {imgdata: theImage, x: pX, y: pY, action: action, color: color, newcolor: newcolor, fuzz: fuzz, filename: pictureName},
-					success: function(data) {
-					//$("#testImage").attr("src","data:image/png;base64,"+data);
-						var imgObj = new Image();
-						imgObj.src = data;
-						imgObj.onload = function () {
-							var image = new fabric.Image(imgObj);
-							image.set({
-								originX: 'center',
-								originY: 'center',
-								left: pLeft,
-								top: pTop,
-								scaleX: pScaleX,
-								scaleY: pScaleY,
-								perPixelTargetFind: true,
-								centeredScaling: true,
-								centeredRotation: true,
-								borderColor: 'red',
-								cornerColor: 'yellow',
-								cornerSize: 12,
-								name: pictureName,
-								transparentCorners: false
-							});
-							
-							image.filters.push(new fabric.Image.filters.Resize({
-								resizeType: 'lanczos',
-								lanczosLobes: 2
-							}));
-							
-							image.on('object:modified',function() {
-								imLeft = image.get('left')
-								imTop = image.get('top');
-								//$("#infoWTF").html("imLeft: "+imLeft+"<br>imTop: "+imTop);
-							});
-							
-							below.remove(object);
-							below.add(image);
-							image.moveTo(idx);
-							below.renderAll();
-							imLeft = image.get('left')
-							imTop = image.get('top');
-							//$("#infoWTF").html("imLeft: "+imLeft+"<br>imTop: "+imTop);
-						}
-					}
-				})
 				return false;
 			}
 		}	
@@ -3416,6 +3585,12 @@
 
     return object;
 };
+
+function getExtension(filename) {
+	var ext = (filename||'').split('.');
+	return ext[ext.length - 1];
+}
+
 </script>
 </head>    
 </html>

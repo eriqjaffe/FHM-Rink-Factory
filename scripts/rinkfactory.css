@@ -530,3 +530,7 @@ legend {
 	pointer-events:none;          /* THIS IS THE TRICK YOU SEEK */
 	display: none;
 }
+
+.hover{
+	box-shadow: 0 0 20px blue;
+}
