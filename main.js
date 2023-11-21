@@ -125,31 +125,18 @@ ipcMain.on('upload-image', (event, arg) => {
 		defaultPath: store.get("uploadImagePath", app.getPath('pictures')),
 		properties: ['openFile'],
 		filters: [
-			{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff'] }
+			{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff', 'svg'] }
 		]
 	}
     dialog.showOpenDialog(null, options).then(result => {
         if (!result.canceled) {
 			store.set("uploadImagePath", path.dirname(result.filePaths[0]))
-            Jimp.read(result.filePaths[0], (err, image) => {
-				if (err) {
-					json.filename = "error not an image"
-					json.image = "error not an image"
-					event.sender.send('add-image-response', json)
-				} else {
-					image.getBase64(Jimp.AUTO, (err, ret) => {
-						json.path = result.filePaths[0]
-						json.filename = path.basename(result.filePaths[0])
-						json.image = ret
-						//json.path = result.filePaths[0]
-						event.sender.send('add-image-response', json)
-					})
-				}
-			})
-            .catch(err => { json.filename = "error not an image"
-                json.image = "error not an image"
-                event.sender.send('add-image-response', err) 
-            })
+			if (path.extname(result.filePaths[0]) == ".svg") {
+				console.log("it's an svg!")
+				event.sender.send('svg-convert', result.filePaths[0])
+			} else {
+				
+			}
         } else {
             res.end()
 			  console.log("cancelled")
@@ -159,29 +146,31 @@ ipcMain.on('upload-image', (event, arg) => {
 
 ipcMain.on('drop-image', (event, arg) => {
     let json = {}
-    //ColorThief.getPalette(arg, 8)
-    //    .then(palette => { 
-            Jimp.read(arg, (err, image) => {
-                if (err) {
-                    json.filename = "error not an image"
-                    json.image = "error not an image"
-                    event.sender.send('add-image-response', json)
-                } else {
-                    image.getBase64(Jimp.AUTO, (err, ret) => {
-						json.path = arg
-                        json.filename = path.basename(arg)
-                        json.image = ret
-                        //json.palette = palette
-                        event.sender.send('add-image-response', json)
-                    })
-                }
-            })
-        //})
-        .catch(err => { json.filename = "error not an image"
-            json.image = "error not an image"
-            event.sender.send('add-image-response', err) 
-        })
-    
+	Jimp.read(arg, (err, image) => {
+		if (err) {
+			json.filename = "error not an image"
+			json.image = "error not an image"
+			event.sender.send('add-image-response', json)
+		} else {
+			image.getBase64(Jimp.AUTO, (err, ret) => {
+				json.path = arg
+				json.filename = path.basename(arg)
+				json.image = ret
+				//json.palette = palette
+				event.sender.send('add-image-response', json)
+			})
+		}
+	})
+	.catch(err => { 
+		console.log(err)
+		json.filename = "error not an image"
+		json.image = "error not an image"
+		event.sender.send('add-image-response', err) 
+	})		
+})
+
+ipcMain.on('render-svg', (event, arg) => {
+	console.log(arg)
 })
 
 ipcMain.on('open-folder', (event, arg) => {

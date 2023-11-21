@@ -159,7 +159,7 @@
 		var fontList = ['Acme','AthleticGothic','AthleticGothicShadow','BeavertonScript','Berkshire_Swash','Cantora_One','CaxtonRoman','Chela_One','Circus','Condiment','Cookie','Courgette','Croissant_One','Damion','Engagement','RawlingsFancyBlock','Germania_One','Graduate','Grand_Hotel','Jockey_One','Kansas','Kaushan_Script','Leckerli_One','Lily_Script_One','Lobster','Lobster_Two','Metal_Mania','Miniver','Molle','New_Rocker','Norican','OldEnglish','Oleo_Script','Oleo_Script_Swash_Caps','Pacifico','Pirata_One','Playball','ProFullBlock','RichardsonFancyBlock','Rubik_One','Rum_Raisin','Satisfy','Seymour_One','spl28','TiffanyRegular','Trade_Winds','Tuscan','UnifrakturCook','UnifrakturMaguntia','Vibur','Viga','Wellfleet','Wendy_One','Yellowtail']
 
 		const validFontTypes = ["ttf", "otf"]
-		const validImageTypes = ["png","jpg","jpeg","bmp","gif","tiff"]
+		const validImageTypes = ["png","jpg","jpeg","bmp","gif","tiff","svg"]
   </script>
 <body>
 <div class="title">
@@ -2722,6 +2722,17 @@
 
     $("#fakeImageButton").on("click",function() {
 		ipcRenderer.send('upload-image', null)
+	})
+
+	ipcRenderer.on('svg-convert', (event, data) => {
+		fabric.loadSVGFromURL(data,function(objects, options){
+			let svgData = fabric.util.groupSVGElements(objects, options);
+			svgData.top = 0;
+			svgData.left = 0;
+			svgData.scaleToWidth(3000);
+			ipcRenderer.send('render-svg', {path: data, iamge: svgData.toDataURL()})
+			//console.log(svgData.toDataURL())
+		});
 	})
 
 	ipcRenderer.on('add-image-response', (event, data) => {
