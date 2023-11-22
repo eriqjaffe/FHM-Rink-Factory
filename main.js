@@ -133,9 +133,29 @@ ipcMain.on('upload-image', (event, arg) => {
 			store.set("uploadImagePath", path.dirname(result.filePaths[0]))
 			if (path.extname(result.filePaths[0]) == ".svg") {
 				console.log("it's an svg!")
-				event.sender.send('svg-convert', result.filePaths[0])
+				json.image = result.filePaths[0]
+				json.filename = path.basename(result.filePaths[0])
+				event.sender.send('svg-convert', json)
 			} else {
-				
+				Jimp.read(result.filePaths[0], (err, image) => {
+					if (err) {
+						json.filename = "error not an image"
+						json.image = "error not an image"
+						event.sender.send('add-image-response', json)
+					} else {
+						image.getBase64(Jimp.AUTO, (err, ret) => {
+							json.path = result.filePaths[0]
+							json.filename = path.basename(result.filePaths[0])
+							json.image = ret
+							//json.path = result.filePaths[0]
+							event.sender.send('add-image-response', json)
+						})
+					}
+				})
+				.catch(err => { json.filename = "error not an image"
+					json.image = "error not an image"
+					event.sender.send('add-image-response', err) 
+				})
 			}
         } else {
             res.end()
