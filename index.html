@@ -396,19 +396,19 @@
 								</tr>
 								<tr>
 									<td><center>
-										<input type="button" id="colorSquare" class="colorSquare" value="Select Color" style="margin-right:10px;"><span id="chosenCoordinates" style="margin-right:5px;"></span>
+										<input type="button" id="colorSquare" class="colorSquare svgNo" value="Select Color" style="margin-right:10px;"><span id="chosenCoordinates" style="margin-right:5px;"></span>
 										Fuzz %:
-										<input type="range" class="range" id="colorFuzz" value="40" min="1" max="100" style="margin-left:5px; margin-right:5px;"> 
+										<input type="range" class="range svgNo" id="colorFuzz" value="40" min="1" max="100" style="margin-left:5px; margin-right:5px;"> 
 										<span id="fuzzAmount">40</span>%
 									</td>
 								</tr>
 								<tr>
 									<td><center>
-										<input type="button" class="button" id="border" value="Remove Border">
-										<input type="button" class="button removeColor" id="removeColorRange" value="Remove Section" data-x="0" data-y="0">
-										<input type="button" class="button removeColor" id="removeAllColor" value="Remove All" data-x="0" data-y="0">
-										<input type="button" class="button replaceColor" id="replaceColorRange" value="Replace Section" data-x="0" data-y="0">
-										<input type="button" class="button replaceColor" id="replaceAllColor" value="Replace All" data-x="0" data-y="0">
+										<input type="button" class="button svgNo" id="border" value="Remove Border">
+										<input type="button" class="button removeColor svgNo" id="removeColorRange" value="Remove Section" data-x="0" data-y="0">
+										<input type="button" class="button removeColor svgNo" id="removeAllColor" value="Remove All" data-x="0" data-y="0">
+										<input type="button" class="button replaceColor svgNo" id="replaceColorRange" value="Replace Section" data-x="0" data-y="0">
+										<input type="button" class="button replaceColor svgNo" id="replaceAllColor" value="Replace All" data-x="0" data-y="0">
 									</td>
 								</tr>
 							</table>
@@ -598,7 +598,7 @@
 		customFonts: ""
 	});
 
-	fabric.Object.NUM_FRACTION_DIGITS = 17;
+		fabric.Object.NUM_FRACTION_DIGITS = 17;
 
 	fabric.Object.prototype.controls.mtr = new fabric.Control({
 		x: 0,
@@ -868,6 +868,13 @@
 				below.renderAll();
 				break;
 			case 46: // delete
+				if (obj.get('type') == "group") {
+					if (obj.get('kind') == "importedSVG") {
+						$("#fileName").html("");
+						below.remove(obj);
+						below.renderAll();
+					}
+				}
 				if (obj.get('type') == "image") {
 					$("#fileName").html("");
 					below.remove(obj);
@@ -2725,12 +2732,39 @@
 	})
 
 	ipcRenderer.on('svg-convert', (event, data) => {
-		fabric.loadSVGFromURL(data,function(objects, options){
+		console.log(data.image)
+		fabric.loadSVGFromURL(data.image,function(objects, options){
 			let svgData = fabric.util.groupSVGElements(objects, options);
-			svgData.top = 0;
-			svgData.left = 0;
 			svgData.scaleToWidth(3000);
-			ipcRenderer.send('render-svg', {path: data, iamge: svgData.toDataURL()})
+			svgData.set({
+				top: 0,
+				left: 0,
+				id: data.filename,
+				kind: "importedSVG"
+			})
+
+			svgData.on('selected',function() {
+				$("#fileName").html(svgData.get('id'));
+				if ($("#trimImageDiv").css("display") == "none") {
+					$("#trimImageDiv").css("display","block");
+					$("#uploadImageDiv").css("display","none");
+					$("#selectedImageDiv").css("display","block");
+				}
+				$("#tipSpan").html("Use Arrow keys to move image 1 pixel.<br>Use Shift + Arrow keys to move image 10 pixels.<br>Use Delete key to remove image.");
+				$(".copypaste").each(function() {
+					$(this).css("display","inline-block")
+				})
+				$(".svgNo").each(function() {
+					$(this).prop( "disabled", true );
+				})
+			})
+
+			below.add(svgData)
+			below.centerObject(svgData)
+			svgData.sendToBack();
+			below.renderAll()
+			below.setActiveObject(svgData)
+			//ipcRenderer.send('render-svg', {path: data, iamge: svgData.toDataURL()})
 			//console.log(svgData.toDataURL())
 		});
 	})
@@ -2772,9 +2806,23 @@
 			})
 			var h = image.height;
 			var w = image.width;
-			//if ((h > 300) || (w > 300)) {
-			//	image.scale(0.5);
-			//}
+
+			image.on('selected',function() {
+				$("#fileName").html(image.get('id'));
+				if ($("#trimImageDiv").css("display") == "none") {
+					$("#trimImageDiv").css("display","block");
+					$("#uploadImageDiv").css("display","none");
+					$("#selectedImageDiv").css("display","block");
+				}
+				$("#tipSpan").html("Use Arrow keys to move image 1 pixel.<br>Use Shift + Arrow keys to move image 10 pixels.<br>Use Delete key to remove image.");
+				$(".copypaste").each(function() {
+					$(this).css("display","inline-block")
+				})
+				$(".svgNo").each(function() {
+					$(this).prop( "disabled", false );
+				})
+			})
+
 			below.add(image);
 			below.centerObject(image)
 			image.sendToBack();
@@ -3376,6 +3424,9 @@
 					$("#tipSpan").html("Use Arrow keys to move image 1 pixel.<br>Use Shift + Arrow keys to move image 10 pixels.<br>Use Delete key to remove image.");
 					$(".copypaste").each(function() {
 						$(this).css("display","inline-block")
+					})
+					$(".svgNo").each(function() {
+						$(this).prop( "disabled", false );
 					})
 				})
 				
