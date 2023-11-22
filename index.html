@@ -2753,8 +2753,8 @@
 			image.set({
 				originX: 'center',
 				originY: 'center',
-				left: imLeft,
-				top: imTop,
+				left: 1440,
+				top: 672,
 				perPixelTargetFind: true,
 				centeredScaling: true,
 				centeredRotation: true,
@@ -2776,16 +2776,9 @@
 			})
 			var h = image.height;
 			var w = image.width;
-			//if ((h > 300) || (w > 300)) {
-			//	image.scale(0.5);
-			//}
 			below.add(image);
-			below.centerObject(image)
 			image.sendToBack();
 			below.renderAll();
-			//image.bringForward();
-			
-			// end fabricJS stuff
 		}
 	}
 
