@@ -177,7 +177,7 @@
                 <div id="canvasContainer" style="width:960px; height:515px;">
 					<div id="dropContainer">
                     <div id="overlay" class="sample" style="width:960px; height:448px;"></div>
-                    <canvas id="below" width="2880" height="1344" style="position:absolute; top:10; left:10; border:1px solid red;"></canvas>
+                    <canvas id="below" width="2880" height="1344" style="position:absolute; top:10; left:10;"></canvas>
 					</div>
                     <div id="tipContainer" style="height:60px; padding-top:5px; font-weight:bold;"></div>
 					<br>
@@ -1073,7 +1073,7 @@
 			evented: false
 		});
 
-		/* centerCircle = new fabric.Path("M 478.19727 156.84961 C 442.14905 157.97588 413.23663 187.56279 413.23633 223.88281 C 413.23552 260.20362 442.14828 289.78789 478.19727 290.91406 L 478.19727 289.31641 A 65.586461 65.586461 0 0 1 414.74023 223.88086 A 65.586461 65.586461 0 0 1 478.19727 158.44727 L 478.19727 156.84961 z M 482.45117 156.84961 L 482.45117 158.44727 A 65.586461 65.586461 0 0 1 545.91211 223.88086 A 65.586461 65.586461 0 0 1 482.45117 289.41406 L 482.45117 290.91406 C 518.49841 289.78588 547.41096 260.20231 547.41016 223.88281 C 547.40985 187.56409 518.49764 157.97789 482.45117 156.84961 z",{
+		centerCircle = new fabric.Path("M 478.19727 156.84961 C 442.14905 157.97588 413.23663 187.56279 413.23633 223.88281 C 413.23552 260.20362 442.14828 289.78789 478.19727 290.91406 L 478.19727 289.31641 A 65.586461 65.586461 0 0 1 414.74023 223.88086 A 65.586461 65.586461 0 0 1 478.19727 158.44727 L 478.19727 156.84961 z M 482.45117 156.84961 L 482.45117 158.44727 A 65.586461 65.586461 0 0 1 545.91211 223.88086 A 65.586461 65.586461 0 0 1 482.45117 289.41406 L 482.45117 290.91406 C 518.49841 289.78588 547.41096 260.20231 547.41016 223.88281 C 547.40985 187.56409 518.49764 157.97789 482.45117 156.84961 z",{
 			fill: initialColors["blueLineColor"],
 			id: 'centerCircle',
 			visible: true,
@@ -1082,22 +1082,6 @@
 		});
 		
 		centerCircleStroke = new fabric.Path("M 478.19727 154.96289 C 441.12414 156.09017 411.34406 186.54164 411.34375 223.88477 C 411.34293 261.22867 441.12348 291.67938 478.19727 292.80664 L 478.19727 287.52344 C 443.98623 286.39815 416.63011 258.36357 416.63086 223.87695 C 416.63113 189.39107 443.98693 161.36517 478.19727 160.24023 L 478.19727 154.96289 z M 482.45117 154.96289 L 482.45117 160.24023 C 516.66493 161.36117 544.01926 189.38845 544.01953 223.87695 C 544.02029 258.36619 516.66563 286.40215 482.45117 287.52344 L 482.45117 292.80664 C 519.52134 291.67535 549.29769 261.22613 549.29688 223.88477 C 549.29656 186.5442 519.52067 156.0942 482.45117 154.96289 z",{
-			fill: initialColors["rinkColor"],
-			id: 'strokeCenterCircle',
-			visible: true,
-			selectable:false,
-			evented: false,
-		}); */
-
-		centerCircle = new fabric.Path("M 1431.9648 418.65039 C 1295.7196 422.90716 1186.4445 534.73138 1186.4434 672.00391 C 1186.4403 809.27941 1295.7167 921.09322 1431.9648 925.34961 L 1431.9648 919.3125 A 247.88584 247.88584 0 0 1 1192.127 671.99609 A 247.88584 247.88584 0 0 1 1431.9648 424.6875 L 1431.9648 418.65039 z M 1448.043 418.65039 L 1448.043 424.6875 A 247.88584 247.88584 0 0 1 1687.8945 671.99609 A 247.88584 247.88584 0 0 1 1448.043 919.68164 L 1448.043 925.34961 C 1584.2845 921.08562 1693.5597 809.27446 1693.5566 672.00391 C 1693.5555 534.7363 1584.2816 422.91476 1448.043 418.65039 z",{
-			fill: initialColors["blueLineColor"],
-			id: 'centerCircle',
-			visible: true,
-			selectable:false,
-			evented: false,
-		});
-		
-		centerCircleStroke = new fabric.Path("M 1431.9766 411.50781 C 1291.8576 415.7684 1179.302 530.8606 1179.3008 672 C 1179.2977 813.1423 1291.8552 928.23168 1431.9766 932.49219 L 1431.9766 912.52344 C 1302.675 908.27037 1199.2804 802.31383 1199.2832 671.9707 C 1199.2842 541.63036 1302.6776 435.70487 1431.9766 431.45312 L 1431.9766 411.50781 z M 1448.0527 411.50781 L 1448.0527 431.45312 C 1577.3646 435.68975 1680.7529 541.62046 1680.7539 671.9707 C 1680.7568 802.32374 1577.3672 908.28549 1448.0527 912.52344 L 1448.0527 932.49219 C 1588.1605 928.21645 1700.7023 813.1327 1700.6992 672 C 1700.698 530.87028 1588.1579 415.78363 1448.0527 411.50781 z ",{
 			fill: initialColors["rinkColor"],
 			id: 'strokeCenterCircle',
 			visible: true,
@@ -1363,13 +1347,24 @@
 		below.add(ezCircle3)
 		below.add(centerDot)
 
+		below.getObjects().forEach(function(o) {
+			o.set("scaleX",3)
+			o.set("scaleY",3)
+			o.set("top", o.top * 3)
+			o.set("left", o.left * 3)
+		})
+
+		
 		centerIcePath = new fabric.Path("M 478.07422 152.98047 C 439.94515 154.17175 409.36361 185.46626 409.36328 223.88281 C 409.36243 262.3002 439.94434 293.59201 478.07422 294.7832 L 478.07422 293.09375 A 69.372372 69.372372 0 0 1 410.95508 223.88086 A 69.372372 69.372372 0 0 1 478.07422 154.66992 L 478.07422 152.98047 z M 482.57422 152.98047 L 482.57422 154.66992 A 69.372372 69.372372 0 0 1 549.69727 223.88086 A 69.372372 69.372372 0 0 1 482.57422 293.19727 L 482.57422 294.7832 C 520.70225 293.58989 551.28403 262.29882 551.2832 223.88281 C 551.28286 185.46764 520.70142 154.17387 482.57422 152.98047 z", {
             visible: false,
             selectable:false,
             evented: false,
             originX: 'center',
             originY: 'center',
-            id: 'centerIcePath'
+            id: 'centerIcePath',
+			scaleX: 3,
+			scaleY: 3,
+			top: 500
         })
 
 		var circleFont = new FontFaceObserver($("#fontTypeCombo").val())
@@ -1414,6 +1409,8 @@
 
 			wordmarkGroup = new fabric.Group([], {
 				visible: false,
+				originX: 'center',
+				originY: 'center',
 				id: 'wordmarkGroup',
 				borderColor: 'red',
                 cornerColor: 'yellow',
@@ -1430,11 +1427,12 @@
 			wordmarkGroup.addWithUpdate(wordmarkTextTop)
 			wordmarkGroup.addWithUpdate(wordmarkTextBottom)
 
+			wordmarkGroup.set("scaleX", 3)
+			wordmarkGroup.set("scaleY", 3)
+			wordmarkGroup.set("top", 672)
+			wordmarkGroup.set("left", 1440)
+
 			below.add(wordmarkGroup)
-			//below.add(wordmarkTextBottom)
-		
-			below.centerObject(wordmarkGroup)
-			//below.centerObject(wordmarkTextBottom)
 		})
 
 		fabric.Image.fromURL("./images/guides.png", function (img) {
@@ -1443,9 +1441,7 @@
                 top: 0, 
 				scaleX: 3,
 				scaleY: 3,
-            	//scaleX: below.width / img.width,
-                //scaleY: below.height / img.height,
-				id: 'guides',
+            	id: 'guides',
 				visible: true,
 				selectable: false,
 				evented: false
@@ -1459,9 +1455,7 @@
 			var nets = img.set({
 				left: 0, 
                 top: 0, 
-                //scaleX: below.width / img.width,
-                //scaleY: below.height / img.height,
-				id: 'nets',
+                id: 'nets',
 				visible: true,
 				selectable: false,
 				evented: false
@@ -1485,13 +1479,10 @@
 		below.add(overlayGroup)
 
 		fabric.Image.fromURL("./images/ice_scratches.png", function (img) {
-			console.log(img.height, img.width)
 			var ice = img.set({
 				left: 0, 
                 top: 0, 
-                //scaleX: below.width / img.width,
-                //scaleY: below.height / img.height,
-				id: 'ice',
+                id: 'ice',
 				visible: true,
 				selectable: false,
 				evented: false
@@ -1507,14 +1498,11 @@
                 left: 0, 
                 top: 0,
 				id: 'boards',
-				//scaleX: below.width / img.width,
-                //scaleY: below.height / img.height,
 				visible: true,
 				selectable: false,
 				evented: false
             })
-			//boards.scaleToHeight(448)
-            overlayGroup.addWithUpdate(boards);
+			overlayGroup.addWithUpdate(boards);
 			overlayGroup.setCoords();
 			overlayGroup.bringToFront();
 			below.renderAll()
@@ -2913,6 +2901,8 @@
 				})
 			}
 		}
+
+		console.log()
 
 		var lines = belowFull.toDataURL();
 		var img = below.toDataURL()
