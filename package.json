@@ -1,7 +1,7 @@
 {
   "name": "fhm-rink-factory",
   "productName": "FHM Rink Factory",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A utility for making rinks for Franchise Hockey Manager",
   "main": "main.js",
   "scripts": {
@@ -23,14 +23,11 @@
     "electron-store": "^8.1.0",
     "fontname": "^1.0.1",
     "image-output": "^2.4.2",
-    "imagemagick-cli": "^0.5.0",
-    "jimp": "^0.16.1",
-    "node-font2base64": "^0.7.1"
+    "jimp": "0.22.12"
   },
-  "packageManager": "yarn@3.1.0",
   "devDependencies": {
-    "electron": "^27.1.0",
-    "electron-builder": "^24.6.4"
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
   },
   "build": {
     "appId": "com.ootputilities.rinkfactory",

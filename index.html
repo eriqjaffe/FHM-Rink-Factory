@@ -3632,6 +3632,123 @@
 	})
 	
 	$("#replaceColorSubmit").on("click",function(e) {
+        var canvas = below
+        var canvasName = "below"
+        var fuzz = parseInt($("#colorFuzz").val());
+        var color = $("#colorSquare").val();
+        var newcolor = $("#replacementColor").spectrum("get").toHexString();
+        var colorSquare = "#colorSquare"
+        var newColorSquare = "#replacemenColor"
+		var action = $(this).data("action");
+		var x = $(this).data("x");
+		var y = $(this).data("y");
+		newcolor = hexToRgb(newcolor)
+		if (canvas.getActiveObject()) {
+			var object = canvas.getActiveObject()
+			var idx = canvas.getObjects().indexOf(object)
+			if (object.get('type') == "image") {
+				//showOverlay("Processing Image...")
+				var pictureName = object.get('name');
+				$(colorSquare).removeClass("colorSquareActive").removeClass("colorSquareSelected");
+				
+				var pLeft = object.get('left')
+				var pTop = object.get('top')
+				var pScaleX = object.get('scaleX')
+				var pScaleY = object.get('scaleY')
+				var pX = x / pScaleX
+				var pY = y / pScaleY
+				var path = object.get('path')
+
+				const img = new Image()
+				if (action.slice(-17) == "replaceColorRange") {	
+					img.onload = function() {
+						const canvas = document.createElement('canvas');
+						const ctx = canvas.getContext('2d');
+
+						canvas.width = img.width;
+						canvas.height = img.height;
+
+						ctx.drawImage(img, 0, 0);
+
+						const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+						const pixels = imageData.data;
+						const startIndex = (y * canvas.width + x) * 4;
+						const baseColor = {
+							r: pixels[startIndex],
+							g: pixels[startIndex + 1],
+							b: pixels[startIndex + 2]
+						};
+
+						const stack = [{ x: x, y: y }];
+
+						while (stack.length) {
+							const { x, y } = stack.pop();
+							const index = (y * canvas.width + x) * 4;
+
+							if (
+								x >= 0 && x < canvas.width &&
+								y >= 0 && y < canvas.height &&
+								isColorMatch(pixels, index, baseColor, color, fuzz)
+							) {
+								pixels[index] = newcolor.r;
+								pixels[index + 1] = newcolor.g;
+								pixels[index + 2] = newcolor.b;
+
+								stack.push({ x: x + 1, y: y });
+								stack.push({ x: x - 1, y: y });
+								stack.push({ x: x, y: y + 1 });
+								stack.push({ x: x, y: y - 1 });
+							}
+						}
+
+						ctx.putImageData(imageData, 0, 0);
+
+						ipcRenderer.send('replace-color', {imgdata: canvas.toDataURL(), fuzz: fuzz, pictureName: pictureName, canvas: canvasName, imgLeft: imLeft, imgTop: imTop, path: path, scaleX: pScaleX, scaleY: pScaleY})
+					};
+					img.src = object._originalElement.currentSrc
+				} else {
+					img.onload = function() {
+						const canvas = document.createElement('canvas');
+						const ctx = canvas.getContext('2d');
+
+						canvas.width = img.width;
+						canvas.height = img.height;
+
+						ctx.drawImage(img, 0, 0);
+
+						const pixelData = ctx.getImageData(x, y, 1, 1).data; // Get pixel data at coordinates (x, y)
+						const color = { r: pixelData[0], g: pixelData[1], b: pixelData[2] }; // Extract RGB values from pixel data
+
+						// Continue with your existing code...
+						const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+						const pixels = imageData.data;
+
+						for (let i = 0; i < pixels.length; i += 4) {
+							const r = pixels[i];
+							const g = pixels[i + 1];
+							const b = pixels[i + 2];
+							const a = pixels[i + 3];
+
+							if (isColorWithinTolerance({ r, g, b }, color, fuzz)) {
+								pixels[i] = newcolor.r;
+								pixels[i + 1] = newcolor.g;
+								pixels[i + 2] = newcolor.b;
+							}
+						}
+
+						ctx.putImageData(imageData, 0, 0);
+
+						ipcRenderer.send('replace-color', {imgdata: canvas.toDataURL(), fuzz: fuzz, pictureName: pictureName, canvas: canvasName, imgLeft: imLeft, imgTop: imTop, path: path, scaleX: pScaleX, scaleY: pScaleY})
+						return false;
+					}
+					img.src = object._originalElement.currentSrc;
+				}
+				return false;
+			}
+		}	
+	})
+
+	/* $("#replaceColorSubmit").on("click",function(e) {
 		let action = $(this).data("action");
 		let x = $(this).data("x");
 		let y = $(this).data("y");
@@ -3662,7 +3779,7 @@
 				return false;
 			}
 		}	
-	})
+	}) */
 
 	$("#aboutRinkFactory").magnificPopup({
 		items: {
