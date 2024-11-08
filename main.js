@@ -17,6 +17,10 @@ const Store = require("electron-store");
 const chokidar = require("chokidar");
 const increment = require("add-filename-increment");
 const admzip = require("adm-zip");
+const { Resvg } = require("@resvg/resvg-js");
+const PSD = require("psd");
+const sizeOf = require("image-size");
+const heicConvert = require("heic-convert");
 
 const tempDir = os.tmpdir();
 const isMac = process.platform === "darwin";
@@ -40,7 +44,7 @@ const watcher = chokidar.watch(userFontsFolder, {
   persistent: true,
 });
 
-watcher.on("ready", () => {});
+watcher.on("ready", () => { });
 
 ipcMain.on("upload-font", (event, arg) => {
   let json = {};
@@ -133,79 +137,197 @@ ipcMain.on("drop-font", (event, arg) => {
 });
 
 ipcMain.on("upload-image", (event, arg) => {
-  let json = {};
   const options = {
     defaultPath: store.get("uploadImagePath", app.getPath("pictures")),
     properties: ["openFile"],
     filters: [
       {
         name: "Images",
-        extensions: ["png", "jpg", "jpeg", "gif", "bmp", "tiff", "svg"],
+        extensions: [
+          "png",
+          "jpg",
+          "jpeg",
+          "bmp",
+          "gif",
+          "tiff",
+          "webp",
+          "svg",
+          "psd",
+          "heic",
+          "heif"
+        ],
       },
     ],
   };
-  dialog.showOpenDialog(null, options).then((result) => {
-    if (!result.canceled) {
-      store.set("uploadImagePath", path.dirname(result.filePaths[0]));
-      if (path.extname(result.filePaths[0]) == ".svg") {
-        console.log("it's an svg!");
-        json.image = result.filePaths[0];
-        json.filename = path.basename(result.filePaths[0]);
-        event.sender.send("svg-convert", json);
-      } else {
-        Jimp.read(result.filePaths[0], (err, image) => {
-          if (err) {
-            json.filename = "error not an image";
-            json.image = "error not an image";
-            event.sender.send("add-image-response", json);
-          } else {
-            image.getBase64(Jimp.AUTO, (err, ret) => {
-              json.path = result.filePaths[0];
-              json.filename = path.basename(result.filePaths[0]);
-              json.image = ret;
-              //json.path = result.filePaths[0]
-              event.sender.send("add-image-response", json);
-            });
-          }
-        }).catch((err) => {
-          json.filename = "error not an image";
-          json.image = "error not an image";
-          event.sender.send("add-image-response", err);
-        });
-      }
+
+  readImage();
+
+  async function readImage() {
+    let json = {};
+    const userFile = await dialog.showOpenDialog(null, options);
+    if (userFile.canceled) {
+      event.sender.send("hide-overlay", null);
     } else {
-      res.end();
-      console.log("cancelled");
+      store.set("uploadImagePath", path.dirname(userFile.filePaths[0]));
+      switch (getExtension(userFile.filePaths[0]).toLowerCase()) {
+        case "heic":
+          let inputBuffer = fs.readFileSync(userFile.filePaths[0])
+          let outputBuffer = await heicConvert({ buffer: inputBuffer, format: 'PNG' })
+          fs.writeFileSync(os.tmpdir() + "/heicParse.png", outputBuffer)
+          fileToRead = os.tmpdir() + "/heicParse.png"
+          break;
+        case "heif":
+          let inputBuffer2 = fs.readFileSync(userFile.filePaths[0])
+          let outputBuffer2 = await heicConvert({ buffer: inputBuffer2, format: 'PNG' })
+          fs.writeFileSync(os.tmpdir() + "/heifParse.png", outputBuffer2)
+          fileToRead = os.tmpdir() + "/heifParse.png"
+          break;
+        case "bmp":
+          let bmpDimensions = sizeOf(arg);
+          event.sender.send("webp-convert", {
+            file: path.basename(arg),
+            path: arg,
+            width: bmpDimensions.width,
+            height: bmpDimensions.height,
+          });
+          return false;
+          break;
+        case "webp":
+          let webpDimensions = sizeOf(arg);
+          event.sender.send("webp-convert", {
+            file: path.basename(arg),
+            path: arg,
+            width: webpDimensions.width,
+            height: webpDimensions.height,
+          });
+          return false;
+          break;
+        case "gif":
+          let tmpGIF = await Jimp.read(userFile.filePaths[0]);
+          await tmpGIF.writeAsync(os.tmpdir() + "/gifParse.png");
+          fileToRead = os.tmpdir() + "/gifParse.png";
+          break;
+        case "tiff":
+          let tmpTIFF = await Jimp.read(userFile.filePaths[0]);
+          await tmpTIFF.writeAsync(os.tmpdir() + "/tiffParse.png");
+          fileToRead = os.tmpdir() + "/tiffParse.png";
+          break;
+        case "svg":
+          const svg = fs.readFileSync(userFile.filePaths[0]);
+          const opts = {
+            background: "rgba(255, 255, 255, 0)",
+            fitTo: {
+              mode: "width",
+              value: 512,
+            },
+          };
+          const resvg = new Resvg(svg, opts);
+          const pngData = resvg.render();
+          fileToRead = pngData.asPng();
+          break;
+        case "psd":
+          const psd = PSD.fromFile(userFile.filePaths[0]);
+          psd.parse();
+          await psd.image.saveAsPng(os.tmpdir() + "/psdParse.png");
+          fileToRead = os.tmpdir() + "/psdParse.png";
+          break;
+        default:
+          fileToRead = userFile.filePaths[0];
+          break;
+      }
+      const image = await Jimp.read(fileToRead);
+      image.autocrop()
+      image.getBase64(Jimp.AUTO, (err, ret) => {
+        json.path = userFile.filePaths[0];
+        json.filename = path.basename(userFile.filePaths[0]);
+        json.image = ret;
+      });
+      event.sender.send("add-image-response", json);
     }
-  });
+  }
 });
 
 ipcMain.on("drop-image", (event, arg) => {
   let json = {};
-  Jimp.read(arg, (err, image) => {
-    if (err) {
-      json.filename = "error not an image";
-      json.image = "error not an image";
-      event.sender.send("add-image-response", json);
-    } else {
-      image.getBase64(Jimp.AUTO, (err, ret) => {
-        json.path = arg;
-        json.filename = path.basename(arg);
-        json.image = ret;
-        //json.palette = palette
-        event.sender.send("add-image-response", json);
-      });
-    }
-  }).catch((err) => {
-    console.log(err);
-    json.filename = "error not an image";
-    json.image = "error not an image";
-    event.sender.send("add-image-response", err);
-  });
-});
 
-ipcMain.on("render-svg", (event, arg) => {
-  console.log(arg);
+  readImage();
+
+  async function readImage() {
+    switch (getExtension(arg).toLowerCase()) {
+      case "heic":
+        let inputBuffer = fs.readFileSync(arg)
+        let outputBuffer = await heicConvert({ buffer: inputBuffer, format: 'PNG' })
+        fs.writeFileSync(os.tmpdir() + "/heicParse.png", outputBuffer)
+        fileToRead = os.tmpdir() + "/heicParse.png"
+        break;
+      case "heif":
+        let inputBuffer2 = fs.readFileSync(arg)
+        let outputBuffer2 = await heicConvert({ buffer: inputBuffer2, format: 'PNG' })
+        fs.writeFileSync(os.tmpdir() + "/heifParse.png", outputBuffer2)
+        fileToRead = os.tmpdir() + "/heifParse.png"
+        break;
+      case "bmp":
+        let bmpDimensions = sizeOf(arg);
+        event.sender.send("webp-convert", {
+          file: path.basename(arg),
+          path: arg,
+          width: bmpDimensions.width,
+          height: bmpDimensions.height,
+        });
+        return false;
+        break;
+      case "webp":
+        let webpDimensions = sizeOf(arg);
+        event.sender.send("webp-convert", {
+          file: path.basename(arg),
+          path: arg,
+          width: webpDimensions.width,
+          height: webpDimensions.height,
+        });
+        return false;
+        break;
+      case "gif":
+        let tmpGIF = await Jimp.read(arg);
+        await tmpGIF.writeAsync(os.tmpdir() + "/gifParse.png");
+        fileToRead = os.tmpdir() + "/gifParse.png";
+        break;
+      case "tiff":
+        let tmpTIFF = await Jimp.read(arg);
+        await tmpTIFF.writeAsync(os.tmpdir() + "/tiffParse.png");
+        fileToRead = os.tmpdir() + "/tiffParse.png";
+        break;
+      case "svg":
+        const svg = fs.readFileSync(arg);
+        const opts = {
+          background: "rgba(255, 255, 255, 0)",
+          fitTo: {
+            mode: "width",
+            value: 512,
+          },
+        };
+        const resvg = new Resvg(svg, opts);
+        const pngData = resvg.render();
+        fileToRead = pngData.asPng();
+        break;
+      case "psd":
+        const psd = PSD.fromFile(arg);
+        psd.parse();
+        await psd.image.saveAsPng(os.tmpdir() + "/psdParse.png");
+        fileToRead = os.tmpdir() + "/psdParse.png";
+        break;
+      default:
+        fileToRead = arg;
+        break;
+    }
+    const image = await Jimp.read(fileToRead);
+    image.autocrop()
+    image.getBase64(Jimp.AUTO, (err, ret) => {
+      json.path = arg;
+      json.filename = path.basename(arg);
+      json.image = ret;
+    });
+    event.sender.send("add-image-response", json);
+  }
 });
 
 ipcMain.on("open-folder", (event, arg) => {
@@ -381,9 +503,9 @@ ipcMain.on("save-rink", (event, arg) => {
     var saveOptions = {
       defaultPath: increment(
         store.get("downloadPath", app.getPath("downloads")) +
-          "/" +
-          arg.name +
-          ".zip",
+        "/" +
+        arg.name +
+        ".zip",
         { fs: true }
       ),
     };
@@ -550,21 +672,21 @@ function createWindow() {
     // { role: 'appMenu' }
     ...(isMac
       ? [
-          {
-            label: app.name,
-            submenu: [
-              { role: "about" },
-              { type: "separator" },
-              { role: "services" },
-              { type: "separator" },
-              { role: "hide" },
-              { role: "hideOthers" },
-              { role: "unhide" },
-              { type: "separator" },
-              { role: "quit" },
-            ],
-          },
-        ]
+        {
+          label: app.name,
+          submenu: [
+            { role: "about" },
+            { type: "separator" },
+            { role: "services" },
+            { type: "separator" },
+            { role: "hide" },
+            { role: "hideOthers" },
+            { role: "unhide" },
+            { type: "separator" },
+            { role: "quit" },
+          ],
+        },
+      ]
       : []),
     // { role: 'fileMenu' }
     {

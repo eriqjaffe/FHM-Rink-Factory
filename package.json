@@ -16,14 +16,18 @@
   },
   "license": "ISC",
   "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "add-filename-increment": "^1.0.0",
     "adm-zip": "^0.5.10",
     "archiver": "^5.3.0",
     "chokidar": "^3.5.3",
     "electron-store": "^8.1.0",
     "fontname": "^1.0.1",
+    "heic-convert": "^2.1.0",
     "image-output": "^2.4.2",
-    "jimp": "0.22.12"
+    "image-size": "^1.1.1",
+    "jimp": "0.22.12",
+    "psd": "^3.4.0"
   },
   "devDependencies": {
     "electron": "^33.2.0",

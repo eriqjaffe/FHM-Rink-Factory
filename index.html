@@ -24,7 +24,7 @@
 	<link href='./scripts/magnific-popup.css' rel='stylesheet' type='text/css'>
 	<link href='./scripts/dd.css' rel='stylesheet' type='text/css'>
     <script>	
-		const { ipcRenderer } = require('electron');
+		const { ipcRenderer,webUtils } = require('electron');
 		const params = new URLSearchParams(window.location.search)
 		const port = params.get('port')
 		
@@ -159,7 +159,7 @@
 		var fontList = ['Acme','AthleticGothic','AthleticGothicShadow','BeavertonScript','Berkshire_Swash','Cantora_One','CaxtonRoman','Chela_One','Circus','Condiment','Cookie','Courgette','Croissant_One','Damion','Engagement','RawlingsFancyBlock','Germania_One','Graduate','Grand_Hotel','Jockey_One','Kansas','Kaushan_Script','Leckerli_One','Lily_Script_One','Lobster','Lobster_Two','Metal_Mania','Miniver','Molle','New_Rocker','Norican','OldEnglish','Oleo_Script','Oleo_Script_Swash_Caps','Pacifico','Pirata_One','Playball','ProFullBlock','RichardsonFancyBlock','Rubik_One','Rum_Raisin','Satisfy','Seymour_One','spl28','TiffanyRegular','Trade_Winds','Tuscan','UnifrakturCook','UnifrakturMaguntia','Vibur','Viga','Wellfleet','Wendy_One','Yellowtail']
 
 		const validFontTypes = ["ttf", "otf"]
-		const validImageTypes = ["png","jpg","jpeg","bmp","gif","tiff","svg"]
+		const validImageTypes = ["png","jpg","jpeg","bmp","gif","tiff","svg","webp","psd","heic","heif"]
   </script>
 <body>
 <div class="title">
@@ -743,7 +743,7 @@
 		e.stopPropagation();
 		e.preventDefault();
 		var files = e.originalEvent.dataTransfer.files;
-		dropFile(files[0].path)
+		dropFile(webUtils.getPathForFile(files[0]))
 		return false;
 	});
 
@@ -751,7 +751,8 @@
         if ($.inArray(getExtension(file).toLowerCase(), validFontTypes) > -1) {
             ipcRenderer.send('drop-font', file)
         } else {
-            if ($.inArray(getExtension(file).toLowerCase(), validImageTypes) > -1) {
+			if ($.inArray(getExtension(file).toLowerCase(), validImageTypes) > -1) {
+				showOverlay(null)
                 ipcRenderer.send('drop-image', file)
             } else {
                 console.log("it's an invalid file")
@@ -2728,45 +2729,8 @@
 	})
 
     $("#fakeImageButton").on("click",function() {
+		showOverlay(null)
 		ipcRenderer.send('upload-image', null)
-	})
-
-	ipcRenderer.on('svg-convert', (event, data) => {
-		console.log(data.image)
-		fabric.loadSVGFromURL(data.image,function(objects, options){
-			let svgData = fabric.util.groupSVGElements(objects, options);
-			svgData.scaleToWidth(3000);
-			svgData.set({
-				top: 0,
-				left: 0,
-				id: data.filename,
-				kind: "importedSVG"
-			})
-
-			svgData.on('selected',function() {
-				$("#fileName").html(svgData.get('id'));
-				if ($("#trimImageDiv").css("display") == "none") {
-					$("#trimImageDiv").css("display","block");
-					$("#uploadImageDiv").css("display","none");
-					$("#selectedImageDiv").css("display","block");
-				}
-				$("#tipSpan").html("Use Arrow keys to move image 1 pixel.<br>Use Shift + Arrow keys to move image 10 pixels.<br>Use Delete key to remove image.");
-				$(".copypaste").each(function() {
-					$(this).css("display","inline-block")
-				})
-				$(".svgNo").each(function() {
-					$(this).prop( "disabled", true );
-				})
-			})
-
-			below.add(svgData)
-			below.centerObject(svgData)
-			svgData.sendToBack();
-			below.renderAll()
-			below.setActiveObject(svgData)
-			//ipcRenderer.send('render-svg', {path: data, iamge: svgData.toDataURL()})
-			//console.log(svgData.toDataURL())
-		});
 	})
 
 	ipcRenderer.on('add-image-response', (event, data) => {
@@ -2827,6 +2791,7 @@
 			below.centerObject(image)
 			image.sendToBack();
 			below.renderAll();
+			hideOverlay()
 			//image.bringForward();
 			
 			// end fabricJS stuff
@@ -3135,6 +3100,14 @@
 		$("#overlay").css("display","none");	
 	})
 
+	function showOverlay(text) {
+		$("#overlay").css("display","inline-block");
+	}
+
+	function hideOverlay() {
+		$("#overlay").css("display","none");
+	}
+
 	ipcRenderer.on('hide-overlay', (event, arg) => {
 		$("#overlay").css("display","none");
 	})
@@ -3346,7 +3319,6 @@
 		if (canvas.getActiveObject()) {
 			$("#overlay").css("display","inline-block");
 			var object = canvas.getActiveObject()
-			console.log(object.scaleX)
 			var idx = canvas.getObjects().indexOf(object)
 			if (object.get('type') == "image") {
 				let imLeft = object.get("left");
@@ -3365,12 +3337,10 @@
 	})
 
 	ipcRenderer.on('imagemagick-response', (event, response) => {
-		console.log(response)
 		if (response.status != "success") {
 			alert(response.message)
 			//hideOverlay()
 		} else {
-			console.log(response.data)
 			let canvas = below
 			let data = response.data
 			let imLeft = response.pLeft
@@ -3445,6 +3415,62 @@
 				$("#overlay").css("display","none");
 			}
 		}
+	})
+
+	ipcRenderer.on('webp-convert', (event, response) => {
+		console.log(response)
+		const img = new Image();
+		img.onload = function() {
+			const tempCanvas = document.createElement('canvas');
+			const tempCtx = tempCanvas.getContext('2d');
+
+			tempCanvas.width = response.width;
+			tempCanvas.height = response.height;
+
+			tempCtx.drawImage(img, 0, 0);
+
+			let convertedImage = tempCanvas.toDataURL()
+
+			const imgObj = new Image()
+			imgObj.onload = function () {
+				let imLeft = 256
+				let imTop = (response.canvas == "jerseyLogoCanvas") ? 512 : 256
+				var image = new fabric.Image(imgObj);
+				image.set({
+					originX: 'center',
+					originY: 'center',
+					perPixelTargetFind: true,
+					centeredScaling: true,
+					centeredRotation: true,
+					name: response.file,
+					id: response.file
+				});
+				image.filters.push(new fabric.Image.filters.Resize({
+					resizeType: 'lanczos', // typo fixed
+					lanczosLobes: 2 // typo fixed
+				}));
+				image.on('object:modified',function() {
+					imLeft = image.get('left')
+					imTop = image.get('top');
+				})
+				image.on('selected',function() {
+					$("#fileName").html(image.get('id'));
+					if ($("#trimImageDiv").css("display") == "none") {
+						$("#trimImageDiv").css("display","block");
+						$("#uploadImageDiv").css("display","none");
+						$("#selectedImageDiv").css("display","block");
+					}
+					$("#tipSpan").html("Use Arrow keys to move image 1 pixel.<br>Use Shift + Arrow keys to move image 10 pixels.<br>Use Delete key to remove image.");
+					$(".copypaste").each(function() {
+						$(this).css("display","inline-block")
+					})
+				})
+				tempCanvas.remove()
+				addImage({filename: response.file, path:response.path, image:tempCanvas.toDataURL()})
+			}
+			imgObj.src = convertedImage
+		}
+		img.src = response.path
 	})
 
 	$("#removeColorRange").on("click",function(e) {
