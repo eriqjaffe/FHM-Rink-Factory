@@ -1,7 +1,7 @@
 {
   "name": "fhm-rink-factory",
   "productName": "FHM Rink Factory",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A utility for making rinks for Franchise Hockey Manager",
   "main": "main.js",
   "scripts": {
@@ -19,7 +19,8 @@
     "@resvg/resvg-js": "^2.6.2",
     "add-filename-increment": "^1.0.0",
     "adm-zip": "^0.5.10",
-    "archiver": "^5.3.0",
+    "archiver": "^7.0.1",
+    "archiver-utils": "^5.0.2",
     "chokidar": "^3.5.3",
     "electron-store": "^8.1.0",
     "fontname": "^1.0.1",
